@@ -1,0 +1,17 @@
+{
+  "id": "./",
+  "name": "Kontrola měření elektroměrů",
+  "short_name": "Měření",
+  "lang": "cs",
+  "description": "Offline kontrola elektroměrů a vývodů",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f6f8f9",
+  "theme_color": "#112b32",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
