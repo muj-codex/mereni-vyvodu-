@@ -1051,3 +1051,44 @@ details li {
     }
   }
 }
+
+.mtp-coefficient output {
+  display: flex;
+  align-items: center;
+  min-height: 52px;
+  padding: 14px 12px;
+  color: #31535e;
+  font-size: 19px;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+.aron-center {
+  grid-column: 1 / -1;
+  background: #687680;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: 750;
+  letter-spacing: 0.6px;
+}
+.aron-polarity {
+  display: block;
+  text-align: right;
+  font-size: 11px;
+  color: #6c8189;
+  margin: 6px 0 0;
+}
+
+.aron-branch {
+  margin-bottom: 10px;
+}
+.aron-branch:last-child {
+  margin-bottom: 0;
+}
+.aron-branch .mapping-row {
+  margin-bottom: 0;
+}

@@ -172,3 +172,66 @@ test('volitelný interval, MTP, pulz X a nezávislá historie při rozpracované
   await page.getByRole('button', { name: 'Nové měření', exact: true }).click();
   await expect(page.getByLabel('VÝROBNÍ ČÍSLO ELEKTROMĚRU', { exact: true })).toHaveValue('999');
 });
+
+test('500 V automaticky ARON, informační MTP, fyzické barvy a historie offline', async ({
+  page,
+  context,
+}) => {
+  await page.goto('/');
+  await page.getByRole('combobox', { name: 'MTP elektroměr', exact: true }).selectOption('250');
+  await expect(page.getByLabel('Korekční koeficient', { exact: true })).toHaveText('× 0,400');
+  await page.getByRole('combobox', { name: 'MTP primár', exact: true }).selectOption('300');
+  await page.getByRole('combobox', { name: 'MTP elektroměr', exact: true }).selectOption('100');
+  await expect(page.getByLabel('Korekční koeficient', { exact: true })).toHaveText('× 3,000');
+  await page.getByRole('combobox', { name: 'Napětí', exact: true }).selectOption('500');
+  await enterMeasurement(page, '000500', '5');
+  await expect(
+    page.getByRole('heading', { name: 'MIMO TOLERANCI – PROVĚŘIT ZAPOJENÍ' }),
+  ).toBeVisible();
+  const cards = page.locator('.aron-mapping');
+  expect(await cards.count()).toBeGreaterThan(0);
+  expect(await cards.count()).toBeLessThanOrEqual(2);
+  for (const center of await page.locator('.aron-center').all()) {
+    await expect(center).toHaveText('ARON');
+    await expect(center).toHaveCSS('background-color', 'rgb(104, 118, 128)');
+  }
+  await expect(page.locator('.mapping-card [data-phase="U2"]')).toHaveCount(0);
+  await expect(page.locator('.mapping-card [data-phase="shorted"]')).toHaveCount(0);
+  await expect(page.locator('.aron-mapping [data-phase="U1"]').first()).toHaveCSS(
+    'background-color',
+    'rgb(207, 52, 60)',
+  );
+  await expect(page.locator('.aron-mapping [data-phase="U3"]').first()).toHaveCSS(
+    'background-color',
+    'rgb(242, 201, 76)',
+  );
+  await noOverflow(page);
+  await page.screenshot({
+    path: `test-results/${test.info().project.name}-aron.png`,
+    fullPage: true,
+  });
+  await page.getByRole('button', { name: 'CO PROVĚŘIT NA ELEKTROMĚRU', exact: true }).click();
+  await page.getByRole('button', { name: 'DETAIL VÝSLEDKU', exact: true }).click();
+  await expect(page.getByText('9,20 A', { exact: true })).toBeVisible();
+  await expect(page.getByText('506,60 V', { exact: true })).toBeVisible();
+  await page.getByText('Všech 8 scénářů · technický detail').click();
+  await expect(page.locator('.scenario-list li')).toHaveCount(8);
+  await noOverflow(page);
+  await page.getByRole('button', { name: 'ULOŽIT MĚŘENÍ', exact: true }).click();
+  await expect(page.getByText('Offline připraveno', { exact: true })).toBeVisible();
+  await context.setOffline(true);
+  await page.reload();
+  await page.getByRole('button', { name: 'Výsledky měření', exact: false }).last().click();
+  await page.locator('.record-open').click();
+  await expect(page.locator('.aron-center').first()).toHaveText('ARON');
+  await page.getByRole('button', { name: 'Data / detail', exact: true }).click();
+  await expect(page.getByText('9,20 A', { exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Nové měření', exact: true }).click();
+  await page.getByRole('combobox', { name: 'Napětí', exact: true }).selectOption('400');
+  await enterMeasurement(page, '000400', '5');
+  await expect(page.locator('.aron-center')).toHaveCount(0);
+  await expect(page.locator('.mapping-card [data-phase="U2"]').first()).toHaveCSS(
+    'background-color',
+    'rgb(33, 131, 74)',
+  );
+});

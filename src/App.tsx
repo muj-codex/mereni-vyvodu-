@@ -9,6 +9,7 @@ import { Field, SelectField } from './ui/Fields';
 import { Detail, Icon, Inspection, PhaseBadge, Result } from './ui/components';
 import { Interval } from './ui/Interval';
 import { History } from './ui/History';
+import { MtpCoefficient } from './ui/MtpCoefficient';
 const STEPS = [
   'Základ / pulz',
   'Napětí a proudy',
@@ -332,6 +333,10 @@ export default function App() {
                       ))}
                       <option value="X">X · neznámá váha</option>
                     </SelectField>
+                    <MtpCoefficient
+                      primary={draft.config.actualMtp}
+                      meter={draft.config.meterMtp}
+                    />
                   </div>
                 </section>
                 <label className="optional-toggle card">

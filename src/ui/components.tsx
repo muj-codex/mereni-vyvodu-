@@ -2,7 +2,13 @@ import type { ReactNode } from 'react';
 import { PHASES, phaseColor, type Phase } from '../core/config';
 import { formatNumber } from '../core/numbers';
 import { inspectionInstructions } from '../core/diagnosis';
-import type { Diagnosis, MeasurementRecord, Scenario } from '../core/types';
+import type {
+  AronScenario,
+  Diagnosis,
+  MeasurementRecord,
+  ThreeCurrentScenario,
+  Scenario,
+} from '../core/types';
 export function Icon({ name, size = 22 }: { name: string; size?: number }) {
   const paths: Record<string, ReactNode> = {
     bolt: <path d="m13 2-9 12h7l-1 8 10-13h-7l1-7Z" />,
@@ -91,7 +97,7 @@ export function PhaseBadge({
     </span>
   );
 }
-export function Mapping({ scenario, title }: { scenario?: Scenario; title: string }) {
+export function Mapping({ scenario, title }: { scenario?: ThreeCurrentScenario; title: string }) {
   return (
     <section className="mapping-card">
       <h3>{title}</h3>
@@ -113,6 +119,69 @@ export function Mapping({ scenario, title }: { scenario?: Scenario; title: strin
     </section>
   );
 }
+export function AronMapping({ scenario, title }: { scenario?: AronScenario; title: string }) {
+  return (
+    <section className="mapping-card aron-mapping">
+      <h3>{title}</h3>
+      <div className="mapping-head">
+        <span>NAPĚTÍ</span>
+        <span />
+        <span>PROUD</span>
+      </div>
+      {([0, 1, 2] as const).map((position) => {
+        if (position === 1)
+          return (
+            <div className="mapping-row" key={position}>
+              <span className="aron-center" data-mode="aron">
+                ARON
+              </span>
+            </div>
+          );
+        const branch = position === 0 ? 0 : 1;
+        const source = scenario?.currents[branch] ?? position;
+        return (
+          <div className="aron-branch" key={position}>
+            <div className="mapping-row">
+              <PhaseBadge kind="U" phase={position} />
+              <span className="connect">←</span>
+              <PhaseBadge kind="I" phase={source} />
+            </div>
+            {scenario?.reversed[branch] && (
+              <span className="aron-polarity">
+                Obrácená polarita k/l · člen {branch === 0 ? '1–3' : '4–6'}
+              </span>
+            )}
+          </div>
+        );
+      })}
+    </section>
+  );
+}
+function ScenarioMapping({
+  scenario,
+  title,
+  aron = false,
+}: {
+  scenario?: Scenario;
+  title: string;
+  aron?: boolean;
+}) {
+  if (scenario?.kind === 'aron') return <AronMapping scenario={scenario} title={title} />;
+  if (!scenario && aron) return <AronMapping title={title} />;
+  return <Mapping scenario={scenario} title={title} />;
+}
+export function scenarioLabel(s: Scenario): string {
+  if (s.kind === 'aron')
+    return s.currents
+      .map(
+        (source, index) =>
+          `L${index === 0 ? 1 : 3}←I${source + 1} (k/l ${s.reversed[index] ? 'obráceně' : 'souhlasně'})`,
+      )
+      .join(' · ');
+  return s.permutation
+    .map((p, t) => `U${t + 1}←${s.shorted[p] ? 'zkrat I' + (p + 1) : 'I' + (p + 1)}`)
+    .join(' · ');
+}
 export function Result({ diagnosis, serial }: { diagnosis: Diagnosis; serial: string }) {
   const ok = diagnosis.status === 'ok';
   return (
@@ -132,7 +201,10 @@ export function Result({ diagnosis, serial }: { diagnosis: Diagnosis; serial: st
       </p>
       {ok ? (
         <>
-          <Mapping title="Přiřazení fází – referenční zapojení" />
+          <ScenarioMapping
+            aron={diagnosis.mode === 'aron'}
+            title="Přiřazení fází – referenční zapojení"
+          />
           <p className="hint">
             Přímé porovnání Kyoritsu × Energis je v toleranci ±15 %. Chybové varianty se
             nezobrazují.
@@ -142,7 +214,7 @@ export function Result({ diagnosis, serial }: { diagnosis: Diagnosis; serial: st
         <>
           {diagnosis.best ? (
             <>
-              <Mapping scenario={diagnosis.best} title="Hlavní varianta modelu" />
+              <ScenarioMapping scenario={diagnosis.best} title="Hlavní varianta modelu" />
               <p className="hint">
                 Barevné přiřazení je diagnostická pomůcka. Samotná shoda celkového výkonu
                 nepotvrzuje zapojení.
@@ -155,7 +227,7 @@ export function Result({ diagnosis, serial }: { diagnosis: Diagnosis; serial: st
             </div>
           )}
           {diagnosis.alternative && (
-            <Mapping scenario={diagnosis.alternative} title="DALŠÍ MOŽNÁ VARIANTA" />
+            <ScenarioMapping scenario={diagnosis.alternative} title="DALŠÍ MOŽNÁ VARIANTA" />
           )}
         </>
       )}
@@ -200,6 +272,12 @@ export function Detail({ record }: { record: MeasurementRecord }) {
   const { input, diagnosis: d } = record;
   return (
     <>
+      {d.mode === 'aron' && (
+        <p className="notice">
+          ARON · dva wattmetrové členy: (L1–L2, I1) + (L3–L2, I3). Svorky napětí 2/5/8; proudové
+          členy 1–3 a 4–6. Napěťový sekundár 100 V.
+        </p>
+      )}
       <section className="card">
         <h3>Porovnání výkonů</h3>
         <dl className="data-list">
@@ -289,7 +367,7 @@ export function Detail({ record }: { record: MeasurementRecord }) {
       </section>
       {d.scenarios.length > 0 && (
         <details className="card technical">
-          <summary>Všech 48 scénářů · technický detail</summary>
+          <summary>Všech {d.scenarios.length} scénářů · technický detail</summary>
           <p className="hint">
             Shoda = max(0; 100 × (1 − |model − Energis| / max(|Kyoritsu|; 0,001))). Jde o
             normalizovanou blízkost výkonů.
@@ -297,13 +375,7 @@ export function Detail({ record }: { record: MeasurementRecord }) {
           <ol className="scenario-list">
             {d.scenarios.map((s) => (
               <li key={s.id}>
-                <span>
-                  {s.permutation
-                    .map(
-                      (p, t) => `U${t + 1}←${s.shorted[p] ? 'zkrat I' + (p + 1) : 'I' + (p + 1)}`,
-                    )
-                    .join(' · ')}
-                </span>
+                <span>{scenarioLabel(s)}</span>
                 <strong>
                   {formatNumber(s.power)} kW · {formatNumber(s.score)} %
                 </strong>
@@ -321,10 +393,19 @@ export function Detail({ record }: { record: MeasurementRecord }) {
           U1 = 0°, U2 = −120°, U3 = +120°. PF &gt; 0 je lagging, PF &lt; 0 leading. Směr činného
           výkonu určuje samostatně znaménko P.
         </p>
+        {d.mode === 'aron' && (
+          <p>
+            ARON počítá Re[(V1−V2)·conj(Ia) + (V3−V2)·conj(Ib)] včetně polarity k/l každého členu.
+            L2 je společná napěťová reference, nikoli vyzkratovaná větev. Převody 500/100 V a
+            proudového sekundáru se při přepočtu na primární kW vykrátí. Model předpokládá
+            třívodičovou síť; skutečná I2 zůstává v naměřených datech a v kalibraci fázoru V2.
+          </p>
+        )}
         <p>
           Ekvivalentní fázové napětí každé fáze je |P| × 1000 / (I × |PF|). Zadaných přibližně 500 V
-          se nepoužívá jako napětí fáze vůči neutrálu. Pro chybné přiřazení se používá ekvivalentní
-          napětí cílové fáze a úhel a proud zdrojové fyzické fáze.
+          se nepoužívá jako napětí fáze vůči neutrálu. Při 400 V se používá ekvivalentní napětí
+          cílové fáze a úhel a proud zdrojové fyzické fáze. V režimu ARON se nejprve vytvoří
+          rozdílové fázory V1−V2 a V3−V2.
         </p>
         <p>
           Nulové I, PF nebo P mohou znemožnit kalibraci napětí. V takovém případě se neodhaduje

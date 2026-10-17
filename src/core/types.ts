@@ -29,16 +29,29 @@ export interface MeasurementInput {
   kyoritsu: number;
   energis: number;
 }
-export interface Scenario {
+interface ScenarioResult {
   id: string;
-  permutation: Triple<Phase>;
-  shorted: Triple<boolean>;
   power: number | null;
   error: number | null;
   score: number | null;
   issues: string[];
 }
+export interface ThreeCurrentScenario extends ScenarioResult {
+  kind?: 'three-current';
+  permutation: Triple<Phase>;
+  shorted: Triple<boolean>;
+}
+export interface AronScenario extends ScenarioResult {
+  kind: 'aron';
+  currents: [0 | 2, 0 | 2];
+  // Polarity is attached to the meter member (1–3 / 4–6), not the source phase.
+  reversed: [boolean, boolean];
+  branchPowers: [number | null, number | null];
+}
+export type Scenario = ThreeCurrentScenario | AronScenario;
 export interface Diagnosis {
+  // Absent on legacy records: retain their original three-current interpretation.
+  mode?: 'three-current' | 'aron';
   status: 'ok' | 'outside' | 'near-zero';
   differencePercent: number | null;
   scenarios: Scenario[];

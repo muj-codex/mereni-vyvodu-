@@ -34,7 +34,7 @@ HTTP adresa počítače v místní síti umožní prohlédnout rozhraní, ale Sa
 1. **Základ / pulz:** povinné výrobní číslo jako řetězec, převody MTP, napětí, váhy pulzu; volitelná kontrola stavů se shodným intervalem Energis.
 2. **Napětí a proudy:** U1–U3 a I1–I3, každá fyzická fáze vlastní pevnou barvou.
 3. **PF a výkony:** znaménkové PF a P po fázích, celkové Kyoritsu a trend Energis. Tlačítka ± pomáhají na číselné klávesnici iPhonu.
-4. **Vizuální výsledek:** přímá tolerance ±15 %, mimo toleranci hlavní model a nejvýše jedna alternativa do 5 procentních bodů shody. Čísla modelu zůstávají v detailu.
+4. **Vizuální výsledek:** při 400 V původní tříproudový model (48 scénářů); při 500 V automaticky ARON (8 scénářů dvou wattmetrových členů). Přímá tolerance ±15 %, mimo toleranci hlavní model a nejvýše jedna alternativa do 5 procentních bodů shody. Čísla modelu zůstávají v detailu.
 5. **Co prověřit:** interní pokyny na elektroměru, terminologie k/l.
 6. **Detail:** skutečná data, model, všech 48 scénářů a předpoklady.
 7. **Výsledky měření:** samostatná hlavní záložka s historií, plným uloženým záznamem, výběrem, e-mailem a TSV.
@@ -51,7 +51,7 @@ Data jsou v IndexedDB pouze v daném prohlížeči/originu. Rozpracované vstupy
 
 ## Fyzika a hranice modelu
 
-Podrobná konvence, předpoklady registru, nulové vstupy a místa pro budoucí rozšíření jsou v [docs/physics.md](docs/physics.md). Není použit starý model obráceného P při k/l ani předpoklad stejného zatížení fází. Bluetooth se bez potvrzeného protokolu KEW 6305 neimplementuje.
+Podrobná konvence, předpoklady registru, nulové vstupy a místa pro budoucí rozšíření jsou v [docs/physics.md](docs/physics.md). Při 400 V zůstává původní vyzkratování větve jako 0 kW; k/l se v tomto modelu nezaměňuje s negací výkonu. Samostatný ARON při 500 V naopak fyzikálně obrací znaménko příslušného wattmetrového členu při opačné polaritě k/l. Ani jeden model nepředpokládá stejné zatížení fází. Bluetooth se bez potvrzeného protokolu KEW 6305 neimplementuje.
 
 ## Testy
 
@@ -78,5 +78,9 @@ scripts/        generování offline cache z produkčního sestavení
 tests/          unit testy a testy úložiště
 e2e/            reálné prohlížečové scénáře
 ```
+
+Informační **Korekční koeficient** na úvodní kartě zobrazuje `MTP primár / MTP elektroměr` na tři desetinná místa. Je pouze vizuální, nepřidává se do záznamu a neškáluje diagnostiku nebo export. Existující volitelná intervalová korekce MTP zůstává beze změny.
+
+Režim se pro nové měření vybírá pouze napětím: **400 V → tříproudový**, **500 V → ARON**. Kyoritsu stále zadává a ukládá všechny tři U/I/PF/P. Výsledková ARON tabulka má prostřední šedé pole pouze „ARON“; nejde o chybějící ani vyzkratovanou L2. Nové záznamy nesou režim a verzi modelu 1.1.0. Staré záznamy bez režimu zůstávají ve své původní interpretaci, včetně dříve uložených 500 V měření; historie se zpětně nepřepočítává.
 
 Centrální konstanty: `CONFIG.alternativeMaxScoreGap`, `CONFIG.tolerancePercent`, `PHASE_COLORS`, `PULSE_OPTIONS`. Fyzické barvy nejsou nikdy odvozené z cílové napěťové pozice. Připravený volitelný `currentAngleDegrees` umožňuje budoucí skutečný úhel z přístroje. Další importní adaptér, PDF nebo typ měřáku lze přidat bez přesunu matematiky do UI.

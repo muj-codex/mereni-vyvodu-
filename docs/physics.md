@@ -23,7 +23,7 @@ Zadané U se ukládá a exportuje, ale nepoužije se automaticky jako napětí f
 
 **Nulové nebo neurčitelné vstupy:** při I = 0 a P = 0 je příspěvek zdrojové větve nulový. Ueq její napěťové pozice však ze samotných těchto dat určit nelze. Totéž nastává při PF = 0, nebo P = 0 při nenulovém I. Neodhadujeme napětí z jiné fáze ani z konfigurace 400/500 V. Pokud je alespoň jeden scénář neurčitelný, zobrazí se dostupná čísla v detailu, ale nevybírá se hlavní varianta z neúplného pořadí. K úplnému vyhodnocení je pak potřeba dodatečná informace o konfiguraci sítě / skutečných fázových napětích a úhlech. Aktivní P při nulovém I nebo PF formulář odmítá jako nekonzistentní.
 
-## Scénáře
+## Tříproudové scénáře – 400 V
 
 6 permutací proudů × 8 masek = 48. Maska vyzkratování patří **fyzickému proudu**, nikoli cílové napěťové pozici. Vyzkratovaná větev má přesně 0 kW; žádná negace P. Zatížení je po fázích nezávislé.
 
@@ -32,6 +32,30 @@ Scénáře se řadí podle absolutního rozdílu výkonu vůči Energis. Shoda m
 `max(0; 100 × (1 − |Pmodel − PEnergis| / max(|PKyoritsu|; 0,001)))`.
 
 Shoda není statistický odhad. Hlavní obrazovka má nejlepší scénář a nejvýše jeden další, pokud rozdíl shody nepřesáhne `CONFIG.alternativeMaxScoreGap = 5` procentních bodů. Více scénářů může mít stejný výkon; například všech šest permutací s plným vyzkratováním je nerozlišitelných. Úplný seznam zůstává v technickém detailu. Barvy vždy sledují identitu: U1/I1 červená, U2/I2 zelená, U3/I3 žlutá; vyzkratování šedé.
+
+## ARON – 500 V, model 1.1.0
+
+Volba 500 V automaticky aktivuje samostatný dvouwattmetrový model. Tři naměřené primární fáze Kyoritsu zůstávají kompletní. Napěťové svorky elektroměru 2/5/8 odpovídají L1/L2/L3; proudové členy 1–3 a 4–6 odpovídají L1 a L3. Společná napěťová reference je L2.
+
+Z každého ekvivalentního fázového napětí a výše definovaného nominálního úhlu vytvoříme komplexní `V1`, `V2`, `V3`. Proudové fázory se odvozují ze skutečných I/PF/P, včetně leading/lagging a znamének P. Výpočet:
+
+`W1 = Re[(V1 − V2) × conj(Ia)] / 1000`
+
+`W3 = Re[(V3 − V2) × conj(Ib)] / 1000`
+
+`Pmodel = polarity1 × W1 + polarity3 × W3`, polarity je +1 nebo −1.
+
+Dvě přiřazení `[Ia, Ib] = [I1, I3]` a `[I3, I1]` × čtyři kombinace polarit členů dávají **8 scénářů**. Polarita patří wattmetrovému členu na elektroměru. Žádné vyzkratované scénáře nejsou bez konkrétního fyzikálního podkladu přidány. L2 není proudový člen v Aronově součtu, ale její napěťový fázor je součástí **obou** rozdílových vazeb; I2/PF2/P2 se nadále zachovávají i pro jeho kalibraci, historii a export.
+
+Primární model je ekvivalentem skutečného sekundárního měření: napěťová transformace při referenci 500 V je 500/100 = 5, proudový převod `r = skutečný primár / 5 A`. Výkon sekundáru je `Pprimary / (5 × r)`. Převod zpět na primární kW pro srovnání s Kyoritsu/Energis tyto faktory přesně vykrátí. Proto se do primární diagnostiky **nepřimíchává** zobrazovaný poměr skutečného/naprogramovaného MTP. Napěťových 100 V je sdružený sekundár, ne fázové napětí vůči neutrálu. Skutečné rozdílové napěťové fázory se získávají z dosavadního kalibračního adaptéru P/I/|PF|, nikoli slepým použitím zadaných 500 V jako fázového napětí.
+
+Aronova identita celkového činného výkonu platí pro **třívodičovou síť**, kde `I1 + I2 + I3 = 0` jako komplexní fázory; zatížení nemusí být symetrické. Pokud síť má významný proud neutrálem či jinou topologii, tento model není platný. Chybějící kalibrace napěťového fázoru společné L2 znemožní výběr hlavní varianty; nevydává se za I2 = 0 nebo vyzkratování.
+
+Kladná i záporná PF se používají jako u dosavadního fázorového adaptéru. Pro symetrický příklad při PF = 0,8 vycházejí wattmetrové příspěvky `Ull I cos(30° + acos(0,8))` a `Ull I cos(30° − acos(0,8))`; test je porovnává nezávisle s implementací. Nesymetrický test používá tři komplexní proudy se součtem nula.
+
+Tolerance je i zde **±15 %**, nikdy ±25 %. Pořadí, definice shody a mez 5 procentních bodů pro jednu alternativu se nemění. Vizuální prostřední šedé pole obsahuje pouze „ARON“; jeho barva označuje režim, nikoli fyzickou fázi. Barevné vstupy a uložená primární měření zůstávají C1 (včetně zelené U2/I2). V řádcích větví zůstávají U1/I1 červené a U3/I3 žluté i při záměně proudů.
+
+Starší záznamy bez pole `mode` se nepřepočítávají a zobrazují svůj původní tříproudový výsledek i při tehdejší hodnotě 500 V. Nové záznamy ukládají explicitní režim. Schéma IndexedDB a exportních sloupců se nemění.
 
 ## Ruční kontrola stavů a pulzy – předpoklad k potvrzení podle elektroměru
 

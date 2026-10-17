@@ -1,7 +1,8 @@
 import { CONFIG, PHASES } from './config';
 import type { Phase } from './config';
 import { branchPower, equivalentPhaseVoltage } from './physics';
-import type { Diagnosis, MeasurementInput, Scenario, Triple } from './types';
+import { generateAronScenarios } from './aron';
+import type { Diagnosis, MeasurementInput, ThreeCurrentScenario, Triple } from './types';
 export const PERMUTATIONS: Triple<Phase>[] = [
   [0, 1, 2],
   [0, 2, 1],
@@ -28,7 +29,7 @@ export function directComparison(kyoritsu: number, energis: number) {
     differencePercent,
   };
 }
-export function generateScenarios(input: MeasurementInput): Scenario[] {
+export function generateScenarios(input: MeasurementInput): ThreeCurrentScenario[] {
   const voltages = input.phases.map(equivalentPhaseVoltage);
   const scale = Math.max(Math.abs(input.kyoritsu), CONFIG.powerEpsilonKw);
   return PERMUTATIONS.flatMap((permutation, permIndex) =>
@@ -74,7 +75,13 @@ export function diagnose(input: MeasurementInput): Diagnosis {
     warnings.push(
       'Kyoritsu je téměř nulové. Procentní srovnání ani spolehlivý výběr varianty nelze určit.',
     );
-  const scenarios = comparison.status === 'outside' ? generateScenarios(input) : [];
+  const mode = input.config.voltage === 500 ? 'aron' : 'three-current';
+  const scenarios =
+    comparison.status === 'outside'
+      ? mode === 'aron'
+        ? generateAronScenarios(input)
+        : generateScenarios(input)
+      : [];
   const incomplete = scenarios.some((s) => s.power === null);
   if (incomplete)
     warnings.push(
@@ -88,6 +95,7 @@ export function diagnose(input: MeasurementInput): Diagnosis {
       : undefined;
   return {
     ...comparison,
+    mode,
     scenarios,
     best,
     alternative,
@@ -102,9 +110,22 @@ export function inspectionInstructions(diagnosis: Diagnosis): string[] {
     return [
       'Nejprve ověřit vstupní údaje a souběžnost odečtů. Z dostupných dat nelze určit hlavní variantu.',
     ];
+  if (diagnosis.best.kind === 'aron') {
+    const scenario = diagnosis.best;
+    const result = scenario.currents.map((source, index) => {
+      const target = index === 0 ? 1 : 3;
+      const member = index === 0 ? '1–3' : '4–6';
+      return `Na elektroměru prověřit člen ${member} (L${target}): proud I${source + 1}, ${scenario.reversed[index] ? 'obrácená polarita k/l' : 'souhlasná polarita k/l'}.`;
+    });
+    if (scenario.currents[0] === 2)
+      result.unshift('Na elektroměru prověřit vzájemnou záměnu proudových větví L1 ↔ L3.');
+    result.push('Napěťové vazby ARON: svorky 2–5 (L1–L2) a 8–5 (L3–L2); napěťový sekundár 100 V.');
+    return result;
+  }
+  const best = diagnosis.best;
   const result: string[] = [];
-  diagnosis.best.permutation.forEach((source, target) => {
-    if (diagnosis.best!.shorted[source])
+  best.permutation.forEach((source, target) => {
+    if (best.shorted[source])
       result.push(
         `Na elektroměru na L${target + 1} prověřit zapojení k/l (větev I${source + 1} v modelu nepřispívá).`,
       );
