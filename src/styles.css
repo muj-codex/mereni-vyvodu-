@@ -1092,3 +1092,59 @@ details li {
 .aron-branch .mapping-row {
   margin-bottom: 0;
 }
+
+/* Field and result hierarchy without increasing the layout scale. */
+h1,
+h2,
+h3,
+legend {
+  font-weight: 700;
+}
+.field > span,
+button,
+.record-top {
+  font-weight: 600;
+}
+input,
+select {
+  font-weight: 500;
+  color: #142e3a;
+}
+.main-percent {
+  font-weight: 800;
+  font-size: 1.3rem;
+  overflow-wrap: anywhere;
+}
+.current-values dd {
+  font-weight: 700;
+  margin: 0 0 0.7rem;
+}
+.current-values dt {
+  font-size: 0.85rem;
+  margin-bottom: 0.2rem;
+}
+.current-phase {
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  color: #101b23;
+}
+fieldset {
+  min-width: 0;
+  border: 0;
+}
+fieldset:disabled {
+  opacity: 0.5;
+}
+.result-banner.intermediate {
+  background: #fff0d6;
+  color: #784700;
+}
+.identification-summary p {
+  overflow-wrap: anywhere;
+}
+.history-item .record-open {
+  min-width: 0;
+}
+.history-toolbar {
+  flex-wrap: wrap;
+}

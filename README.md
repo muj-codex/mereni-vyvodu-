@@ -24,7 +24,7 @@ Vývojový režim záměrně neregistruje service worker. `build` provede TypeSc
 
 1. Publikujte obsah `dist/` na statický **HTTPS** hosting. Pro GitHub Pages je připraven ručně spouštěný workflow `.github/workflows/pages.yml`: po nahrání změn zapněte v repozitáři **Settings → Pages → Source: GitHub Actions** a v **Actions → Publish PWA to GitHub Pages → Run workflow** spusťte publikaci. Výslednou adresu poskytne GitHub v dokončeném workflow.
 2. Otevřete publikovanou HTTPS adresu v Safari. Při prvním připojení počkejte na „Offline připraveno“.
-3. V nabídce sdílení **Safari** zvolte **Přidat na plochu**. Spusťte aplikaci z ikony. Nabídka Safari je potřeba jen k instalaci; sdílení naměřených dat v aplikaci používá výhradně e-mail.
+3. V nabídce sdílení **Safari** zvolte **Přidat na plochu**. Spusťte aplikaci z ikony. Nabídka Safari je potřeba jen k instalaci; sdílení naměřených dat v aplikaci používá systémové Web Share API s textovým/e-mailovým fallbackem.
 4. Vyzkoušejte opětovné otevření v režimu letadlo před odjezdem do terénu.
 
 HTTP adresa počítače v místní síti umožní prohlédnout rozhraní, ale Safari na ní nepovolí plnohodnotné PWA/offline funkce. Pro provoz na telefonu je nutné HTTPS. Lokální `localhost` na vývojovém počítači je výjimka pro testy. Aplikace zatím nebyla z této pracovní kopie veřejně nasazena ani otestována na fyzickém iOS zařízení.
@@ -43,9 +43,9 @@ HTTP adresa počítače v místní síti umožní prohlédnout rozhraní, ale Sa
 
 ## Export a ochrana dat
 
-E-mail a TSV obsahují pouze 16 povolených sloupců naměřených dat; nikdy diagnostiku, modelové skóre ani pracovní pokyny. Sloupce jsou centrálně v `src/data/export.ts`. TSV nemá hlavičku, používá skutečné tabulátory a jeden řádek na měření. Pro zachování počátečních nul předformátujte první sloupec Excelu jako **Text**; aplikace číslo nikdy nepřevádí na číslo.
+E-mail a TSV obsahují naměřené hodnoty, společnou identifikaci a podepsané procentní rozdíly; neobsahují modelové scénáře, skóre ani pracovní pokyny. Sloupce jsou centrálně v `src/data/export.ts`. TSV nemá hlavičku, používá skutečné tabulátory a jeden řádek na měření. Pro zachování počátečních nul předformátujte sloupec čísla elektroměru v Excelu jako **Text**; aplikace číslo nikdy nepřevádí na číslo.
 
-`mailto:` otevře výchozí poštu bez příjemce. U delších výběrů (URL nad 1800 znaků) aplikace nabídne naměřený text ke zkopírování a otevření pošty. Ruční fallback je dostupný i při chybějícím klientovi nebo schránce. Aplikace neodesílá e-mail sama, negarantuje doručení, nepoužívá obecný iOS share sheet ani vlastní mailserver.
+`mailto:` otevře výchozí poštu bez příjemce. U delších výběrů (URL nad 1800 znaků) aplikace nabídne naměřený text ke zkopírování a otevření pošty. Ruční fallback je dostupný i při chybějícím klientovi nebo schránce. Aplikace neodesílá e-mail sama, negarantuje doručení, používá systémové sdílení tam, kde ho prohlížeč podporuje, a nemá vlastní mailserver.
 
 Data jsou v IndexedDB pouze v daném prohlížeči/originu. Rozpracované vstupy se průběžně ukládají do localStorage. Vymazání webových dat, odinstalace, soukromé prohlížení nebo zásah správy úložiště iOS mohou lokální data odstranit. Aplikace žádá o persistentní úložiště, pokud jej prohlížeč podporuje; pravidelný export je přesto nutný. Změna domény znamená jiné úložiště. Mazání jednotlivého záznamu vyžaduje potvrzení; celá historie navíc opsání **SMAZAT**.
 
@@ -84,3 +84,19 @@ Informační **Korekční koeficient** na úvodní kartě zobrazuje `MTP primár
 Režim se pro nové měření vybírá pouze napětím: **400 V → tříproudový**, **500 V → ARON**. Kyoritsu stále zadává a ukládá všechny tři U/I/PF/P. Výsledková ARON tabulka má prostřední šedé pole pouze „ARON“; nejde o chybějící ani vyzkratovanou L2. Nové záznamy nesou režim a verzi modelu 1.1.0. Staré záznamy bez režimu zůstávají ve své původní interpretaci, včetně dříve uložených 500 V měření; historie se zpětně nepřepočítává.
 
 Centrální konstanty: `CONFIG.alternativeMaxScoreGap`, `CONFIG.tolerancePercent`, `PHASE_COLORS`, `PULSE_OPTIONS`. Fyzické barvy nejsou nikdy odvozené z cílové napěťové pozice. Připravený volitelný `currentAngleDegrees` umožňuje budoucí skutečný úhel z přístroje. Další importní adaptér, PDF nebo typ měřáku lze přidat bez přesunu matematiky do UI.
+
+## Prompt 1 – proudová diagnostika NN / VN (aplikace 1.2.0)
+
+Přepínač **Proudový režim NN / VN** otevře samostatný proudový formulář. Společná identifikace pro všechny režimy obsahuje editovatelné datum, textové číslo elektroměru, lokalitu a samostatné pole/umístění. Čas vyhodnocení se ukládá na sekundy. NN nabízí jen trafostanice a MTP /5 A, VN jen rozvodny a MTP /1 A; proudová reference VN pochází ze SCADA.
+
+Kyoritsu MODEL 8112 má pevné rozsahy 200 mA, 2 A a 20 A (1, 10 a 100 mA na mV). Multimetr přijímá mV i V, čárku i tečku. Výsledek každé fáze obsahuje očekávaný a skutečný sekundár v mA/A, přepočtený primár a podepsaný rozdíl. Nulová reference vrací neurčené procento. Proudový režim nikdy nepočítá činný výkon.
+
+Volitelné napětí pracuje mezi fázemi. Sekundár má editovatelný výchozí stav 100 V a zaznamenává ruční změny. VN primár je ze SCADA (6 / 10 / 10,3 kV nebo vlastní hodnoty). Při podobných hodnotách aplikace neurčuje pořadí větví. Návrh přiřazení vyžaduje rozlišené normalizované hodnoty, malou chybu a odstup od další varianty; nezaručuje fyzické zapojení.
+
+3f procento je `(Energis − Kyoritsu) / Kyoritsu × 100`. Pracovní karta rozlišuje ≤15 %, mezizónu do 25 % a větší odchylky; historie má jako hlavní výsledek skutečná procenta. Informační koeficient MTP zůstává mimo tyto výpočty i export.
+
+IndexedDB používá stejný název a store jako původní aplikace. Upgrade z v1 na v2 ponechá všechny existující objekty beze změny. Nový proudový typ ukládá původní vstupy, jednotky, rozsah, zdroj a odvozené hodnoty; staré 3f záznamy zůstávají čitelné i bez nové identifikace.
+
+**ZÁLOHOVAT HISTORII** stáhne TSV s hlavičkou a jednotnými sloupci pro smíšenou historii. **KOPÍROVAT PRO EXCEL** kopíruje řádky podle typu měření bez hlavičky. Centrální definice sloupců jsou v `src/data/export.ts`. TS/R a umístění jsou vždy samostatné buňky. Systémové sdílení nabídne soubor TSV, pokud ho prohlížeč podporuje, jinak text; při nepodporovaném sdílení zůstává ruční kopírování a e-mail. Verze aplikace a čas buildu jsou v nápovědě.
+
+Offline E2E čeká po kliknutí na uložení na vyčištění čísla elektroměru: tento stav nastává teprve po dokončení IndexedDB transakce. Samotné dokončení kliknutí nečeká na asynchronní handler a dříve dovolovalo reload během zápisu. Testy neobsahují pevná časová čekání.

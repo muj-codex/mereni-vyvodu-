@@ -1,3 +1,4 @@
+import { signedPercent, workingBand } from '../core/current';
 import type { ReactNode } from 'react';
 import { PHASES, phaseColor, type Phase } from '../core/config';
 import { formatNumber } from '../core/numbers';
@@ -186,16 +187,23 @@ export function Result({ diagnosis, serial }: { diagnosis: Diagnosis; serial: st
   const ok = diagnosis.status === 'ok';
   return (
     <>
-      <div className={`result-banner ${ok ? 'success' : 'warning'}`}>
+      <div className={`result-banner ${workingBand(diagnosis.differencePercent)}`}>
         <Icon name={ok ? 'check' : 'alert'} size={28} />
         <h2>
           {ok
             ? 'MĚŘENÍ V POŘÁDKU'
-            : diagnosis.status === 'near-zero'
-              ? 'VÝKON TÉMĚŘ NULOVÝ'
-              : 'MIMO TOLERANCI – PROVĚŘIT ZAPOJENÍ'}
+            : diagnosis.differencePercent !== null && Math.abs(diagnosis.differencePercent) <= 25
+              ? 'OVĚŘIT SOUBĚŽNOST MĚŘENÍ'
+              : diagnosis.status === 'near-zero'
+                ? 'VÝKON TÉMĚŘ NULOVÝ'
+                : 'MIMO TOLERANCI – PROVĚŘIT ZAPOJENÍ'}
         </h2>
       </div>
+      <p className="main-percent">{signedPercent(diagnosis.differencePercent)}</p>
+      <p className="hint">
+        + = Energis ukazuje více · − = Energis ukazuje méně. Pracovní pomůcka; konečné rozhodnutí
+        dělá člověk.
+      </p>
       <p className="serial-line">
         Elektroměr <strong>{serial}</strong>
       </p>

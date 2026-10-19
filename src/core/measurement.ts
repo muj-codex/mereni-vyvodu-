@@ -1,3 +1,4 @@
+import { emptyIdentification, validateIdentification } from './current';
 import { parseNumber, localTimestamp } from './numbers';
 import { diagnose } from './diagnosis';
 import { compareEnergy } from './energy';
@@ -19,6 +20,7 @@ export const DEFAULT_CONFIG: MeterConfig = {
 export function emptyDraft(config: MeterConfig = DEFAULT_CONFIG): FormDraft {
   return {
     serial: '',
+    identification: emptyIdentification(),
     config: structuredClone(config),
     intervalEnabled: false,
     interval: { from: '', to: '', start: '', end: '', energis: '' },
@@ -31,8 +33,10 @@ export function readDraft(
   draft: FormDraft,
   includeInterval = draft.intervalEnabled,
 ): MeasurementInput {
-  if (!/^\d+$/.test(draft.serial))
-    throw new Error('Vyplňte výrobní číslo elektroměru pouze číslicemi.');
+  if (!draft.serial.trim()) throw new Error('Vyplňte číslo elektroměru.');
+  if (draft.identification) validateIdentification(draft.identification);
+  if (![draft.config.actualMtp, draft.config.meterMtp].every((v) => Number.isFinite(v) && v > 0))
+    throw Error('MTP musí být kladný.');
   const phases = draft.phases.map((phase, index) => {
     const p = Object.fromEntries(
       Object.entries(phase).map(([k, v]) => [k, parseNumber(v)]),
@@ -63,6 +67,7 @@ export function readDraft(
   if (interval) compareEnergy(interval, draft.config);
   return {
     serial: draft.serial,
+    identification: draft.identification ? structuredClone(draft.identification) : undefined,
     config: structuredClone(draft.config),
     phases,
     kyoritsu,
@@ -75,7 +80,12 @@ export function createRecord(input: MeasurementInput, date = new Date()): Measur
     id: crypto.randomUUID(),
     savedAt: date.toISOString(),
     localTimestamp: localTimestamp(date),
-    input,
+    input: {
+      ...input,
+      identification: input.identification
+        ? { ...input.identification, time: localTimestamp(date).split(' ')[1] }
+        : undefined,
+    },
     diagnosis: diagnose(input),
   });
 }

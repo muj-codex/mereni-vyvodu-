@@ -48,8 +48,8 @@ describe('Přímé porovnání', () => {
   it.each([8.4999, 11.5001])('mimo hranici (%s)', (n) =>
     expect(directComparison(10, n).status).toBe('outside'),
   );
-  it('zachovává znaménka a používá absolutní jmenovatel', () =>
-    expect(directComparison(-10, -11).differencePercent).toBe(-10));
+  it('používá podepsanou referenci podle Promptu 1', () =>
+    expect(directComparison(-10, -11).differencePercent).toBe(10));
   it.each([0, 0.00001, -0.00001])('bezpečná nula %s', (n) =>
     expect(directComparison(n, 1).status).toBe('near-zero'),
   );
@@ -210,9 +210,11 @@ describe('Stavy, korekce MTP a pulzy', () => {
   });
 });
 describe('Data, čas, reset a export', () => {
+  it('číslo elektroměru je textové včetně písmen a počátečních nul', () =>
+    expect(readDraft({ ...referenceDraft(), serial: '000AB12' }).serial).toBe('000AB12'));
   it('počáteční nuly výrobního čísla', () =>
     expect(readDraft(referenceDraft()).serial).toBe('0012345678'));
-  it.each(['', '123,0', '12a'])('odmítá výrobní číslo %s', (serial) =>
+  it.each(['', '   '])('odmítá výrobní číslo %s', (serial) =>
     expect(() => readDraft({ ...referenceDraft(), serial })).toThrow(),
   );
   it('timestamp na sekundy je uložen při vytvoření', () => {
@@ -254,16 +256,16 @@ describe('Data, čas, reset a export', () => {
     ).rejects.toThrow('full');
     expect(draft.serial).toBe(reference.serial);
   });
-  it('TSV jeden záznam, 16 skutečných tabulátorových sloupců', () => {
+  it('TSV jeden záznam, 22 skutečných tabulátorových sloupců', () => {
     const r = createRecord(reference);
     const t = toTSV([r]);
-    expect(t.split('\t')).toHaveLength(16);
-    expect(t.split('\t')[0]).toBe('0012345678');
-    expect(t.split('\t')[2]).toBe('506');
-    expect(t.split('\t')[14]).toBe('9,2');
+    expect(t.split('\t')).toHaveLength(22);
+    expect(t.split('\t')[4]).toBe('0012345678');
+    expect(t.split('\t')[6]).toBe('506');
+    expect(t.split('\t')[18]).toBe('9,2');
   });
   it('TSV více řádků a centrální pořadí', () => {
-    expect(EXPORT_COLUMNS).toHaveLength(16);
+    expect(EXPORT_COLUMNS).toHaveLength(22);
     expect(
       toTSV([createRecord(reference), createRecord({ ...reference, serial: '0002' })]).split('\n'),
     ).toHaveLength(2);

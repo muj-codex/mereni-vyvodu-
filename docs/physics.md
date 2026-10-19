@@ -2,7 +2,7 @@
 
 ## Přímé porovnání
 
-`100 × (Energis − Kyoritsu) / |Kyoritsu|`. Obě znaménka výkonů se zachovávají. Rozdíl včetně hranice ±15 % je v toleranci a nespouští diagnostické scénáře. Pro `|Kyoritsu| < 0,001 kW` se procento a výběr varianty neurčují. Energis může být vyhlazený/opožděný; scénář odvozený z jediného celkového výkonu není důkaz zapojení.
+`100 × (Energis − Kyoritsu) / Kyoritsu`. Obě znaménka výkonů se zachovávají. Rozdíl včetně hranice ±15 % je v toleranci a nespouští diagnostické scénáře. Pro `|Kyoritsu| < 0,001 kW` se procento a výběr varianty neurčují. Energis může být vyhlazený/opožděný; scénář odvozený z jediného celkového výkonu není důkaz zapojení.
 
 ## Fázory
 

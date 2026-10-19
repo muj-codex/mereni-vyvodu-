@@ -1,9 +1,12 @@
+import { CurrentMeasurement } from './ui/CurrentMeasurement';
+import { IdentificationFields, IdentificationSummary } from './ui/Identification';
+import { emptyIdentification } from './core/current';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { MTP_OPTIONS, PHASES, PULSE_OPTIONS, type Phase } from './core/config';
 import { createRecord, emptyDraft, readDraft, saveAndReset } from './core/measurement';
 import { parseNumber } from './core/numbers';
 import { compareEnergy } from './core/energy';
-import type { FormDraft, MeasurementRecord, MeterConfig } from './core/types';
+import type { FormDraft, HistoryRecord, MeterConfig } from './core/types';
 import { createHistory } from './data/history';
 import { Field, SelectField } from './ui/Fields';
 import { Detail, Icon, Inspection, PhaseBadge, Result } from './ui/components';
@@ -25,7 +28,7 @@ function restoreDraft(): FormDraft {
     if (raw) {
       const d = JSON.parse(raw);
       if (typeof d.serial === 'string' && d.phases?.length === 3 && d.config && d.interval)
-        return d;
+        return { ...d, identification: d.identification ?? emptyIdentification() };
     }
   } catch {
     /* Storage unavailable: retain current-session functionality. */
@@ -33,10 +36,11 @@ function restoreDraft(): FormDraft {
   return emptyDraft();
 }
 export default function App() {
+  const [mode, setMode] = useState<'power' | 'current'>('power');
   const [draft, setDraft] = useState<FormDraft>(restoreDraft),
     [step, setStep] = useState(0),
     [tab, setTab] = useState<'measure' | 'history'>('measure');
-  const [records, setRecords] = useState<MeasurementRecord[]>([]),
+  const [records, setRecords] = useState<HistoryRecord[]>([]),
     [loading, setLoading] = useState(true),
     [error, setError] = useState(''),
     [message, setMessage] = useState(''),
@@ -124,8 +128,8 @@ export default function App() {
       ) as FormDraft['phases'],
     });
   function navigate(next: number, skipInterval = false) {
-    if (next > 0 && !/^\d+$/.test(draft.serial)) {
-      setError('Vyplňte výrobní číslo elektroměru pouze číslicemi.');
+    if (next > 0 && !draft.serial.trim()) {
+      setError('Vyplňte číslo elektroměru.');
       return;
     }
     if (step === 1 && next > 1) {
@@ -223,292 +227,324 @@ export default function App() {
           />
         ) : (
           <>
-            <div className="step-top">
-              <span>KROK {step + 1} Z 6</span>
-              <span>{step < 3 ? 'ZADÁNÍ MĚŘENÍ' : 'VYHODNOCENÍ'}</span>
+            <div className="segmented" aria-label="Režim měření">
+              <button className={mode === 'power' ? 'active' : ''} onClick={() => setMode('power')}>
+                3f měření
+              </button>
+              <button
+                className={mode === 'current' ? 'active' : ''}
+                onClick={() => setMode('current')}
+              >
+                Proudový režim NN / VN
+              </button>
             </div>
-            <div className="progress-track">
-              {STEPS.map((s, i) => (
-                <button
-                  key={s}
-                  aria-label={`Krok ${i + 1}: ${s}`}
-                  aria-current={step === i ? 'step' : undefined}
-                  className={i <= step ? 'filled' : ''}
-                  onClick={() => {
-                    if (i <= step) navigate(i);
-                  }}
-                  disabled={i > step}
-                />
-              ))}
-            </div>
-            <div className="page-heading">
-              <span className="eyebrow">
-                {step === 0
-                  ? 'ELEKTROMĚR'
-                  : step <= 2
-                    ? 'KYORITSU · KEW 6305'
-                    : 'DIAGNOSTIKA MĚŘENÍ'}
-              </span>
-              <h1 ref={heading} tabIndex={-1}>
-                {STEPS[step]}
-              </h1>
-              <p>
-                {
-                  [
-                    'Identifikace elektroměru a nastavení převodů.',
-                    'Zadejte skutečné hodnoty po jednotlivých fázích.',
-                    'Znaménka PF a činného výkonu se vyhodnocují odděleně.',
-                    'Barva vždy označuje fyzickou fázi.',
-                    'Interní pomůcka pro kontrolu na elektroměru.',
-                    'Naměřené hodnoty a podrobnosti modelu.',
-                  ][step]
-                }
-              </p>
-            </div>
-            {step === 0 && (
+            {mode === 'current' ? (
+              <CurrentMeasurement
+                notify={notify}
+                onSave={async (r) => {
+                  await repo.add(r);
+                  setRecords((prev) => [r, ...prev]);
+                }}
+              />
+            ) : (
               <>
-                <section className="card serial-card">
-                  <Field
-                    label="VÝROBNÍ ČÍSLO ELEKTROMĚRU"
-                    value={draft.serial}
-                    onChange={(serial) => change({ ...draft, serial })}
-                    serial
-                    id="serial"
-                  />
-                  <span className="hint">Povinný údaj · počáteční nuly se zachovají</span>
-                </section>
-                <section className="card">
-                  <h3>Převody a pulzy</h3>
-                  <div className="field-grid">
-                    <SelectField
-                      label="MTP primár"
-                      value={draft.config.actualMtp}
-                      onChange={(v) => config('actualMtp', Number(v))}
-                    >
-                      {MTP_OPTIONS.map((v) => (
-                        <option key={v} value={v}>
-                          {v}/5 A
-                        </option>
-                      ))}
-                    </SelectField>
-                    <SelectField
-                      label="MTP elektroměr"
-                      value={draft.config.meterMtp}
-                      onChange={(v) => config('meterMtp', Number(v))}
-                    >
-                      {MTP_OPTIONS.map((v) => (
-                        <option key={v} value={v}>
-                          {v}/5 A
-                        </option>
-                      ))}
-                    </SelectField>
-                    <SelectField
-                      label="Napětí"
-                      value={draft.config.voltage}
-                      onChange={(v) => config('voltage', Number(v))}
-                    >
-                      <option value={400}>400 V</option>
-                      <option value={500}>500 V</option>
-                    </SelectField>
-                    <SelectField
-                      label="Váha pulzu elektroměru"
-                      value={draft.config.meterPulse}
-                      onChange={(v) => config('meterPulse', Number(v))}
-                    >
-                      {PULSE_OPTIONS.map((p) => (
-                        <option key={p.value} value={p.value}>
-                          {p.label}
-                        </option>
-                      ))}
-                    </SelectField>
-                    <SelectField
-                      label="Váha pulzu Energis"
-                      value={draft.config.energisPulse}
-                      onChange={(v) => config('energisPulse', v === 'X' ? 'X' : Number(v))}
-                    >
-                      {PULSE_OPTIONS.map((p) => (
-                        <option key={p.value} value={p.value}>
-                          {p.label}
-                        </option>
-                      ))}
-                      <option value="X">X · neznámá váha</option>
-                    </SelectField>
-                    <MtpCoefficient
-                      primary={draft.config.actualMtp}
-                      meter={draft.config.meterMtp}
-                    />
-                  </div>
-                </section>
-                <label className="optional-toggle card">
-                  <span>
-                    <strong>Porovnat stavy s Energis</strong>
-                    <small>Volitelná kontrola spotřeby za interval</small>
-                  </span>
-                  <input
-                    type="checkbox"
-                    checked={draft.intervalEnabled}
-                    onChange={(e) => change({ ...draft, intervalEnabled: e.target.checked })}
-                  />
-                </label>
-                {draft.intervalEnabled && (
-                  <Interval draft={draft} onChange={(interval) => change({ ...draft, interval })} />
-                )}
-                <div className="step-actions">
-                  <button className="button primary" onClick={() => navigate(1, true)}>
-                    PŘESKOČIT → KYORITSU <Icon name="arrow" />
-                  </button>
-                  {draft.intervalEnabled && (
+                <div className="step-top">
+                  <span>KROK {step + 1} Z 6</span>
+                  <span>{step < 3 ? 'ZADÁNÍ MĚŘENÍ' : 'VYHODNOCENÍ'}</span>
+                </div>
+                <div className="progress-track">
+                  {STEPS.map((s, i) => (
                     <button
-                      className="button secondary"
+                      key={s}
+                      aria-label={`Krok ${i + 1}: ${s}`}
+                      aria-current={step === i ? 'step' : undefined}
+                      className={i <= step ? 'filled' : ''}
                       onClick={() => {
-                        const v = draft.interval;
-                        try {
-                          if (!Object.values(v).every(Boolean))
-                            throw Error('Vyplňte všechny údaje intervalu nebo kontrolu přeskočte.');
-                          /* Full interval check independent of phase inputs. */ validateInterval(
-                            draft,
-                          );
-                          navigate(1);
-                        } catch (e) {
-                          setError((e as Error).message);
-                        }
+                        if (i <= step) navigate(i);
                       }}
-                    >
-                      Použít kontrolu stavů a pokračovat
-                    </button>
-                  )}
-                </div>
-              </>
-            )}
-            {step === 1 && (
-              <>
-                <div className="phase-inputs">
-                  {PHASES.map((p) => (
-                    <section className="card phase-input-card" key={p}>
-                      <div className="phase-input-title">
-                        <PhaseBadge kind="U" phase={p} />
-                        <PhaseBadge kind="I" phase={p} />
-                        <span>FÁZE {p + 1}</span>
-                      </div>
-                      <div className="two-fields">
-                        <Field
-                          label={`U${p + 1}`}
-                          unit="V"
-                          value={draft.phases[p].u}
-                          onChange={(v) => phase(p, 'u', v)}
-                        />
-                        <Field
-                          label={`I${p + 1}`}
-                          unit="A"
-                          value={draft.phases[p].i}
-                          onChange={(v) => phase(p, 'i', v)}
-                        />
-                      </div>
-                    </section>
+                      disabled={i > step}
+                    />
                   ))}
                 </div>
-                <p className="hint">
-                  Čárka i tečka jsou podporované. Fáze 1 je červená, 2 zelená a 3 žlutá.
-                </p>
-                <div className="step-actions">
-                  <button className="button primary" onClick={() => navigate(2)}>
-                    POKRAČOVAT NA PF A VÝKONY <Icon name="arrow" />
-                  </button>
-                  <button className="button secondary" onClick={() => navigate(0)}>
-                    Zpět
-                  </button>
-                </div>
-              </>
-            )}
-            {step === 2 && (
-              <>
-                <div className="phase-inputs">
-                  {PHASES.map((p) => (
-                    <section className="card phase-input-card" key={p}>
-                      <div className="phase-input-title">
-                        <PhaseBadge kind="I" phase={p} />
-                        <span>FÁZE {p + 1}</span>
-                      </div>
-                      <div className="two-fields">
-                        <Field
-                          label={`PF${p + 1}`}
-                          value={draft.phases[p].pf}
-                          signed
-                          onChange={(v) => phase(p, 'pf', v)}
-                        />
-                        <Field
-                          label={`P${p + 1}`}
-                          unit="kW"
-                          value={draft.phases[p].p}
-                          signed
-                          onChange={(v) => phase(p, 'p', v)}
-                        />
-                      </div>
-                    </section>
-                  ))}
-                </div>
-                <p className="hint">
-                  +PF: lagging / induktivní · −PF: leading / kapacitní.
-                  <br />
-                  Tlačítko ± mění znaménko i na klávesnici iPhonu.
-                </p>
-                <section className="card total-card">
-                  <h3>Okamžité porovnání</h3>
-                  <Field
-                    label="Celkový výkon Kyoritsu"
-                    unit="kW"
-                    value={draft.kyoritsu}
-                    signed
-                    onChange={(kyoritsu) => change({ ...draft, kyoritsu })}
-                  />
-                  <Field
-                    label="Trend Energis"
-                    unit="kW"
-                    value={draft.energis}
-                    signed
-                    onChange={(energis) => change({ ...draft, energis })}
-                  />
-                  <p className="hint">
-                    Kyoritsu je okamžitá reference. Trend Energis může být časově opožděný.
+                <div className="page-heading">
+                  <span className="eyebrow">
+                    {step === 0
+                      ? 'ELEKTROMĚR'
+                      : step <= 2
+                        ? 'KYORITSU · KEW 6305'
+                        : 'DIAGNOSTIKA MĚŘENÍ'}
+                  </span>
+                  <h1 ref={heading} tabIndex={-1}>
+                    {STEPS[step]}
+                  </h1>
+                  <p>
+                    {
+                      [
+                        'Identifikace elektroměru a nastavení převodů.',
+                        'Zadejte skutečné hodnoty po jednotlivých fázích.',
+                        'Znaménka PF a činného výkonu se vyhodnocují odděleně.',
+                        'Barva vždy označuje fyzickou fázi.',
+                        'Interní pomůcka pro kontrolu na elektroměru.',
+                        'Naměřené hodnoty a podrobnosti modelu.',
+                      ][step]
+                    }
                   </p>
-                </section>
-                <div className="step-actions">
-                  <button className="button primary" onClick={() => navigate(3)}>
-                    VYHODNOTIT MĚŘENÍ <Icon name="arrow" />
-                  </button>
-                  <button className="button secondary" onClick={() => navigate(1)}>
-                    Zpět
-                  </button>
                 </div>
-              </>
-            )}
-            {step >= 3 && evaluation.record && (
-              <>
-                {step === 3 ? (
-                  <Result diagnosis={evaluation.record.diagnosis} serial={draft.serial} />
-                ) : step === 4 ? (
-                  <Inspection diagnosis={evaluation.record.diagnosis} />
-                ) : (
-                  <Detail record={{ ...evaluation.record, savedAt: '', localTimestamp: '' }} />
+                {step === 0 && (
+                  <>
+                    <IdentificationFields
+                      serial={draft.serial}
+                      value={draft.identification ?? emptyIdentification()}
+                      onSerial={(serial) => change({ ...draft, serial })}
+                      onChange={(identification) => change({ ...draft, identification })}
+                    />
+                    <section className="card">
+                      <h3>Převody a pulzy</h3>
+                      <div className="field-grid">
+                        <SelectField
+                          label="MTP primár"
+                          value={draft.config.actualMtp}
+                          onChange={(v) => config('actualMtp', Number(v))}
+                        >
+                          {MTP_OPTIONS.map((v) => (
+                            <option key={v} value={v}>
+                              {v}/5 A
+                            </option>
+                          ))}
+                        </SelectField>
+                        <SelectField
+                          label="MTP elektroměr"
+                          value={draft.config.meterMtp}
+                          onChange={(v) => config('meterMtp', Number(v))}
+                        >
+                          {MTP_OPTIONS.map((v) => (
+                            <option key={v} value={v}>
+                              {v}/5 A
+                            </option>
+                          ))}
+                        </SelectField>
+                        <SelectField
+                          label="Napětí"
+                          value={draft.config.voltage}
+                          onChange={(v) => config('voltage', Number(v))}
+                        >
+                          <option value={400}>400 V</option>
+                          <option value={500}>500 V</option>
+                        </SelectField>
+                        <SelectField
+                          label="Váha pulzu elektroměru"
+                          value={draft.config.meterPulse}
+                          onChange={(v) => config('meterPulse', Number(v))}
+                        >
+                          {PULSE_OPTIONS.map((p) => (
+                            <option key={p.value} value={p.value}>
+                              {p.label}
+                            </option>
+                          ))}
+                        </SelectField>
+                        <SelectField
+                          label="Váha pulzu Energis"
+                          value={draft.config.energisPulse}
+                          onChange={(v) => config('energisPulse', v === 'X' ? 'X' : Number(v))}
+                        >
+                          {PULSE_OPTIONS.map((p) => (
+                            <option key={p.value} value={p.value}>
+                              {p.label}
+                            </option>
+                          ))}
+                          <option value="X">X · neznámá váha</option>
+                        </SelectField>
+                        <MtpCoefficient
+                          primary={draft.config.actualMtp}
+                          meter={draft.config.meterMtp}
+                        />
+                      </div>
+                    </section>
+                    <label className="optional-toggle card">
+                      <span>
+                        <strong>Porovnat stavy s Energis</strong>
+                        <small>Volitelná kontrola spotřeby za interval</small>
+                      </span>
+                      <input
+                        type="checkbox"
+                        checked={draft.intervalEnabled}
+                        onChange={(e) => change({ ...draft, intervalEnabled: e.target.checked })}
+                      />
+                    </label>
+                    {draft.intervalEnabled && (
+                      <Interval
+                        draft={draft}
+                        onChange={(interval) => change({ ...draft, interval })}
+                      />
+                    )}
+                    <div className="step-actions">
+                      <button className="button primary" onClick={() => navigate(1, true)}>
+                        PŘESKOČIT → KYORITSU <Icon name="arrow" />
+                      </button>
+                      {draft.intervalEnabled && (
+                        <button
+                          className="button secondary"
+                          onClick={() => {
+                            const v = draft.interval;
+                            try {
+                              if (!Object.values(v).every(Boolean))
+                                throw Error(
+                                  'Vyplňte všechny údaje intervalu nebo kontrolu přeskočte.',
+                                );
+                              /* Full interval check independent of phase inputs. */ validateInterval(
+                                draft,
+                              );
+                              navigate(1);
+                            } catch (e) {
+                              setError((e as Error).message);
+                            }
+                          }}
+                        >
+                          Použít kontrolu stavů a pokračovat
+                        </button>
+                      )}
+                    </div>
+                  </>
                 )}
-                <div className="step-actions">
-                  {step < 5 && (
-                    <button className="button secondary" onClick={() => navigate(step + 1)}>
-                      {step === 3 ? 'CO PROVĚŘIT NA ELEKTROMĚRU' : 'DETAIL VÝSLEDKU'}
-                      <Icon name="arrow" />
-                    </button>
-                  )}
-                  <button className="button primary" disabled={busy} onClick={() => void save()}>
-                    <Icon name="check" />
-                    {busy ? 'UKLÁDÁM…' : 'ULOŽIT MĚŘENÍ'}
-                  </button>
-                  <button
-                    className="text-button centered"
-                    onClick={() => navigate(step === 3 ? 2 : step - 1)}
-                  >
-                    Zpět {step === 3 ? 'k hodnotám' : ''}
-                  </button>
-                </div>
+                {step === 1 && (
+                  <>
+                    <div className="phase-inputs">
+                      {PHASES.map((p) => (
+                        <section className="card phase-input-card" key={p}>
+                          <div className="phase-input-title">
+                            <PhaseBadge kind="U" phase={p} />
+                            <PhaseBadge kind="I" phase={p} />
+                            <span>FÁZE {p + 1}</span>
+                          </div>
+                          <div className="two-fields">
+                            <Field
+                              label={`U${p + 1}`}
+                              unit="V"
+                              value={draft.phases[p].u}
+                              onChange={(v) => phase(p, 'u', v)}
+                            />
+                            <Field
+                              label={`I${p + 1}`}
+                              unit="A"
+                              value={draft.phases[p].i}
+                              onChange={(v) => phase(p, 'i', v)}
+                            />
+                          </div>
+                        </section>
+                      ))}
+                    </div>
+                    <p className="hint">
+                      Čárka i tečka jsou podporované. Fáze 1 je červená, 2 zelená a 3 žlutá.
+                    </p>
+                    <div className="step-actions">
+                      <button className="button primary" onClick={() => navigate(2)}>
+                        POKRAČOVAT NA PF A VÝKONY <Icon name="arrow" />
+                      </button>
+                      <button className="button secondary" onClick={() => navigate(0)}>
+                        Zpět
+                      </button>
+                    </div>
+                  </>
+                )}
+                {step === 2 && (
+                  <>
+                    <div className="phase-inputs">
+                      {PHASES.map((p) => (
+                        <section className="card phase-input-card" key={p}>
+                          <div className="phase-input-title">
+                            <PhaseBadge kind="I" phase={p} />
+                            <span>FÁZE {p + 1}</span>
+                          </div>
+                          <div className="two-fields">
+                            <Field
+                              label={`PF${p + 1}`}
+                              value={draft.phases[p].pf}
+                              signed
+                              onChange={(v) => phase(p, 'pf', v)}
+                            />
+                            <Field
+                              label={`P${p + 1}`}
+                              unit="kW"
+                              value={draft.phases[p].p}
+                              signed
+                              onChange={(v) => phase(p, 'p', v)}
+                            />
+                          </div>
+                        </section>
+                      ))}
+                    </div>
+                    <p className="hint">
+                      +PF: lagging / induktivní · −PF: leading / kapacitní.
+                      <br />
+                      Tlačítko ± mění znaménko i na klávesnici iPhonu.
+                    </p>
+                    <section className="card total-card">
+                      <h3>Okamžité porovnání</h3>
+                      <Field
+                        label="Celkový výkon Kyoritsu"
+                        unit="kW"
+                        value={draft.kyoritsu}
+                        signed
+                        onChange={(kyoritsu) => change({ ...draft, kyoritsu })}
+                      />
+                      <Field
+                        label="Trend Energis"
+                        unit="kW"
+                        value={draft.energis}
+                        signed
+                        onChange={(energis) => change({ ...draft, energis })}
+                      />
+                      <p className="hint">
+                        Kyoritsu je okamžitá reference. Trend Energis může být časově opožděný.
+                      </p>
+                    </section>
+                    <div className="step-actions">
+                      <button className="button primary" onClick={() => navigate(3)}>
+                        VYHODNOTIT MĚŘENÍ <Icon name="arrow" />
+                      </button>
+                      <button className="button secondary" onClick={() => navigate(1)}>
+                        Zpět
+                      </button>
+                    </div>
+                  </>
+                )}
+                {step >= 3 && evaluation.record && (
+                  <>
+                    <IdentificationSummary
+                      serial={draft.serial}
+                      value={evaluation.record.input.identification}
+                    />
+                    {step === 3 ? (
+                      <Result diagnosis={evaluation.record.diagnosis} serial={draft.serial} />
+                    ) : step === 4 ? (
+                      <Inspection diagnosis={evaluation.record.diagnosis} />
+                    ) : (
+                      <Detail record={evaluation.record} />
+                    )}
+                    <div className="step-actions">
+                      {step < 5 && (
+                        <button className="button secondary" onClick={() => navigate(step + 1)}>
+                          {step === 3 ? 'CO PROVĚŘIT NA ELEKTROMĚRU' : 'DETAIL VÝSLEDKU'}
+                          <Icon name="arrow" />
+                        </button>
+                      )}
+                      <button
+                        className="button primary"
+                        disabled={busy}
+                        onClick={() => void save()}
+                      >
+                        <Icon name="check" />
+                        {busy ? 'UKLÁDÁM…' : 'ULOŽIT MĚŘENÍ'}
+                      </button>
+                      <button
+                        className="text-button centered"
+                        onClick={() => navigate(step === 3 ? 2 : step - 1)}
+                      >
+                        Zpět {step === 3 ? 'k hodnotám' : ''}
+                      </button>
+                    </div>
+                  </>
+                )}
               </>
             )}
           </>
@@ -553,6 +589,9 @@ export default function App() {
         <div className="modal-backdrop">
           <section className="modal" role="dialog" aria-modal="true" aria-labelledby="help-title">
             <h2 id="help-title">Práce v terénu</h2>
+            <p className="hint">
+              Verze {__APP_VERSION__} · build {new Date(__BUILD_DATE__).toLocaleString('cs-CZ')}
+            </p>
             <h3>Instalace na iPhone / iPad</h3>
             <p>
               Otevřete aplikaci v Safari přes HTTPS. V nabídce sdílení Safari zvolte „Přidat na

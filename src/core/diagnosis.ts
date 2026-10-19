@@ -20,7 +20,9 @@ export function directComparison(kyoritsu: number, energis: number) {
   if (![kyoritsu, energis].every(Number.isFinite)) throw new Error('Neplatný výkon.');
   if (Math.abs(kyoritsu) < CONFIG.powerEpsilonKw)
     return { status: 'near-zero' as const, differencePercent: null };
-  const differencePercent = ((energis - kyoritsu) / Math.abs(kyoritsu)) * 100;
+  const differencePercent = ((energis - kyoritsu) / kyoritsu) * 100;
+  if (!Number.isFinite(differencePercent))
+    throw new Error('Výkon je příliš velký pro bezpečné vyhodnocení.');
   return {
     status:
       Math.abs(differencePercent) <= CONFIG.tolerancePercent + 1e-9

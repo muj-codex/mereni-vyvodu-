@@ -1,3 +1,4 @@
+import { isCurrent } from '../src/data/export';
 import 'fake-indexeddb/auto';
 import { describe, expect, it } from 'vitest';
 import { createElement } from 'react';
@@ -230,11 +231,12 @@ describe('ARON vzhled, informace MTP a zachování dat', () => {
     await store.close();
     const reopened = createHistory(name);
     const [saved] = await reopened.all();
+    if (isCurrent(saved)) throw Error('Expected power record');
     expect(saved.input.phases).toEqual(input.phases);
     expect(saved.diagnosis.mode).toBe('aron');
     const cells = toTSV([saved]).split('\t');
-    expect(cells).toHaveLength(16);
-    expect(cells.slice(2, 8)).toEqual(['500', '500', '500', '10', '10', '10']);
+    expect(cells).toHaveLength(22);
+    expect(cells.slice(6, 12)).toEqual(['500', '500', '500', '10', '10', '10']);
     expect(emailBody([saved])).toContain('I2 [A]: 10');
     await reopened.close();
   });

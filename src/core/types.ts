@@ -1,3 +1,4 @@
+import type { CurrentRecord } from './current';
 import type { Phase } from './config';
 export type Triple<T> = [T, T, T];
 export interface PhaseReading {
@@ -21,7 +22,15 @@ export interface IntervalInput {
   end: number;
   energis: number;
 }
+export interface Identification {
+  date: string;
+  time?: string;
+  location: string;
+  placement: string;
+}
+export type HistoryRecord = MeasurementRecord | CurrentRecord;
 export interface MeasurementInput {
+  identification?: Identification;
   serial: string;
   config: MeterConfig;
   interval?: IntervalInput;
@@ -68,6 +77,7 @@ export interface MeasurementRecord {
   diagnosis: Diagnosis;
 }
 export interface FormDraft {
+  identification?: Identification;
   serial: string;
   config: MeterConfig;
   intervalEnabled: boolean;

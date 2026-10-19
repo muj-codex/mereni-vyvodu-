@@ -1,7 +1,10 @@
+import { CurrentResult } from './CurrentMeasurement';
+import { IdentificationSummary } from './Identification';
+import { percentDifference, signedPercent } from '../core/current';
 import { useState } from 'react';
-import type { MeasurementRecord } from '../core/types';
+import type { HistoryRecord } from '../core/types';
 import { formatNumber } from '../core/numbers';
-import { emailBody, mailtoLink, toTSV } from '../data/export';
+import { emailBody, mailtoLink, toTSV, isCurrent, downloadBackup, backupTSV } from '../data/export';
 import { Detail, Icon, Inspection, Result } from './components';
 export function History({
   records,
@@ -10,13 +13,13 @@ export function History({
   onClear,
   notify,
 }: {
-  records: MeasurementRecord[];
+  records: HistoryRecord[];
   loading: boolean;
   onDelete: (id: string) => Promise<void>;
   onClear: () => Promise<void>;
   notify: (text: string) => void;
 }) {
-  const [opened, setOpened] = useState<MeasurementRecord | null>(null),
+  const [opened, setOpened] = useState<HistoryRecord | null>(null),
     [section, setSection] = useState('result');
   const [selecting, setSelecting] = useState(false),
     [selected, setSelected] = useState<string[]>([]);
@@ -40,6 +43,23 @@ export function History({
       return;
     }
     window.location.href = link;
+  }
+  async function share() {
+    if (!navigator.share) {
+      setFallback({ text: emailBody(chosen), kind: 'email' });
+      return;
+    }
+    try {
+      const file = new File([backupTSV(chosen)], 'mereni.tsv', {
+        type: 'text/tab-separated-values',
+      });
+      if (navigator.canShare?.({ files: [file] }))
+        await navigator.share({ files: [file], title: 'Naměřená data' });
+      else await navigator.share({ title: 'Naměřená data', text: emailBody(chosen) });
+    } catch (e) {
+      if ((e as Error).name !== 'AbortError')
+        setFallback({ text: emailBody(chosen), kind: 'email' });
+    }
   }
   async function remove() {
     setBusy(true);
@@ -88,7 +108,14 @@ export function History({
               </button>
             ))}
           </div>
-          {section === 'result' ? (
+          <IdentificationSummary
+            serial={opened.input.serial}
+            value={opened.input.identification}
+            fallback={opened.localTimestamp}
+          />
+          {isCurrent(opened) ? (
+            <CurrentResult record={opened} />
+          ) : section === 'result' ? (
             <Result diagnosis={opened.diagnosis} serial={opened.input.serial} />
           ) : section === 'inspection' ? (
             <Inspection diagnosis={opened.diagnosis} />
@@ -113,6 +140,13 @@ export function History({
             <p>{records.length} uložených měření · pouze v tomto zařízení</p>
           </div>
           <div className="history-toolbar">
+            <button
+              className="button secondary"
+              disabled={!records.length}
+              onClick={() => downloadBackup(records)}
+            >
+              ZÁLOHOVAT HISTORII
+            </button>
             <button
               className="button secondary"
               onClick={() => {
@@ -195,14 +229,31 @@ export function History({
                       <Icon name="arrow" size={18} />
                     </div>
                     <time dateTime={r.savedAt}>{r.localTimestamp}</time>
-                    <div className="record-values">
-                      <span>
-                        Kyoritsu <b>{formatNumber(r.input.kyoritsu)} kW</b>
-                      </span>
-                      <span>
-                        Energis <b>{formatNumber(r.input.energis)} kW</b>
-                      </span>
-                    </div>
+                    <p>
+                      {r.input.identification?.location} · {r.input.identification?.placement}
+                    </p>
+                    <strong className="main-percent">
+                      {isCurrent(r)
+                        ? r.phases
+                            .map((p, i) => `L${i + 1}: ${signedPercent(p.differencePercent)}`)
+                            .join(' · ')
+                        : signedPercent(percentDifference(r.input.energis, r.input.kyoritsu))}
+                    </strong>
+                    {isCurrent(r) ? (
+                      <p>
+                        {r.input.vn ? 'VN · SCADA' : 'NN'} · MTP {r.input.ctPrimary}/
+                        {r.input.ctSecondary} A
+                      </p>
+                    ) : (
+                      <div className="record-values">
+                        <span>
+                          Kyoritsu <b>{formatNumber(r.input.kyoritsu)} kW</b>
+                        </span>
+                        <span>
+                          Energis <b>{formatNumber(r.input.energis)} kW</b>
+                        </span>
+                      </div>
+                    )}
                   </button>
                 </article>
               ))}
@@ -211,7 +262,14 @@ export function History({
           {selecting && (
             <div className="share-actions card">
               <p className="hint">Sdílí se jen naměřené hodnoty. Diagnostika zůstává v aplikaci.</p>
-              <button className="button primary" disabled={!chosen.length} onClick={sendEmail}>
+              <button
+                className="button primary"
+                disabled={!chosen.length}
+                onClick={() => void share()}
+              >
+                SDÍLET SYSTÉMOVĚ
+              </button>
+              <button className="button secondary" disabled={!chosen.length} onClick={sendEmail}>
                 <Icon name="mail" /> ODESLAT E-MAILEM
               </button>
               <button
@@ -222,8 +280,9 @@ export function History({
                 <Icon name="copy" /> KOPÍROVAT PRO EXCEL
               </button>
               <p className="hint">
-                TSV bez hlavičky, 16 sloupců. Pro zachování počátečních nul nastavte první sloupec
-                Excelu jako text.
+                TSV bez hlavičky: jeden záznam na řádek. Číslo elektroměru nastavte v Excelu jako
+                text pro zachování počátečních nul. Záloha obsahuje společnou hlavičku i pro různé
+                režimy.
               </p>
             </div>
           )}

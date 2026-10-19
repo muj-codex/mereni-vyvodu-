@@ -119,6 +119,9 @@ test('PWA se znovu načte offline a uchová historii', async ({ page, context })
   await expect(page.getByText('Offline připraveno', { exact: true })).toBeVisible();
   await enterMeasurement(page);
   await page.getByRole('button', { name: 'ULOŽIT MĚŘENÍ', exact: true }).click();
+  // Click completion does not await the IndexedDB transaction in the async handler.
+  // The cleared serial is the app's acknowledgement that tx.done completed.
+  await expect(page.getByLabel('VÝROBNÍ ČÍSLO ELEKTROMĚRU', { exact: true })).toHaveValue('');
   await context.setOffline(true);
   await page.reload();
   await expect(page.getByRole('heading', { name: 'Základ / pulz' })).toBeVisible();
@@ -218,6 +221,7 @@ test('500 V automaticky ARON, informační MTP, fyzické barvy a historie offlin
   await expect(page.locator('.scenario-list li')).toHaveCount(8);
   await noOverflow(page);
   await page.getByRole('button', { name: 'ULOŽIT MĚŘENÍ', exact: true }).click();
+  await expect(page.getByLabel('VÝROBNÍ ČÍSLO ELEKTROMĚRU', { exact: true })).toHaveValue('');
   await expect(page.getByText('Offline připraveno', { exact: true })).toBeVisible();
   await context.setOffline(true);
   await page.reload();
