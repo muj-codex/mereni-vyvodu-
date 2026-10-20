@@ -38,10 +38,6 @@ export function History({
   }
   function sendEmail() {
     const link = mailtoLink(chosen);
-    if (link.length > 1800) {
-      setFallback({ text: emailBody(chosen), kind: 'email' });
-      return;
-    }
     window.location.href = link;
   }
   async function share() {
@@ -114,7 +110,7 @@ export function History({
             fallback={opened.localTimestamp}
           />
           {isCurrent(opened) ? (
-            <CurrentResult record={opened} />
+            <CurrentResult record={opened} section={section} />
           ) : section === 'result' ? (
             <Result diagnosis={opened.diagnosis} serial={opened.input.serial} />
           ) : section === 'inspection' ? (
@@ -235,7 +231,9 @@ export function History({
                     <strong className="main-percent">
                       {isCurrent(r)
                         ? r.phases
-                            .map((p, i) => `L${i + 1}: ${signedPercent(p.differencePercent)}`)
+                            .flatMap((p, i) =>
+                              p.unused ? [] : [`IL${i + 1}: ${signedPercent(p.differencePercent)}`],
+                            )
                             .join(' · ')
                         : signedPercent(percentDifference(r.input.energis, r.input.kyoritsu))}
                     </strong>
@@ -354,7 +352,7 @@ export function History({
               <Icon name="copy" /> Kopírovat text
             </button>
             {fallback.kind === 'email' && (
-              <a className="button primary" href="mailto:?subject=Nam%C4%9B%C5%99en%C3%A1%20data">
+              <a className="button primary" href={mailtoLink(chosen)}>
                 Otevřít e-mailovou aplikaci
               </a>
             )}

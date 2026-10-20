@@ -43,7 +43,7 @@ export function generateScenarios(input: MeasurementInput): ThreeCurrentScenario
         const value = branchPower(voltages[target], target, source, input.phases[source]);
         if (value === null)
           issues.push(
-            `U${target + 1} ← I${source + 1}: nelze určit ekvivalentní napětí nebo úhel.`,
+            `UL${target + 1} ← IL${source + 1}: nelze určit ekvivalentní napětí nebo úhel.`,
           );
         return value;
       });
@@ -107,38 +107,12 @@ export function diagnose(input: MeasurementInput): Diagnosis {
 }
 export function inspectionInstructions(diagnosis: Diagnosis): string[] {
   if (diagnosis.status === 'ok')
-    return ['ZAPOJENÍ V POŘÁDKU – podle přímého porovnání v toleranci ±15 %.'];
-  if (!diagnosis.best)
     return [
-      'Nejprve ověřit vstupní údaje a souběžnost odečtů. Z dostupných dat nelze určit hlavní variantu.',
+      'Přímé porovnání je v toleranci ±15 %. Samotné porovnání nepotvrzuje správné zapojení.',
     ];
-  if (diagnosis.best.kind === 'aron') {
-    const scenario = diagnosis.best;
-    const result = scenario.currents.map((source, index) => {
-      const target = index === 0 ? 1 : 3;
-      const member = index === 0 ? '1–3' : '4–6';
-      return `Na elektroměru prověřit člen ${member} (L${target}): proud I${source + 1}, ${scenario.reversed[index] ? 'obrácená polarita k/l' : 'souhlasná polarita k/l'}.`;
-    });
-    if (scenario.currents[0] === 2)
-      result.unshift('Na elektroměru prověřit vzájemnou záměnu proudových větví L1 ↔ L3.');
-    result.push('Napěťové vazby ARON: svorky 2–5 (L1–L2) a 8–5 (L3–L2); napěťový sekundár 100 V.');
-    return result;
-  }
-  const best = diagnosis.best;
-  const result: string[] = [];
-  best.permutation.forEach((source, target) => {
-    if (best.shorted[source])
-      result.push(
-        `Na elektroměru na L${target + 1} prověřit zapojení k/l (větev I${source + 1} v modelu nepřispívá).`,
-      );
-    if (source !== target)
-      result.push(
-        `Na elektroměru prověřit přiřazení proudových vodičů: na L${target + 1} model odpovídá proudu I${source + 1} z L${source + 1}.`,
-      );
-  });
-  return result.length
-    ? result
-    : [
-        'Nejbližší model má správné přiřazení. Prověřit nastavení převodu MTP, váhy pulzu a časový posun Energis.',
-      ];
+  return [
+    'Rozdíl proti Energis je významný. Z tohoto porovnání nelze jednoznačně určit chybu zapojení.',
+    'Ověřte souběžnost měření, časový posun a agregaci / vyhlazení Energis.',
+    'Možné příčiny: převod, proudový nebo napěťový obvod, zapojení či více závad současně. Změřte místně primár a sekundár přes MTP.',
+  ];
 }

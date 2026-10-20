@@ -3,7 +3,7 @@ export const CONFIG = {
   alternativeMaxScoreGap: 5,
   powerEpsilonKw: 0.001,
   numericEpsilon: 1e-8,
-  modelVersion: '1.1.0',
+  modelVersion: '1.1.1',
 } as const;
 export type Phase = 0 | 1 | 2;
 export const PHASES = [0, 1, 2] as const;

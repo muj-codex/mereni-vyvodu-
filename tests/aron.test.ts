@@ -129,7 +129,7 @@ describe('Přepnutí napětím a skutečný dvouwattmetrový ARON', () => {
     const result = diagnose(input);
     expect(result.best?.id).toBe('aron-0-1');
     expect(result.best?.score).toBeCloseTo(100);
-    expect(inspectionInstructions(result).join(' ')).toContain('obrácená polarita k/l');
+    expect(inspectionInstructions(result).join(' ')).toContain('nelze jednoznačně určit');
     if (result.alternative)
       expect(result.best!.score! - result.alternative.score!).toBeLessThanOrEqual(
         CONFIG.alternativeMaxScoreGap,
@@ -223,7 +223,11 @@ describe('ARON vzhled, informace MTP a zachování dat', () => {
       p: String(p.p),
     })) as typeof draft.phases;
     const parsed = readDraft(draft);
-    expect(parsed.phases).toEqual(input.phases);
+    expect(parsed.phases).toEqual([
+      input.phases[0],
+      { ...input.phases[1], i: 0, pf: 0, p: 0 },
+      input.phases[2],
+    ]);
     const record = createRecord(parsed),
       name = crypto.randomUUID(),
       store = createHistory(name);
@@ -232,12 +236,12 @@ describe('ARON vzhled, informace MTP a zachování dat', () => {
     const reopened = createHistory(name);
     const [saved] = await reopened.all();
     if (isCurrent(saved)) throw Error('Expected power record');
-    expect(saved.input.phases).toEqual(input.phases);
+    expect(saved.input.phases).toEqual(parsed.phases);
     expect(saved.diagnosis.mode).toBe('aron');
     const cells = toTSV([saved]).split('\t');
     expect(cells).toHaveLength(22);
-    expect(cells.slice(6, 12)).toEqual(['500', '500', '500', '10', '10', '10']);
-    expect(emailBody([saved])).toContain('I2 [A]: 10');
+    expect(cells.slice(6, 12)).toEqual(['500', '500', '500', '10', '', '10']);
+    expect(emailBody([saved])).toBe(toTSV([saved]));
     await reopened.close();
   });
 });

@@ -151,10 +151,10 @@ describe('Fázory a 48 scénářů', () => {
     }
     expect(found).toBe(true);
   });
-  it('pokyny jsou na elektroměru a používají k/l', () => {
+  it('Energis neprokazuje konkrétní chybu zapojení', () => {
     const r = diagnose({ ...reference, energis: 0 });
-    expect(inspectionInstructions(r).join(' ')).toContain('elektroměru');
-    expect(inspectionInstructions(r).join(' ')).toContain('k/l');
+    expect(inspectionInstructions(r).join(' ')).toContain('nelze jednoznačně určit');
+    expect(inspectionInstructions(r).join(' ')).toContain('souběžnost');
   });
 });
 describe('C1 fyzické barvy', () => {
@@ -276,7 +276,7 @@ describe('Data, čas, reset a export', () => {
     for (const text of [toTSV([r]), emailBody([r])]) {
       expect(text).not.toMatch(/TAJNA_DIAGNOSTIKA|scenarios|shoda|prověřit|diagnó|modelVersion/i);
     }
-    expect(emailBody([r, r])).toContain('Měření 2');
+    expect(emailBody([r, r])).toBe(toTSV([r, r]));
     expect(mailtoLink([r])).toMatch(/^mailto:\?subject=/);
   });
 });

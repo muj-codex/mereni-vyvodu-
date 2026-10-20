@@ -39,7 +39,7 @@ it('IndexedDB ukládá nezávisle, přežije znovuotevření a maže jednotlivě
   expect(await reopened.all()).toHaveLength(2);
   await reopened.remove(first.id);
   expect(await reopened.all()).toHaveLength(1);
-  await reopened.clear();
+  await reopened.removeAllExplicitly();
   expect(await reopened.all()).toHaveLength(0);
   await reopened.close();
 });

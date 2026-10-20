@@ -1148,3 +1148,7 @@ fieldset:disabled {
 .history-toolbar {
   flex-wrap: wrap;
 }
+
+[hidden] {
+  display: none !important;
+}

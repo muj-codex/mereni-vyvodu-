@@ -34,7 +34,10 @@ export const EXPORT_COLUMNS: Column<MeasurementRecord>[] = [
     [0, 1, 2].map((phase) => ({
       key: `${key}${phase + 1}`,
       label: `${key === 'pf' ? 'cosφ' : key.toUpperCase()}${phase + 1}${key === 'i' ? ' [A]' : key === 'u' ? ' [V]' : key === 'p' ? ' [kW]' : ''}`,
-      value: (r: MeasurementRecord) => r.input.phases[phase][key],
+      value: (r: MeasurementRecord) =>
+        r.input.config.voltage === 500 && phase === 1 && key !== 'u'
+          ? ''
+          : r.input.phases[phase][key],
     })),
   ),
   { key: 'kyoritsu', label: 'Kyoritsu celkem [kW]', value: (r) => r.input.kyoritsu },
@@ -49,7 +52,12 @@ export const EXPORT_COLUMNS: Column<MeasurementRecord>[] = [
 export const CURRENT_COLUMNS: Column<CurrentRecord>[] = [
   ...identityColumns,
   { key: 'mtp', label: 'MTP', value: (r) => `${r.input.ctPrimary}/${r.input.ctSecondary} A` },
-  { key: 'mode', label: 'Režim', value: (r) => (r.input.vn ? 'VN' : 'NN') },
+  {
+    key: 'mode',
+    label: 'Režim',
+    value: (r) =>
+      `${r.input.vn ? 'VN' : 'NN'} ${r.input.networkVoltage ?? (r.input.vn ? 10000 : 400)} V`,
+  },
   ...([0, 1, 2] as const).flatMap((i) =>
     (
       [
@@ -68,7 +76,7 @@ export const CURRENT_COLUMNS: Column<CurrentRecord>[] = [
     ).map(([key, label]) => ({
       key: `L${i + 1}-${key}`,
       label: `L${i + 1} ${label}`,
-      value: (r: CurrentRecord) => r.phases[i][key],
+      value: (r: CurrentRecord) => (r.phases[i].unused ? '' : r.phases[i][key]),
     })),
   ),
   ...([0, 1, 2] as const).flatMap((i) => [
@@ -109,6 +117,8 @@ function columns(r: HistoryRecord): Column<HistoryRecord>[] {
   return (isCurrent(r) ? CURRENT_COLUMNS : EXPORT_COLUMNS) as Column<HistoryRecord>[];
 }
 export function toTSV(records: HistoryRecord[]) {
+  if (records.some(isCurrent) && records.some((r) => !isCurrent(r)))
+    return backupTSV(records).split('\n').slice(1).join('\n');
   return records
     .map((r) =>
       columns(r)
@@ -118,17 +128,7 @@ export function toTSV(records: HistoryRecord[]) {
     .join('\n');
 }
 export function emailBody(records: HistoryRecord[]) {
-  return records
-    .map(
-      (r, index) =>
-        `Měření ${index + 1}\n${columns(r)
-          .map(
-            (c) =>
-              `${c.key === 'location' ? (isCurrent(r) && r.input.vn ? 'Rozvodna' : 'Trafostanice') : c.label}: ${safeCell(columnValue(c.key, c.value(r)))}`,
-          )
-          .join('\n')}`,
-    )
-    .join('\n\n────────────\n\n');
+  return toTSV(records);
 }
 export function mailtoLink(records: HistoryRecord[]) {
   return `mailto:?subject=${encodeURIComponent(`Naměřená data – ${records.length} měření`)}&body=${encodeURIComponent(emailBody(records))}`;

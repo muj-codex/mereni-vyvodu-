@@ -143,14 +143,14 @@ describe('Kyoritsu 8112', () => {
   });
   it('napětí nehádá při podobnosti; rozliší přesvědčivou záměnu', () => {
     expect(diagnoseVoltage([400, 401, 400], [100, 100, 100])).toContain('nelze');
-    expect(diagnoseVoltage([360, 400, 440], [110, 90, 100])).toContain('L1–L2 ← L1–L3');
+    expect(diagnoseVoltage([360, 400, 440], [110, 90, 100])).toContain('UL1-L2 ← UL1-L3');
     expect(diagnoseVoltage([360, 400, 440], [90, 100, 140])).toContain('nelze');
   });
   it('TSV, sdílení a smíšená záloha zachovají číslo i samostatné buňky', () => {
     const r = evaluateCurrent(draft());
     const cells = toTSV([r]).split('\t');
     expect(cells.slice(2, 6)).toEqual(['TS 3308/250', '8L', '00AB01', '300/5 A']);
-    expect(emailBody([r])).toContain('Trafostanice: TS 3308/250');
+    expect(emailBody([r])).toBe(toTSV([r]));
     const lines = backupTSV([r, createRecord(reference)]).split('\n');
     expect(lines).toHaveLength(3);
     expect(new Set(lines.map((l) => l.split('\t').length)).size).toBe(1);

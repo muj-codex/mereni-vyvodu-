@@ -38,9 +38,14 @@ export function readDraft(
   if (![draft.config.actualMtp, draft.config.meterMtp].every((v) => Number.isFinite(v) && v > 0))
     throw Error('MTP musí být kladný.');
   const phases = draft.phases.map((phase, index) => {
+    const aronUnused = draft.config.voltage === 500 && index === 1;
     const p = Object.fromEntries(
       Object.entries(phase).map(([k, v]) => [k, parseNumber(v)]),
     ) as unknown as PhaseReading;
+    if (aronUnused) {
+      if (!Number.isFinite(p.u) || p.u <= 0) throw Error('Vyplňte kladné UL2.');
+      return { u: p.u, i: 0, pf: 0, p: 0 };
+    }
     if (![p.u, p.i, p.pf, p.p].every(Number.isFinite))
       throw new Error(`Vyplňte U, I, PF a P pro fázi ${index + 1}.`);
     if (p.u <= 0 || p.i < 0 || Math.abs(p.pf) > 1)
@@ -97,6 +102,7 @@ export async function saveAndReset(
 ) {
   const input = readDraft(draft);
   const record = createRecord(input, date);
+  record.originalDraft = structuredClone(draft);
   await persist(record);
   return { record, nextDraft: emptyDraft(draft.config) };
 }

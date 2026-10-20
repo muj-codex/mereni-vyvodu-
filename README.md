@@ -34,7 +34,7 @@ HTTP adresa počítače v místní síti umožní prohlédnout rozhraní, ale Sa
 1. **Základ / pulz:** povinné výrobní číslo jako řetězec, převody MTP, napětí, váhy pulzu; volitelná kontrola stavů se shodným intervalem Energis.
 2. **Napětí a proudy:** U1–U3 a I1–I3, každá fyzická fáze vlastní pevnou barvou.
 3. **PF a výkony:** znaménkové PF a P po fázích, celkové Kyoritsu a trend Energis. Tlačítka ± pomáhají na číselné klávesnici iPhonu.
-4. **Vizuální výsledek:** při 400 V původní tříproudový model (48 scénářů); při 500 V automaticky ARON (8 scénářů dvou wattmetrových členů). Přímá tolerance ±15 %, mimo toleranci hlavní model a nejvýše jedna alternativa do 5 procentních bodů shody. Čísla modelu zůstávají v detailu.
+4. **Vizuální výsledek:** při 400 V původní tříproudový model (48 scénářů); při 500 V automaticky ARON (8 scénářů dvou wattmetrových členů). Přímá tolerance ±15 %, mimo toleranci upozornění na souběžnost a možné příčiny, bez jistého verdiktu o zapojení. Čísla modelu zůstávají v detailu.
 5. **Co prověřit:** interní pokyny na elektroměru, terminologie k/l.
 6. **Detail:** skutečná data, model, všech 48 scénářů a předpoklady.
 7. **Výsledky měření:** samostatná hlavní záložka s historií, plným uloženým záznamem, výběrem, e-mailem a TSV.
@@ -45,7 +45,7 @@ HTTP adresa počítače v místní síti umožní prohlédnout rozhraní, ale Sa
 
 E-mail a TSV obsahují naměřené hodnoty, společnou identifikaci a podepsané procentní rozdíly; neobsahují modelové scénáře, skóre ani pracovní pokyny. Sloupce jsou centrálně v `src/data/export.ts`. TSV nemá hlavičku, používá skutečné tabulátory a jeden řádek na měření. Pro zachování počátečních nul předformátujte sloupec čísla elektroměru v Excelu jako **Text**; aplikace číslo nikdy nepřevádí na číslo.
 
-`mailto:` otevře výchozí poštu bez příjemce. U delších výběrů (URL nad 1800 znaků) aplikace nabídne naměřený text ke zkopírování a otevření pošty. Ruční fallback je dostupný i při chybějícím klientovi nebo schránce. Aplikace neodesílá e-mail sama, negarantuje doručení, používá systémové sdílení tam, kde ho prohlížeč podporuje, a nemá vlastní mailserver.
+`mailto:` otevře výchozí poštu bez příjemce. Tělo tvoří pouze čisté TSV, bez úvodu a bez přílohy; i fallback odkaz obsahuje stejné neprázdné tělo. Ruční fallback je dostupný i při chybějícím klientovi nebo schránce. Aplikace neodesílá e-mail sama, negarantuje doručení, používá systémové sdílení tam, kde ho prohlížeč podporuje, a nemá vlastní mailserver.
 
 Data jsou v IndexedDB pouze v daném prohlížeči/originu. Rozpracované vstupy se průběžně ukládají do localStorage. Vymazání webových dat, odinstalace, soukromé prohlížení nebo zásah správy úložiště iOS mohou lokální data odstranit. Aplikace žádá o persistentní úložiště, pokud jej prohlížeč podporuje; pravidelný export je přesto nutný. Změna domény znamená jiné úložiště. Mazání jednotlivého záznamu vyžaduje potvrzení; celá historie navíc opsání **SMAZAT**.
 
@@ -81,17 +81,17 @@ e2e/            reálné prohlížečové scénáře
 
 Informační **Korekční koeficient** na úvodní kartě zobrazuje `MTP primár / MTP elektroměr` na tři desetinná místa. Je pouze vizuální, nepřidává se do záznamu a neškáluje diagnostiku nebo export. Existující volitelná intervalová korekce MTP zůstává beze změny.
 
-Režim se pro nové měření vybírá pouze napětím: **400 V → tříproudový**, **500 V → ARON**. Kyoritsu stále zadává a ukládá všechny tři U/I/PF/P. Výsledková ARON tabulka má prostřední šedé pole pouze „ARON“; nejde o chybějící ani vyzkratovanou L2. Nové záznamy nesou režim a verzi modelu 1.1.0. Staré záznamy bez režimu zůstávají ve své původní interpretaci, včetně dříve uložených 500 V měření; historie se zpětně nepřepočítává.
+Režim se pro nové měření vybírá pouze napětím: **400 V → tříproudový**, **500 V → ARON**. U 500 V se proudová IL2 nezadává ani nevyhodnocuje; primární napětí zůstává dostupné. Výsledková ARON tabulka má prostřední šedé pole pouze „ARON“; nejde o chybějící ani vyzkratovanou L2. Nové záznamy nesou režim a verzi modelu 1.1.1. Staré záznamy bez režimu zůstávají ve své původní interpretaci, včetně dříve uložených 500 V měření; historie se zpětně nepřepočítává.
 
 Centrální konstanty: `CONFIG.alternativeMaxScoreGap`, `CONFIG.tolerancePercent`, `PHASE_COLORS`, `PULSE_OPTIONS`. Fyzické barvy nejsou nikdy odvozené z cílové napěťové pozice. Připravený volitelný `currentAngleDegrees` umožňuje budoucí skutečný úhel z přístroje. Další importní adaptér, PDF nebo typ měřáku lze přidat bez přesunu matematiky do UI.
 
-## Prompt 1 – proudová diagnostika NN / VN (aplikace 1.2.0)
+## Prompt 1.1 – proudová diagnostika NN / VN (aplikace 1.2.1)
 
-Přepínač **Proudový režim NN / VN** otevře samostatný proudový formulář. Společná identifikace pro všechny režimy obsahuje editovatelné datum, textové číslo elektroměru, lokalitu a samostatné pole/umístění. Čas vyhodnocení se ukládá na sekundy. NN nabízí jen trafostanice a MTP /5 A, VN jen rozvodny a MTP /1 A; proudová reference VN pochází ze SCADA.
+Hlavní přepínač nabízí **MĚŘENÍ** a připravovaný **VÝPOČET SPOTŘEBY A SAZEB**, zatím bez kalkulačky. V měření jsou karty **3f měření** a **1f měření**. Společná identifikace na 3f kartě obsahuje datum, textové číslo elektroměru, lokalitu, pole/umístění a režim sítě. Na 1f je pouze její needitovatelný souhrn, nezávislý na vyplnění pulzů nebo dokončení 3f výpočtu. Čas vyhodnocení se ukládá na sekundy. NN nabízí jen trafostanice a MTP /5 A, VN jen rozvodny a MTP /1 A; proudová reference VN pochází ze SCADA.
 
 Kyoritsu MODEL 8112 má pevné rozsahy 200 mA, 2 A a 20 A (1, 10 a 100 mA na mV). Multimetr přijímá mV i V, čárku i tečku. Výsledek každé fáze obsahuje očekávaný a skutečný sekundár v mA/A, přepočtený primár a podepsaný rozdíl. Nulová reference vrací neurčené procento. Proudový režim nikdy nepočítá činný výkon.
 
-Volitelné napětí pracuje mezi fázemi. Sekundár má editovatelný výchozí stav 100 V a zaznamenává ruční změny. VN primár je ze SCADA (6 / 10 / 10,3 kV nebo vlastní hodnoty). Při podobných hodnotách aplikace neurčuje pořadí větví. Návrh přiřazení vyžaduje rozlišené normalizované hodnoty, malou chybu a odstup od další varianty; nezaručuje fyzické zapojení.
+Volitelné napětí pracuje mezi fázemi. Sekundár má editovatelný výchozí stav 100 V a zaznamenává ruční změny. VN primár je ze SCADA (6 / 6,3 / 10 / 10,3 kV, pouze podle společné identifikace). Při podobných hodnotách aplikace neurčuje pořadí větví. Návrh přiřazení vyžaduje rozlišené normalizované hodnoty, malou chybu a odstup od další varianty; nezaručuje fyzické zapojení.
 
 3f procento je `(Energis − Kyoritsu) / Kyoritsu × 100`. Pracovní karta rozlišuje ≤15 %, mezizónu do 25 % a větší odchylky; historie má jako hlavní výsledek skutečná procenta. Informační koeficient MTP zůstává mimo tyto výpočty i export.
 
@@ -99,4 +99,6 @@ IndexedDB používá stejný název a store jako původní aplikace. Upgrade z v
 
 **ZÁLOHOVAT HISTORII** stáhne TSV s hlavičkou a jednotnými sloupci pro smíšenou historii. **KOPÍROVAT PRO EXCEL** kopíruje řádky podle typu měření bez hlavičky. Centrální definice sloupců jsou v `src/data/export.ts`. TS/R a umístění jsou vždy samostatné buňky. Systémové sdílení nabídne soubor TSV, pokud ho prohlížeč podporuje, jinak text; při nepodporovaném sdílení zůstává ruční kopírování a e-mail. Verze aplikace a čas buildu jsou v nápovědě.
 
-Offline E2E čeká po kliknutí na uložení na vyčištění čísla elektroměru: tento stav nastává teprve po dokončení IndexedDB transakce. Samotné dokončení kliknutí nečeká na asynchronní handler a dříve dovolovalo reload během zápisu. Testy neobsahují pevná časová čekání.
+Offline E2E čeká po kliknutí na uložení na potvrzený reset: u 3f vyčištění čísla, u 1f odstranění tlačítka uložení po dokončení IndexedDB transakce. Samotné dokončení kliknutí nečeká na asynchronní handler a dříve dovolovalo reload během zápisu. Testy neobsahují pevná časová čekání.
+
+Podrobnosti oprav persistence a meze určení příčiny terénního incidentu jsou v [docs/PROMPT_1_1.md](docs/PROMPT_1_1.md).

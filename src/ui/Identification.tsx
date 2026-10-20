@@ -15,7 +15,7 @@ export function IdentificationFields({
 }) {
   return (
     <section className="card identification">
-      <h3>Identifikace místa měření</h3>
+      <h3>IDENTIFIKACE MĚŘENÍ</h3>
       <div className="field-grid">
         <label className="field">
           <span>VÝROBNÍ ČÍSLO ELEKTROMĚRU</span>
@@ -76,7 +76,7 @@ export function IdentificationSummary({
       <strong>Elektroměr {serial}</strong>
       <p>
         {value
-          ? `${value.date} ${value.time ?? ''} · ${value.location} · ${value.placement}`
+          ? `${value.date} ${value.time ?? ''} · ${value.location} · ${value.placement} · ${value.networkVoltage ? (value.networkVoltage > 500 ? `VN ${String(value.networkVoltage / 1000).replace('.', ',')} kV` : `NN ${value.networkVoltage} V${value.networkVoltage === 500 ? ' – ARON' : ''}`) : ''}`
           : fallback}
       </p>
     </section>

@@ -13,7 +13,8 @@ async function enterMeasurement(page: Page, serial = '0012345678', energis = '9,
     ['506,5', '12,9'],
   ].entries()) {
     await page.getByLabel(`U${i + 1}`, { exact: true }).fill(u);
-    await page.getByLabel(`I${i + 1}`, { exact: true }).fill(current);
+    if (await page.getByLabel(`IL${i + 1}`, { exact: true }).count())
+      await page.getByLabel(`IL${i + 1}`, { exact: true }).fill(current);
   }
   await noOverflow(page);
   await page.getByRole('button', { name: 'POKRAČOVAT NA PF A VÝKONY' }).click();
@@ -22,6 +23,7 @@ async function enterMeasurement(page: Page, serial = '0012345678', energis = '9,
     ['0,844', '2,2'],
     ['0,979', '3,5'],
   ].entries()) {
+    if (!(await page.getByLabel(`PF${i + 1}`, { exact: true }).count())) continue;
     await page.getByLabel(`PF${i + 1}`, { exact: true }).fill(pf);
     await page.getByLabel(`P${i + 1}`, { exact: true }).fill(p);
   }
@@ -94,7 +96,8 @@ test('sériové měření, historie, výběr, export a bezpečné mazání', asy
   await page.getByRole('button', { name: 'E-mail se neotevřel?', exact: false }).click();
   const text = await page.getByLabel('Text pro ruční zkopírování').inputValue();
   expect(text).toContain('0012345678');
-  expect(text).toContain('Měření 2');
+  expect(text.split('\n')).toHaveLength(2);
+  expect(text).toContain('\t');
   expect(text).not.toMatch(/shoda|varianta|prověřit|scénář/i);
   await page.getByRole('button', { name: 'Zavřít', exact: true }).click();
   await page.getByRole('button', { name: 'KOPÍROVAT PRO EXCEL' }).click();
@@ -186,7 +189,9 @@ test('500 V automaticky ARON, informační MTP, fyzické barvy a historie offlin
   await page.getByRole('combobox', { name: 'MTP primár', exact: true }).selectOption('300');
   await page.getByRole('combobox', { name: 'MTP elektroměr', exact: true }).selectOption('100');
   await expect(page.getByLabel('Korekční koeficient', { exact: true })).toHaveText('× 3,000');
-  await page.getByRole('combobox', { name: 'Napětí', exact: true }).selectOption('500');
+  await page
+    .getByRole('combobox', { name: 'Režim sítě / napětí', exact: true })
+    .selectOption('500');
   await enterMeasurement(page, '000500', '5');
   await expect(
     page.getByRole('heading', { name: 'MIMO TOLERANCI – PROVĚŘIT ZAPOJENÍ' }),
@@ -215,8 +220,8 @@ test('500 V automaticky ARON, informační MTP, fyzické barvy a historie offlin
   });
   await page.getByRole('button', { name: 'CO PROVĚŘIT NA ELEKTROMĚRU', exact: true }).click();
   await page.getByRole('button', { name: 'DETAIL VÝSLEDKU', exact: true }).click();
-  await expect(page.getByText('9,20 A', { exact: true })).toBeVisible();
-  await expect(page.getByText('506,60 V', { exact: true })).toBeVisible();
+  await expect(page.getByText('12,90 A', { exact: true })).toBeVisible();
+  await expect(page.getByText('UL2 506,60 V', { exact: true })).toBeVisible();
   await page.getByText('Všech 8 scénářů · technický detail').click();
   await expect(page.locator('.scenario-list li')).toHaveCount(8);
   await noOverflow(page);
@@ -229,9 +234,11 @@ test('500 V automaticky ARON, informační MTP, fyzické barvy a historie offlin
   await page.locator('.record-open').click();
   await expect(page.locator('.aron-center').first()).toHaveText('ARON');
   await page.getByRole('button', { name: 'Data / detail', exact: true }).click();
-  await expect(page.getByText('9,20 A', { exact: true })).toBeVisible();
+  await expect(page.getByText('12,90 A', { exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Nové měření', exact: true }).click();
-  await page.getByRole('combobox', { name: 'Napětí', exact: true }).selectOption('400');
+  await page
+    .getByRole('combobox', { name: 'Režim sítě / napětí', exact: true })
+    .selectOption('400');
   await enterMeasurement(page, '000400', '5');
   await expect(page.locator('.aron-center')).toHaveCount(0);
   await expect(page.locator('.mapping-card [data-phase="U2"]').first()).toHaveCSS(

@@ -14,7 +14,10 @@ export function aronBranchPower(
   reversed: boolean,
 ): number | null {
   const targetVoltage = equivalentPhaseVoltage(input.phases[target]);
-  const referenceVoltage = equivalentPhaseVoltage(input.phases[1]);
+  const referenceVoltage =
+    input.phases[1].i === 0
+      ? null // Unused IL2 cannot calibrate a phasor: report incomplete model conservatively.
+      : equivalentPhaseVoltage(input.phases[1]);
   const reading = input.phases[source];
   if (!Number.isFinite(reading.i) || reading.i < 0) return null;
   if (reading.i <= CONFIG.numericEpsilon)

@@ -1,8 +1,9 @@
+import { MtpSelect } from './ui/MtpSelect';
 import { CurrentMeasurement } from './ui/CurrentMeasurement';
 import { IdentificationFields, IdentificationSummary } from './ui/Identification';
-import { emptyIdentification } from './core/current';
+import { emptyIdentification, locations, validateIdentification } from './core/current';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { MTP_OPTIONS, PHASES, PULSE_OPTIONS, type Phase } from './core/config';
+import { PHASES, PULSE_OPTIONS, type Phase } from './core/config';
 import { createRecord, emptyDraft, readDraft, saveAndReset } from './core/measurement';
 import { parseNumber } from './core/numbers';
 import { compareEnergy } from './core/energy';
@@ -36,6 +37,7 @@ function restoreDraft(): FormDraft {
   return emptyDraft();
 }
 export default function App() {
+  const [mainSection, setMainSection] = useState('measurement');
   const [mode, setMode] = useState<'power' | 'current'>('power');
   const [draft, setDraft] = useState<FormDraft>(restoreDraft),
     [step, setStep] = useState(0),
@@ -132,16 +134,28 @@ export default function App() {
       setError('Vyplňte číslo elektroměru.');
       return;
     }
+    if (next > 0) {
+      try {
+        validateIdentification(draft.identification ?? emptyIdentification());
+      } catch (e) {
+        setError((e as Error).message);
+        return;
+      }
+    }
     if (step === 1 && next > 1) {
       for (let i = 0; i < 3; i++) {
         const p = draft.phases[i];
         if (
           !Number.isFinite(parseNumber(p.u)) ||
           parseNumber(p.u) <= 0 ||
-          !Number.isFinite(parseNumber(p.i)) ||
-          parseNumber(p.i) < 0
+          (!(draft.config.voltage === 500 && i === 1) &&
+            (!Number.isFinite(parseNumber(p.i)) || parseNumber(p.i) < 0))
         ) {
-          setError(`Vyplňte kladné U${i + 1} a nezáporné I${i + 1}.`);
+          setError(
+            draft.config.voltage === 500 && i === 1
+              ? 'Vyplňte kladné UL2. ARON – IL2 se nepoužívá.'
+              : `Vyplňte kladné UL${i + 1} a nezáporné IL${i + 1}.`,
+          );
           return;
         }
       }
@@ -210,7 +224,27 @@ export default function App() {
               : 'Offline se připravuje'}
         </span>
       </div>
-      <main>
+      <div className="segmented" aria-label="Hlavní části aplikace">
+        <button
+          className={mainSection === 'measurement' ? 'active' : ''}
+          onClick={() => setMainSection('measurement')}
+        >
+          MĚŘENÍ
+        </button>
+        <button
+          className={mainSection === 'rates' ? 'active' : ''}
+          onClick={() => setMainSection('rates')}
+        >
+          VÝPOČET SPOTŘEBY A SAZEB
+        </button>
+      </div>
+      {mainSection === 'rates' && (
+        <section className="card">
+          <h1>Výpočet spotřeby a sazeb</h1>
+          <p>Připravuje se</p>
+        </section>
+      )}
+      <main hidden={mainSection !== 'measurement'}>
         {tab === 'history' ? (
           <History
             records={records}
@@ -220,7 +254,7 @@ export default function App() {
               setRecords((r) => r.filter((x) => x.id !== id));
             }}
             onClear={async () => {
-              await repo.clear();
+              await repo.removeAllExplicitly();
               setRecords([]);
             }}
             notify={notify}
@@ -235,14 +269,25 @@ export default function App() {
                 className={mode === 'current' ? 'active' : ''}
                 onClick={() => setMode('current')}
               >
-                Proudový režim NN / VN
+                1f měření
               </button>
             </div>
             {mode === 'current' ? (
               <CurrentMeasurement
                 notify={notify}
+                shared={{
+                  serial: draft.serial,
+                  identification: {
+                    ...(draft.identification ?? emptyIdentification()),
+                    networkVoltage: draft.config.voltage,
+                  },
+                }}
                 onSave={async (r) => {
                   await repo.add(r);
+                  void navigator.storage
+                    ?.persist?.()
+                    .then(setStoragePersistent)
+                    .catch(() => setStoragePersistent(false));
                   setRecords((prev) => [r, ...prev]);
                 }}
               />
@@ -293,117 +338,136 @@ export default function App() {
                 {step === 0 && (
                   <>
                     <IdentificationFields
+                      vn={draft.config.voltage > 500}
                       serial={draft.serial}
                       value={draft.identification ?? emptyIdentification()}
                       onSerial={(serial) => change({ ...draft, serial })}
                       onChange={(identification) => change({ ...draft, identification })}
                     />
-                    <section className="card">
-                      <h3>Převody a pulzy</h3>
-                      <div className="field-grid">
-                        <SelectField
-                          label="MTP primár"
-                          value={draft.config.actualMtp}
-                          onChange={(v) => config('actualMtp', Number(v))}
-                        >
-                          {MTP_OPTIONS.map((v) => (
-                            <option key={v} value={v}>
-                              {v}/5 A
-                            </option>
-                          ))}
-                        </SelectField>
-                        <SelectField
-                          label="MTP elektroměr"
-                          value={draft.config.meterMtp}
-                          onChange={(v) => config('meterMtp', Number(v))}
-                        >
-                          {MTP_OPTIONS.map((v) => (
-                            <option key={v} value={v}>
-                              {v}/5 A
-                            </option>
-                          ))}
-                        </SelectField>
-                        <SelectField
-                          label="Napětí"
-                          value={draft.config.voltage}
-                          onChange={(v) => config('voltage', Number(v))}
-                        >
-                          <option value={400}>400 V</option>
-                          <option value={500}>500 V</option>
-                        </SelectField>
-                        <SelectField
-                          label="Váha pulzu elektroměru"
-                          value={draft.config.meterPulse}
-                          onChange={(v) => config('meterPulse', Number(v))}
-                        >
-                          {PULSE_OPTIONS.map((p) => (
-                            <option key={p.value} value={p.value}>
-                              {p.label}
-                            </option>
-                          ))}
-                        </SelectField>
-                        <SelectField
-                          label="Váha pulzu Energis"
-                          value={draft.config.energisPulse}
-                          onChange={(v) => config('energisPulse', v === 'X' ? 'X' : Number(v))}
-                        >
-                          {PULSE_OPTIONS.map((p) => (
-                            <option key={p.value} value={p.value}>
-                              {p.label}
-                            </option>
-                          ))}
-                          <option value="X">X · neznámá váha</option>
-                        </SelectField>
-                        <MtpCoefficient
-                          primary={draft.config.actualMtp}
-                          meter={draft.config.meterMtp}
-                        />
-                      </div>
+                    <section className="card" aria-label="Režim sítě v identifikaci">
+                      <SelectField
+                        label="Režim sítě / napětí"
+                        value={draft.config.voltage}
+                        onChange={(v) => {
+                          const voltage = Number(v);
+                          const vn = voltage > 500;
+                          change({
+                            ...draft,
+                            config: { ...draft.config, voltage },
+                            identification: {
+                              ...(draft.identification ?? emptyIdentification()),
+                              networkVoltage: voltage,
+                              location: locations(vn).includes(draft.identification?.location ?? '')
+                                ? draft.identification!.location
+                                : locations(vn)[0],
+                            },
+                          });
+                        }}
+                      >
+                        <option value={400}>NN 400 V</option>
+                        <option value={500}>NN 500 V – ARON</option>
+                        <option value={6000}>VN 6 kV</option>
+                        <option value={6300}>VN 6,3 kV</option>
+                        <option value={10000}>VN 10 kV</option>
+                        <option value={10300}>VN 10,3 kV</option>
+                      </SelectField>
                     </section>
-                    <label className="optional-toggle card">
-                      <span>
-                        <strong>Porovnat stavy s Energis</strong>
-                        <small>Volitelná kontrola spotřeby za interval</small>
-                      </span>
-                      <input
-                        type="checkbox"
-                        checked={draft.intervalEnabled}
-                        onChange={(e) => change({ ...draft, intervalEnabled: e.target.checked })}
-                      />
-                    </label>
-                    {draft.intervalEnabled && (
-                      <Interval
-                        draft={draft}
-                        onChange={(interval) => change({ ...draft, interval })}
-                      />
-                    )}
-                    <div className="step-actions">
-                      <button className="button primary" onClick={() => navigate(1, true)}>
-                        PŘESKOČIT → KYORITSU <Icon name="arrow" />
-                      </button>
-                      {draft.intervalEnabled && (
-                        <button
-                          className="button secondary"
-                          onClick={() => {
-                            const v = draft.interval;
-                            try {
-                              if (!Object.values(v).every(Boolean))
-                                throw Error(
-                                  'Vyplňte všechny údaje intervalu nebo kontrolu přeskočte.',
-                                );
-                              /* Full interval check independent of phase inputs. */ validateInterval(
-                                draft,
-                              );
-                              navigate(1);
-                            } catch (e) {
-                              setError((e as Error).message);
+                    {draft.config.voltage > 500 ? (
+                      <p className="notice">
+                        VN: pokračujte na 1f měření. Primární proud a napětí ze SCADA.
+                      </p>
+                    ) : (
+                      <>
+                        <section className="card">
+                          <h3>Převody a pulzy</h3>
+                          <div className="field-grid">
+                            <MtpSelect
+                              label="MTP primár"
+                              value={draft.config.actualMtp}
+                              onChange={(v) => config('actualMtp', v)}
+                            />
+                            <MtpSelect
+                              label="MTP elektroměr"
+                              value={draft.config.meterMtp}
+                              onChange={(v) => config('meterMtp', v)}
+                            />
+                            <SelectField
+                              label="Váha pulzu elektroměru"
+                              value={draft.config.meterPulse}
+                              onChange={(v) => config('meterPulse', Number(v))}
+                            >
+                              {PULSE_OPTIONS.map((p) => (
+                                <option key={p.value} value={p.value}>
+                                  {p.label}
+                                </option>
+                              ))}
+                            </SelectField>
+                            <SelectField
+                              label="Váha pulzu Energis"
+                              value={draft.config.energisPulse}
+                              onChange={(v) => config('energisPulse', v === 'X' ? 'X' : Number(v))}
+                            >
+                              {PULSE_OPTIONS.map((p) => (
+                                <option key={p.value} value={p.value}>
+                                  {p.label}
+                                </option>
+                              ))}
+                              <option value="X">X · neznámá váha</option>
+                            </SelectField>
+                            <MtpCoefficient
+                              primary={draft.config.actualMtp}
+                              meter={draft.config.meterMtp}
+                            />
+                          </div>
+                        </section>
+                        <label className="optional-toggle card">
+                          <span>
+                            <strong>Porovnat stavy s Energis</strong>
+                            <small>Volitelná kontrola spotřeby za interval</small>
+                          </span>
+                          <input
+                            type="checkbox"
+                            checked={draft.intervalEnabled}
+                            onChange={(e) =>
+                              change({ ...draft, intervalEnabled: e.target.checked })
                             }
-                          }}
-                        >
-                          Použít kontrolu stavů a pokračovat
-                        </button>
-                      )}
-                    </div>
+                          />
+                        </label>
+                        {draft.intervalEnabled && (
+                          <Interval
+                            draft={draft}
+                            onChange={(interval) => change({ ...draft, interval })}
+                          />
+                        )}
+                        <div className="step-actions">
+                          <button className="button primary" onClick={() => navigate(1, true)}>
+                            PŘESKOČIT → KYORITSU <Icon name="arrow" />
+                          </button>
+                          {draft.intervalEnabled && (
+                            <button
+                              className="button secondary"
+                              onClick={() => {
+                                const v = draft.interval;
+                                try {
+                                  if (!Object.values(v).every(Boolean))
+                                    throw Error(
+                                      'Vyplňte všechny údaje intervalu nebo kontrolu přeskočte.',
+                                    );
+                                  /* Full interval check independent of phase inputs. */ validateInterval(
+                                    draft,
+                                  );
+                                  navigate(1);
+                                } catch (e) {
+                                  setError((e as Error).message);
+                                }
+                              }}
+                            >
+                              Použít kontrolu stavů a pokračovat
+                            </button>
+                          )}
+                        </div>
+                      </>
+                    )}
                   </>
                 )}
                 {step === 1 && (
@@ -413,7 +477,11 @@ export default function App() {
                         <section className="card phase-input-card" key={p}>
                           <div className="phase-input-title">
                             <PhaseBadge kind="U" phase={p} />
-                            <PhaseBadge kind="I" phase={p} />
+                            {draft.config.voltage === 500 && p === 1 ? (
+                              <span className="aron-center">ARON</span>
+                            ) : (
+                              <PhaseBadge kind="I" phase={p} />
+                            )}
                             <span>FÁZE {p + 1}</span>
                           </div>
                           <div className="two-fields">
@@ -423,12 +491,16 @@ export default function App() {
                               value={draft.phases[p].u}
                               onChange={(v) => phase(p, 'u', v)}
                             />
-                            <Field
-                              label={`I${p + 1}`}
-                              unit="A"
-                              value={draft.phases[p].i}
-                              onChange={(v) => phase(p, 'i', v)}
-                            />
+                            {draft.config.voltage === 500 && p === 1 ? (
+                              <p className="aron-center">ARON – IL2 se nepoužívá</p>
+                            ) : (
+                              <Field
+                                label={`IL${p + 1}`}
+                                unit="A"
+                                value={draft.phases[p].i}
+                                onChange={(v) => phase(p, 'i', v)}
+                              />
+                            )}
                           </div>
                         </section>
                       ))}
@@ -452,23 +524,33 @@ export default function App() {
                       {PHASES.map((p) => (
                         <section className="card phase-input-card" key={p}>
                           <div className="phase-input-title">
-                            <PhaseBadge kind="I" phase={p} />
+                            {draft.config.voltage === 500 && p === 1 ? (
+                              <span className="aron-center">ARON</span>
+                            ) : (
+                              <PhaseBadge kind="I" phase={p} />
+                            )}
                             <span>FÁZE {p + 1}</span>
                           </div>
                           <div className="two-fields">
-                            <Field
-                              label={`PF${p + 1}`}
-                              value={draft.phases[p].pf}
-                              signed
-                              onChange={(v) => phase(p, 'pf', v)}
-                            />
-                            <Field
-                              label={`P${p + 1}`}
-                              unit="kW"
-                              value={draft.phases[p].p}
-                              signed
-                              onChange={(v) => phase(p, 'p', v)}
-                            />
+                            {draft.config.voltage === 500 && p === 1 ? (
+                              <p className="aron-center">ARON – IL2 se nepoužívá</p>
+                            ) : (
+                              <>
+                                <Field
+                                  label={`PF${p + 1}`}
+                                  value={draft.phases[p].pf}
+                                  signed
+                                  onChange={(v) => phase(p, 'pf', v)}
+                                />
+                                <Field
+                                  label={`P${p + 1}`}
+                                  unit="kW"
+                                  value={draft.phases[p].p}
+                                  signed
+                                  onChange={(v) => phase(p, 'p', v)}
+                                />
+                              </>
+                            )}
                           </div>
                         </section>
                       ))}
@@ -556,7 +638,11 @@ export default function App() {
           </div>
         )}
       </main>
-      <nav className="bottom-nav" aria-label="Hlavní navigace">
+      <nav
+        hidden={mainSection !== 'measurement'}
+        className="bottom-nav"
+        aria-label="Hlavní navigace"
+      >
         <button
           className={tab === 'measure' ? 'active' : ''}
           onClick={() => {

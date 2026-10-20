@@ -1,7 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { PHASES, phaseColor } from '../core/config';
 import {
   currentOptions,
+  currentInstructions,
+  changeClampRange,
+  rangeAdvice,
+  workingBand,
   emptyCurrent,
   evaluateCurrent,
   RANGES,
@@ -11,14 +15,46 @@ import {
   type ClampRange,
   type InputUnit,
 } from '../core/current';
-import { formatNumber } from '../core/numbers';
-import { IdentificationFields, IdentificationSummary } from './Identification';
+import { formatNumber, parseNumber } from '../core/numbers';
+import type { Identification } from '../core/types';
+import { IdentificationSummary } from './Identification';
 import { Field, SelectField } from './Fields';
-const pairs = ['L1–L2', 'L1–L3', 'L2–L3'];
-export function CurrentResult({ record }: { record: CurrentRecord }) {
+const pairs = ['UL1-L2', 'UL1-L3', 'UL2-L3'];
+export function CurrentResult({
+  record,
+  section = 'detail',
+}: {
+  record: CurrentRecord;
+  section?: string;
+}) {
+  if (section === 'inspection')
+    return (
+      <section className="card">
+        <h2>Co prověřit</h2>
+        {currentInstructions(record).map((text) => (
+          <p key={text}>{text}</p>
+        ))}
+      </section>
+    );
+  if (section === 'result')
+    return (
+      <section className="card">
+        <h2>Výsledek proudového měření</h2>
+        {record.phases.flatMap((p, i) =>
+          p.unused
+            ? []
+            : [
+                <p key={i} className={`notice ${workingBand(p.differencePercent)}`}>
+                  IL{i + 1}: {signedPercent(p.differencePercent)} ·{' '}
+                  {workingBand(p.differencePercent) === 'success' ? 'V toleranci' : 'Ověřit měření'}
+                </p>,
+              ],
+        )}
+      </section>
+    );
+
   return (
     <>
-      <IdentificationSummary serial={record.input.serial} value={record.input.identification} />
       <h2>Proudové měření {record.input.vn ? 'VN · SCADA' : 'NN · měřený proud'}</h2>
       <p>
         <strong>
@@ -27,38 +63,44 @@ export function CurrentResult({ record }: { record: CurrentRecord }) {
         </strong>
       </p>
       <div className="phase-inputs">
-        {record.phases.map((p, i) => (
-          <section className="card" key={i}>
-            <h3 className="current-phase" style={{ backgroundColor: phaseColor(i as 0 | 1 | 2) }}>
-              L{i + 1}
-            </h3>
-            <dl className="current-values">
-              <dt>Primár ({p.source})</dt>
-              <dd>{formatNumber(p.primary, 1)} A</dd>
-              <dt>Očekávaný sekundár</dt>
-              <dd>
-                {formatNumber(p.expectedA * 1000, 1)} mA / {formatNumber(p.expectedA, 3)} A
-              </dd>
-              <dt>Vstup multimetru</dt>
-              <dd>
-                {p.raw} {p.unit} ({formatNumber(p.millivolts, 3)} mV)
-              </dd>
-              <dt>Rozsah</dt>
-              <dd>{p.range}</dd>
-              <dt>Skutečný sekundár</dt>
-              <dd>
-                {formatNumber(p.secondaryMA, 1)} mA / {formatNumber(p.secondaryA, 3)} A
-              </dd>
-              <dt>Přepočtený primár</dt>
-              <dd>{formatNumber(p.primaryFromSecondary, 1)} A</dd>
-              <dt>Rozdíl</dt>
-              <dd className="main-percent">{signedPercent(p.differencePercent)}</dd>
-            </dl>
-            {p.differencePercent === null && (
-              <p className="hint">Při nulové referenci nelze procentní rozdíl určit.</p>
-            )}
-          </section>
-        ))}
+        {record.phases.map((p, i) =>
+          p.unused ? (
+            <section className="card aron-center" key={i}>
+              ARON – IL2 se nepoužívá
+            </section>
+          ) : (
+            <section className="card" key={i}>
+              <h3 className="current-phase" style={{ backgroundColor: phaseColor(i as 0 | 1 | 2) }}>
+                IL{i + 1}
+              </h3>
+              <dl className="current-values">
+                <dt>Primár ({p.source})</dt>
+                <dd>{formatNumber(p.primary, 1)} A</dd>
+                <dt>Očekávaný sekundár</dt>
+                <dd>
+                  {formatNumber(p.expectedA * 1000, 1)} mA / {formatNumber(p.expectedA, 3)} A
+                </dd>
+                <dt>Klešťový ampérmetr (mV / V)</dt>
+                <dd>
+                  {p.raw} {p.unit} ({formatNumber(p.millivolts, 3)} mV)
+                </dd>
+                <dt>Rozsah</dt>
+                <dd>{p.range}</dd>
+                <dt>Skutečný sekundár</dt>
+                <dd>
+                  {formatNumber(p.secondaryMA, 1)} mA / {formatNumber(p.secondaryA, 3)} A
+                </dd>
+                <dt>Přepočtený primár</dt>
+                <dd>{formatNumber(p.primaryFromSecondary, 1)} A</dd>
+                <dt>Rozdíl</dt>
+                <dd className="main-percent">{signedPercent(p.differencePercent)}</dd>
+              </dl>
+              {p.differencePercent === null && (
+                <p className="hint">Při nulové referenci nelze procentní rozdíl určit.</p>
+              )}
+            </section>
+          ),
+        )}
       </div>
       {record.voltage && (
         <section className="card">
@@ -89,7 +131,9 @@ function restore(): CurrentDraft {
 export function CurrentMeasurement({
   onSave,
   notify,
+  shared,
 }: {
+  shared: { serial: string; identification: Identification };
   onSave: (r: CurrentRecord) => Promise<void>;
   notify: (s: string) => void;
 }) {
@@ -97,6 +141,38 @@ export function CurrentMeasurement({
     [result, setResult] = useState<CurrentRecord | null>(null),
     [error, setError] = useState(''),
     [busy, setBusy] = useState(false);
+  const networkVoltage = shared.identification.networkVoltage ?? 400;
+  useEffect(() => {
+    setResult(null);
+    setDraft((d) => ({
+      ...d,
+      serial: shared.serial,
+      identification: { ...shared.identification },
+      vn: networkVoltage > 500,
+      networkVoltage,
+      voltage: {
+        ...d.voltage,
+        ...(networkVoltage > 500
+          ? {
+              preset: String(networkVoltage / 1000),
+              primary: [
+                String(networkVoltage / 1000),
+                String(networkVoltage / 1000),
+                String(networkVoltage / 1000),
+              ] as [string, string, string],
+            }
+          : {}),
+      },
+    }));
+  }, [
+    shared.serial,
+    shared.identification.date,
+    shared.identification.location,
+    shared.identification.placement,
+    networkVoltage,
+  ]);
+  const [customMtp, setCustomMtp] = useState(false);
+  const [mtpText, setMtpText] = useState(() => String(draft.ctPrimary));
   function change(d: CurrentDraft) {
     setDraft(d);
     setResult(null);
@@ -121,7 +197,28 @@ export function CurrentMeasurement({
     setBusy(true);
     try {
       await onSave(result);
-      change(emptyCurrent(draft.vn));
+      change({
+        ...emptyCurrent(draft.vn),
+        ctPrimary: draft.ctPrimary,
+        range: draft.range,
+        serial: shared.serial,
+        identification: { ...shared.identification },
+        vn: draft.vn,
+        networkVoltage,
+        voltage: {
+          ...emptyCurrent(draft.vn).voltage,
+          ...(draft.vn
+            ? {
+                preset: String(networkVoltage / 1000),
+                primary: [
+                  String(networkVoltage / 1000),
+                  String(networkVoltage / 1000),
+                  String(networkVoltage / 1000),
+                ] as [string, string, string],
+              }
+            : {}),
+        },
+      });
       notify('Proudové měření uloženo.');
     } catch (e) {
       setError(`Měření nebylo uloženo. ${(e as Error).message}`);
@@ -132,56 +229,52 @@ export function CurrentMeasurement({
   return (
     <>
       <h1>Proudová diagnostika NN / VN</h1>
-      <label className="check-label card">
-        <input
-          type="checkbox"
-          checked={draft.vn}
-          onChange={(e) => {
-            const vn = e.target.checked;
-            change({
-              ...draft,
-              vn,
-              ctPrimary: currentOptions(vn).some((ct) => ct.primary === draft.ctPrimary)
-                ? draft.ctPrimary
-                : 300,
-              identification: {
-                ...draft.identification,
-                location: emptyCurrent(vn).identification.location,
-              },
-              voltage: {
-                ...draft.voltage,
-                primary: vn ? ['10', '10', '10'] : ['', '', ''],
-                preset: '10',
-              },
-            });
-          }}
-        />{' '}
-        VN
-      </label>
-      <IdentificationFields
-        serial={draft.serial}
-        value={draft.identification}
-        vn={draft.vn}
-        onSerial={(serial) => change({ ...draft, serial })}
-        onChange={(identification) => change({ ...draft, identification })}
-      />
+      <IdentificationSummary serial={shared.serial} value={shared.identification} />
+      <p className="hint">Identifikaci upravíte na kartě 3f měření.</p>
       <section className="card">
         <div className="field-grid">
           <SelectField
             label="MTP"
-            value={draft.ctPrimary}
-            onChange={(v) => change({ ...draft, ctPrimary: Number(v) })}
+            value={
+              customMtp || !currentOptions(draft.vn).some((ct) => ct.primary === draft.ctPrimary)
+                ? 'custom'
+                : draft.ctPrimary
+            }
+            onChange={(v) => {
+              setCustomMtp(v === 'custom');
+              if (v === 'custom') setMtpText(String(draft.ctPrimary));
+              if (v !== 'custom') change({ ...draft, ctPrimary: Number(v) });
+            }}
           >
+            <option value="custom">VLASTNÍ MTP</option>
             {currentOptions(draft.vn).map((ct) => (
               <option key={ct.primary} value={ct.primary}>
                 {ct.primary}/{ct.secondary} A
               </option>
             ))}
           </SelectField>
+          {(customMtp ||
+            !currentOptions(draft.vn).some((ct) => ct.primary === draft.ctPrimary)) && (
+            <Field
+              label="Vlastní primár MTP"
+              value={mtpText}
+              onChange={(v) => {
+                setMtpText(v);
+                change({ ...draft, ctPrimary: parseNumber(v) });
+              }}
+            />
+          )}
+          <p>
+            MTP {Number.isFinite(draft.ctPrimary) ? String(draft.ctPrimary).replace('.', ',') : '—'}
+            /{draft.vn ? 1 : 5} A
+          </p>
           <SelectField
             label="Rozsah Kyoritsu 8112"
             value={draft.range}
-            onChange={(v) => change({ ...draft, range: v as ClampRange })}
+            onChange={(v) => {
+              change(changeClampRange(draft, v as ClampRange));
+              notify('Rozsah změněn – znovu odečtěte a zadejte hodnoty.');
+            }}
           >
             {Object.keys(RANGES).map((v) => (
               <option key={v}>{v}</option>
@@ -194,58 +287,69 @@ export function CurrentMeasurement({
           {draft.vn ? 'Primární proud ze SCADA.' : 'Primární proud měřte velkými kleštěmi.'}
         </p>
       </section>
+      {rangeAdvice(draft).map((text) => (
+        <p className="notice warning" key={text}>
+          {text}
+        </p>
+      ))}
       <div className="phase-inputs">
-        {PHASES.map((i) => (
-          <section className="card" key={i}>
-            <h3
-              className="current-phase"
-              data-phase={`I${i + 1}`}
-              style={{ backgroundColor: phaseColor(i) }}
-            >
-              L{i + 1}
-            </h3>
-            <Field
-              label={`Primár L${i + 1}${draft.vn ? ' SCADA' : ''}`}
-              unit="A"
-              value={draft.phases[i].primary}
-              onChange={(v) =>
-                change({
-                  ...draft,
-                  phases: draft.phases.map((p, j) =>
-                    i === j ? { ...p, primary: v } : p,
-                  ) as CurrentDraft['phases'],
-                })
-              }
-            />
-            <Field
-              label={`Multimetr L${i + 1}`}
-              value={draft.phases[i].raw}
-              onChange={(v) =>
-                change({
-                  ...draft,
-                  phases: draft.phases.map((p, j) =>
-                    i === j ? { ...p, raw: v } : p,
-                  ) as CurrentDraft['phases'],
-                })
-              }
-            />
-            <SelectField
-              label={`Jednotka L${i + 1}`}
-              value={draft.phases[i].unit}
-              onChange={(v) =>
-                change({
-                  ...draft,
-                  phases: draft.phases.map((p, j) =>
-                    i === j ? { ...p, unit: v as InputUnit } : p,
-                  ) as CurrentDraft['phases'],
-                })
-              }
-            >
-              <option>mV</option>
-              <option>V</option>
-            </SelectField>
-          </section>
-        ))}
+        {PHASES.map((i) =>
+          networkVoltage === 500 && i === 1 ? (
+            <section className="card aron-center" key={i}>
+              ARON – IL2 se nepoužívá
+            </section>
+          ) : (
+            <section className="card" key={i}>
+              <h3
+                className="current-phase"
+                data-phase={`I${i + 1}`}
+                style={{ backgroundColor: phaseColor(i) }}
+              >
+                IL{i + 1}
+              </h3>
+              <Field
+                label={`Primár L${i + 1}${draft.vn ? ' SCADA' : ''}`}
+                unit="A"
+                value={draft.phases[i].primary}
+                onChange={(v) =>
+                  change({
+                    ...draft,
+                    phases: draft.phases.map((p, j) =>
+                      i === j ? { ...p, primary: v } : p,
+                    ) as CurrentDraft['phases'],
+                  })
+                }
+              />
+              <Field
+                label={`Klešťový ampérmetr L${i + 1} (mV / V)`}
+                value={draft.phases[i].raw}
+                onChange={(v) =>
+                  change({
+                    ...draft,
+                    phases: draft.phases.map((p, j) =>
+                      i === j ? { ...p, raw: v } : p,
+                    ) as CurrentDraft['phases'],
+                  })
+                }
+              />
+              <SelectField
+                label={`Jednotka L${i + 1}`}
+                value={draft.phases[i].unit}
+                onChange={(v) =>
+                  change({
+                    ...draft,
+                    phases: draft.phases.map((p, j) =>
+                      i === j ? { ...p, unit: v as InputUnit } : p,
+                    ) as CurrentDraft['phases'],
+                  })
+                }
+              >
+                <option>mV</option>
+                <option>V</option>
+              </SelectField>
+            </section>
+          ),
+        )}
       </div>
       <label className="check-label card">
         <input
@@ -260,47 +364,37 @@ export function CurrentMeasurement({
         {draft.vn && (
           <>
             <p>Primární VN napětí pouze ze SCADA. Nikdy neměřte multimetrem přímo na VN.</p>
-            <SelectField
-              label="Primární napětí SCADA"
-              value={draft.voltage.preset}
-              onChange={(v) =>
-                change({
-                  ...draft,
-                  voltage: {
-                    ...draft.voltage,
-                    preset: v,
-                    primary: v === 'custom' ? draft.voltage.primary : [v, v, v],
-                  },
-                })
-              }
-            >
-              <option value="6">6 kV</option>
-              <option value="10">10 kV</option>
-              <option value="10.3">10,3 kV</option>
-              <option value="custom">VLASTNÍ</option>
-            </SelectField>
+            <p>
+              Primární napětí SCADA: {String(networkVoltage / 1000).replace('.', ',')} kV (z
+              Identifikace měření)
+            </p>
           </>
         )}
         <div className="phase-inputs">
           {pairs.map((pair, i) => (
             <div key={pair}>
-              <Field
-                label={`Primární ${pair}${draft.vn ? ' SCADA' : ''}`}
-                unit={draft.vn ? 'kV' : 'V'}
-                value={draft.voltage.primary[i]}
-                onChange={(v) =>
-                  change({
-                    ...draft,
-                    voltage: {
-                      ...draft.voltage,
-                      preset: draft.vn ? 'custom' : draft.voltage.preset,
-                      primary: draft.voltage.primary.map((x, j) =>
-                        i === j ? v : x,
-                      ) as CurrentDraft['voltage']['primary'],
-                    },
-                  })
-                }
-              />
+              {draft.vn ? (
+                <p>
+                  {pair}: {String(networkVoltage / 1000).replace('.', ',')} kV
+                </p>
+              ) : (
+                <Field
+                  label={`Primární ${pair}${draft.vn ? ' SCADA' : ''}`}
+                  unit={draft.vn ? 'kV' : 'V'}
+                  value={draft.voltage.primary[i]}
+                  onChange={(v) =>
+                    change({
+                      ...draft,
+                      voltage: {
+                        ...draft.voltage,
+                        primary: draft.voltage.primary.map((x, j) =>
+                          i === j ? v : x,
+                        ) as CurrentDraft['voltage']['primary'],
+                      },
+                    })
+                  }
+                />
+              )}
               <Field
                 label={`Sekundární ${pair}`}
                 unit="V"
@@ -339,6 +433,8 @@ export function CurrentMeasurement({
       </button>
       {result && (
         <>
+          <CurrentResult record={result} section="result" />
+          <CurrentResult record={result} section="inspection" />
           <CurrentResult record={result} />
           <button className="button primary" disabled={busy} onClick={() => void save()}>
             {busy ? 'UKLÁDÁM…' : 'ULOŽIT PROUDOVÉ MĚŘENÍ'}

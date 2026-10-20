@@ -23,6 +23,7 @@ export interface IntervalInput {
   energis: number;
 }
 export interface Identification {
+  networkVoltage?: number;
   date: string;
   time?: string;
   location: string;
@@ -53,7 +54,7 @@ export interface ThreeCurrentScenario extends ScenarioResult {
 export interface AronScenario extends ScenarioResult {
   kind: 'aron';
   currents: [0 | 2, 0 | 2];
-  // Polarity is attached to the meter member (1–3 / 4–6), not the source phase.
+  // Polarity is attached to the meter member (1–3 / 7–9), not the source phase.
   reversed: [boolean, boolean];
   branchPowers: [number | null, number | null];
 }
@@ -74,6 +75,7 @@ export interface MeasurementRecord {
   savedAt: string;
   localTimestamp: string;
   input: MeasurementInput;
+  originalDraft?: FormDraft;
   diagnosis: Diagnosis;
 }
 export interface FormDraft {

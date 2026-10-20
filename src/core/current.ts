@@ -35,6 +35,7 @@ export const VN_MTP = [
 export const currentOptions = (vn: boolean) =>
   (vn ? VN_MTP : MTP_OPTIONS).map((primary) => ({ primary, secondary: vn ? 1 : 5 }));
 export const locations = (vn: boolean): readonly string[] => (vn ? R_LOCATIONS : TS_LOCATIONS);
+export const VN_VOLTAGES = [6000, 6300, 10000, 10300] as const;
 export const RANGES = { '200 mA': 1, '2 A': 10, '20 A': 100 } as const;
 export type ClampRange = keyof typeof RANGES;
 export type InputUnit = 'mV' | 'V';
@@ -85,6 +86,7 @@ export interface CurrentPhase {
   range: ClampRange;
   unit: InputUnit;
   raw: string;
+  unused?: boolean;
   millivolts: number;
   secondaryMA: number;
   secondaryA: number;
@@ -108,6 +110,7 @@ export interface VoltageResult {
 export interface CurrentDraft {
   serial: string;
   identification: Identification;
+  networkVoltage?: number;
   vn: boolean;
   ctPrimary: number;
   range: ClampRange;
@@ -117,12 +120,15 @@ export interface CurrentDraft {
 }
 export interface CurrentRecord {
   kind: 'current';
+  originalDraft?: CurrentDraft;
+  diagnostics?: string[];
   id: string;
   savedAt: string;
   localTimestamp: string;
   input: {
     serial: string;
     identification: Identification;
+    networkVoltage?: number;
     vn: boolean;
     ctPrimary: number;
     ctSecondary: number;
@@ -165,7 +171,9 @@ export function convertClamp(raw: string, unit: InputUnit, range: ClampRange) {
   const secondaryMA = millivolts * RANGES[range];
   if (!Number.isFinite(secondaryMA)) throw Error('Hodnota multimetru je příliš velká.');
   if (secondaryMA > { '200 mA': 200, '2 A': 2000, '20 A': 20000 }[range])
-    throw Error('Překročen rozsah Kyoritsu 8112. Ověřte přepínač a měření.');
+    throw Error(
+      `Překročen rozsah Kyoritsu 8112: ${formatNumber(secondaryMA, 1)} mA. Zvolte vyšší rozsah a měřte znovu.`,
+    );
   return { millivolts, secondaryMA, secondaryA: secondaryMA / 1000 };
 }
 // Only distinguish branches with separated signatures and a unique, close ratio match.
@@ -195,7 +203,7 @@ export function diagnoseVoltage(primary: Triple<number>, secondary: Triple<numbe
     }))
     .sort((a, b) => a.score - b.score);
   if (scores[0].score > 0.02 || scores[1].score - scores[0].score < 0.02) return unknown;
-  const pairs = ['L1–L2', 'L1–L3', 'L2–L3'];
+  const pairs = ['UL1-L2', 'UL1-L3', 'UL2-L3'];
   return (
     'Pravděpodobné přiřazení (primár ← sekundár): ' +
     scores[0].order.map((j, i) => `${pairs[i]} ← ${pairs[j]}`).join('; ') +
@@ -207,12 +215,36 @@ export function evaluateCurrent(d: CurrentDraft, date = new Date()): CurrentReco
   validateIdentification(d.identification);
   if (!locations(d.vn).includes(d.identification.location))
     throw Error('Lokalita neodpovídá režimu NN/VN.');
-  if (!currentOptions(d.vn).some((ct) => ct.primary === d.ctPrimary))
+  if (!Number.isFinite(d.ctPrimary) || d.ctPrimary <= 0)
     throw Error('Neplatný MTP pro tento režim.');
   const ctSecondary = d.vn ? 1 : 5;
-  const phases = d.phases.map((p) => {
+  const voltageMode = d.networkVoltage ?? (d.vn ? 10000 : 400);
+  if (![400, 500, ...VN_VOLTAGES].includes(voltageMode) || d.vn !== voltageMode > 500)
+    throw Error('Neplatný režim sítě.');
+  const phases = d.phases.map((p, index) => {
+    if (voltageMode === 500 && index === 1)
+      return {
+        unused: true,
+        primary: 0,
+        source: 'měřený proud',
+        range: d.range,
+        unit: 'mV',
+        raw: '',
+        millivolts: 0,
+        secondaryMA: 0,
+        secondaryA: 0,
+        expectedA: 0,
+        primaryFromSecondary: 0,
+        differencePercent: null,
+      };
+
     const primary = positive(p.primary, 'Primární proud');
-    const converted = convertClamp(p.raw, p.unit, d.range);
+    let converted: ReturnType<typeof convertClamp>;
+    try {
+      converted = convertClamp(p.raw, p.unit, d.range);
+    } catch (error) {
+      throw Error(`IL${index + 1}: ${(error as Error).message}`);
+    }
     const expectedA = (primary * ctSecondary) / d.ctPrimary,
       primaryFromSecondary = (converted.secondaryA * d.ctPrimary) / ctSecondary;
     if (![expectedA, primaryFromSecondary].every(Number.isFinite))
@@ -231,13 +263,17 @@ export function evaluateCurrent(d: CurrentDraft, date = new Date()): CurrentReco
   }) as Triple<CurrentPhase>;
   let voltage: VoltageResult | undefined;
   if (d.voltageEnabled) {
-    if (d.vn && !['6', '10', '10.3', 'custom'].includes(d.voltage.preset))
+    if (d.vn && !['6', '6.3', '10', '10.3'].includes(d.voltage.preset))
       throw Error('Neplatná volba napětí.');
+    if (d.vn && d.networkVoltage !== undefined && Number(d.voltage.preset) * 1000 !== voltageMode)
+      throw Error('Napětí neodpovídá společné identifikaci.');
+    if (d.vn && d.voltage.primary.some((v) => parseNumber(v) !== Number(d.voltage.preset)))
+      throw Error('VN napětí musí odpovídat předvolbě.');
     const primary = d.voltage.primary.map(
       (v) => positive(v, 'Primární napětí', false) * (d.vn ? 1000 : 1),
     ) as Triple<number>;
-    const secondary = d.voltage.secondary.map((v) =>
-      positive(v, 'Sekundární napětí', false),
+    const secondary = d.voltage.secondary.map((v, index) =>
+      voltageMode === 500 && index === 1 && !v.trim() ? 0 : positive(v, 'Sekundární napětí', false),
     ) as Triple<number>;
     if (!primary.every(Number.isFinite)) throw Error('Napětí je příliš velké.');
     voltage = {
@@ -248,7 +284,8 @@ export function evaluateCurrent(d: CurrentDraft, date = new Date()): CurrentReco
       diagnosis: diagnoseVoltage(primary, secondary),
     };
   }
-  return {
+  const record: CurrentRecord = {
+    originalDraft: structuredClone(d),
     kind: 'current',
     id: crypto.randomUUID(),
     savedAt: date.toISOString(),
@@ -256,6 +293,7 @@ export function evaluateCurrent(d: CurrentDraft, date = new Date()): CurrentReco
     input: {
       serial: d.serial,
       identification: { ...d.identification, time: localTimestamp(date).split(' ')[1] },
+      networkVoltage: voltageMode,
       vn: d.vn,
       ctPrimary: d.ctPrimary,
       ctSecondary,
@@ -264,4 +302,46 @@ export function evaluateCurrent(d: CurrentDraft, date = new Date()): CurrentReco
     phases,
     voltage,
   };
+  record.diagnostics = currentInstructions(record);
+  return record;
+}
+
+export const currentTerminals = (phase: number) => ['1–3', '4–6', '7–9'][phase];
+export function currentInstructions(record: CurrentRecord): string[] {
+  return record.phases.flatMap((phase, index) => {
+    if (phase.unused) return [];
+    const band = workingBand(phase.differencePercent);
+    if (band === 'success')
+      return [
+        `IL${index + 1}: měřicí převod a proudová větev odpovídají. Rozdíl proti Energis může být způsoben nesouběžností nebo zpracováním dat.`,
+      ];
+    if (band === 'unknown')
+      return [
+        `IL${index + 1}: při nulové referenci nelze určit procentní rozdíl. Znovu změřte primár i sekundár.`,
+      ];
+    const verify = `IL${index + 1} se liší. Doporučeno znovu ověřit primární a sekundární měření IL${index + 1}.`;
+    if (band === 'intermediate') return [verify + ' Ověřte souběžnost měření.'];
+    return [
+      verify +
+        ` Prověř IL${index + 1} – proudový obvod elektroměru ${currentTerminals(index)}. Možné příčiny: ponechané zkratování měřicí svorkovnice, vyzkratovaný nebo přerušený proudový obvod, nesprávné zapojení či záměna proudových větví. Samotná velikost proudu neurčuje polaritu.`,
+    ];
+  });
+}
+export function changeClampRange(draft: CurrentDraft, range: ClampRange): CurrentDraft {
+  return {
+    ...draft,
+    range,
+    phases: draft.phases.map((p) => ({ ...p, raw: '' })) as CurrentDraft['phases'],
+  };
+}
+export function rangeAdvice(draft: CurrentDraft): string[] {
+  const limit = { '200 mA': 200, '2 A': 2000, '20 A': 20000 }[draft.range];
+  return draft.phases.flatMap((p, index) => {
+    if (draft.networkVoltage === 500 && index === 1) return [];
+    const expected = ((parseNumber(p.primary) * (draft.vn ? 1 : 5)) / draft.ctPrimary) * 1000;
+    if (!Number.isFinite(expected) || expected <= limit) return [];
+    return [
+      `Pro IL${index + 1} je očekáváno přibližně ${formatNumber(expected, 1)} mA. ${expected <= 2000 ? 'Zvolte rozsah 2 A.' : expected <= 20000 ? 'Zvolte rozsah 20 A.' : 'Překročen i rozsah 20 A.'}`,
+    ];
+  });
 }

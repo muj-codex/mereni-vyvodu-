@@ -94,7 +94,7 @@ export function PhaseBadge({
       style={{ backgroundColor: phaseColor(shorted ? null : phase) }}
       data-phase={shorted ? 'shorted' : `${kind}${phase + 1}`}
     >
-      {shorted ? 'VYZKRATOVÁNO' : `${kind}${phase + 1}`}
+      {shorted ? 'VYZKRATOVÁNO' : `${kind}L${phase + 1}`}
     </span>
   );
 }
@@ -149,7 +149,7 @@ export function AronMapping({ scenario, title }: { scenario?: AronScenario; titl
             </div>
             {scenario?.reversed[branch] && (
               <span className="aron-polarity">
-                Obrácená polarita k/l · člen {branch === 0 ? '1–3' : '4–6'}
+                Obrácená polarita k/l · člen {branch === 0 ? '1–3' : '7–9'}
               </span>
             )}
           </div>
@@ -176,11 +176,11 @@ export function scenarioLabel(s: Scenario): string {
     return s.currents
       .map(
         (source, index) =>
-          `L${index === 0 ? 1 : 3}←I${source + 1} (k/l ${s.reversed[index] ? 'obráceně' : 'souhlasně'})`,
+          `L${index === 0 ? 1 : 3}←IL${source + 1} (k/l ${s.reversed[index] ? 'obráceně' : 'souhlasně'})`,
       )
       .join(' · ');
   return s.permutation
-    .map((p, t) => `U${t + 1}←${s.shorted[p] ? 'zkrat I' + (p + 1) : 'I' + (p + 1)}`)
+    .map((p, t) => `UL${t + 1}←${s.shorted[p] ? 'zkrat IL' + (p + 1) : 'IL' + (p + 1)}`)
     .join(' · ');
 }
 export function Result({ diagnosis, serial }: { diagnosis: Diagnosis; serial: string }) {
@@ -220,23 +220,14 @@ export function Result({ diagnosis, serial }: { diagnosis: Diagnosis; serial: st
         </>
       ) : (
         <>
-          {diagnosis.best ? (
-            <>
-              <ScenarioMapping scenario={diagnosis.best} title="Hlavní varianta modelu" />
-              <p className="hint">
-                Barevné přiřazení je diagnostická pomůcka. Samotná shoda celkového výkonu
-                nepotvrzuje zapojení.
-              </p>
-            </>
-          ) : (
-            <div className="notice warning">
-              Z dostupných dat nelze bezpečně určit hlavní variantu. Ověřte naměřené hodnoty v
-              detailu.
-            </div>
-          )}
-          {diagnosis.alternative && (
-            <ScenarioMapping scenario={diagnosis.alternative} title="DALŠÍ MOŽNÁ VARIANTA" />
-          )}
+          <ScenarioMapping
+            aron={diagnosis.mode === 'aron'}
+            title="Referenční zapojení – nepotvrzuje příčinu rozdílu"
+          />
+          <p className="notice warning">
+            Rozdíl proti Energis je významný. Z tohoto porovnání nelze jednoznačně určit chybu
+            zapojení.
+          </p>
         </>
       )}
       {diagnosis.warnings.map((w) => (
@@ -253,8 +244,8 @@ export function Inspection({ diagnosis }: { diagnosis: Diagnosis }) {
       <div className="notice">
         <Icon name="info" />
         <div>
-          Pracovní pokyny se týkají <strong>elektroměru</strong>. Primární MTP i napěťové fáze se
-          považují za správné.
+          Pracovní pokyny se týkají <strong>elektroměru</strong>. Převody a napěťové obvody je třeba
+          ověřit místním měřením.
         </div>
       </div>
       <section className="card instructions">
@@ -282,8 +273,8 @@ export function Detail({ record }: { record: MeasurementRecord }) {
     <>
       {d.mode === 'aron' && (
         <p className="notice">
-          ARON · dva wattmetrové členy: (L1–L2, I1) + (L3–L2, I3). Svorky napětí 2/5/8; proudové
-          členy 1–3 a 4–6. Napěťový sekundár 100 V.
+          ARON · dva wattmetrové členy: (UL1-L2, IL1) + (UL3-L2, IL3). Svorky napětí 2/5/8; proudové
+          členy 1–3 a 7–9. Napěťový sekundár 100 V.
         </p>
       )}
       <section className="card">
@@ -307,34 +298,33 @@ export function Detail({ record }: { record: MeasurementRecord }) {
           <dd>{formatNumber(d.best?.power)} kW</dd>
           <dt>Shoda modelu</dt>
           <dd>{formatNumber(d.best?.score)} %</dd>
-          {d.alternative && (
-            <>
-              <dt>Další blízký model</dt>
-              <dd>
-                {formatNumber(d.alternative.power)} kW / {formatNumber(d.alternative.score)} %
-              </dd>
-            </>
-          )}
         </dl>
       </section>
       <section className="card">
         <h3>Naměřené hodnoty</h3>
         <div className="reading-grid">
-          {input.phases.map((p, index) => (
-            <div key={index} className="reading-phase">
-              <PhaseBadge kind="U" phase={index as Phase} />
-              <dl>
-                <dt>U</dt>
-                <dd>{formatNumber(p.u)} V</dd>
-                <dt>I</dt>
-                <dd>{formatNumber(p.i)} A</dd>
-                <dt>PF</dt>
-                <dd>{formatNumber(p.pf, 3)}</dd>
-                <dt>P</dt>
-                <dd>{formatNumber(p.p)} kW</dd>
-              </dl>
-            </div>
-          ))}
+          {input.phases.map((p, index) =>
+            input.config.voltage === 500 && index === 1 ? (
+              <div key={index} className="reading-phase">
+                <p>UL2 {formatNumber(p.u)} V</p>
+                <p className="aron-center">ARON – IL2 se nepoužívá</p>
+              </div>
+            ) : (
+              <div key={index} className="reading-phase">
+                <PhaseBadge kind="U" phase={index as Phase} />
+                <dl>
+                  <dt>U</dt>
+                  <dd>{formatNumber(p.u)} V</dd>
+                  <dt>I</dt>
+                  <dd>{formatNumber(p.i)} A</dd>
+                  <dt>PF</dt>
+                  <dd>{formatNumber(p.pf, 3)}</dd>
+                  <dt>P</dt>
+                  <dd>{formatNumber(p.p)} kW</dd>
+                </dl>
+              </div>
+            ),
+          )}
         </div>
       </section>
       <section className="card">
@@ -377,8 +367,8 @@ export function Detail({ record }: { record: MeasurementRecord }) {
         <details className="card technical">
           <summary>Všech {d.scenarios.length} scénářů · technický detail</summary>
           <p className="hint">
-            Shoda = max(0; 100 × (1 − |model − Energis| / max(|Kyoritsu|; 0,001))). Jde o
-            normalizovanou blízkost výkonů.
+            Pouze orientační matematické scénáře, nikoli důkaz chyby zapojení. Shoda = max(0; 100 ×
+            (1 − |model − Energis| / max(|Kyoritsu|; 0,001))). Jde o normalizovanou blízkost výkonů.
           </p>
           <ol className="scenario-list">
             {d.scenarios.map((s) => (
@@ -406,7 +396,7 @@ export function Detail({ record }: { record: MeasurementRecord }) {
             ARON počítá Re[(V1−V2)·conj(Ia) + (V3−V2)·conj(Ib)] včetně polarity k/l každého členu.
             L2 je společná napěťová reference, nikoli vyzkratovaná větev. Převody 500/100 V a
             proudového sekundáru se při přepočtu na primární kW vykrátí. Model předpokládá
-            třívodičovou síť; skutečná I2 zůstává v naměřených datech a v kalibraci fázoru V2.
+            třívodičovou síť; IL2 se proudově nepoužívá. Napěťová reference UL2 zůstává dostupná.
           </p>
         )}
         <p>
