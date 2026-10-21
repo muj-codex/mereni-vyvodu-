@@ -58,8 +58,8 @@ export function CurrentResult({
       <h2>Proudové měření {record.input.vn ? 'VN · SCADA' : 'NN · měřený proud'}</h2>
       <p>
         <strong>
-          MTP {record.input.ctPrimary}/{record.input.ctSecondary} A · Kyoritsu 8112 – rozsah{' '}
-          {record.input.range}
+          MTP {formatNumber(record.input.ctPrimary)}/{record.input.ctSecondary} A · Kyoritsu 8112 –
+          rozsah {record.input.range}
         </strong>
       </p>
       <div className="phase-inputs">
@@ -82,7 +82,7 @@ export function CurrentResult({
                 </dd>
                 <dt>Klešťový ampérmetr (mV / V)</dt>
                 <dd>
-                  {p.raw} {p.unit} ({formatNumber(p.millivolts, 3)} mV)
+                  {formatNumber(parseNumber(p.raw))} {p.unit} ({formatNumber(p.millivolts, 3)} mV)
                 </dd>
                 <dt>Rozsah</dt>
                 <dd>{p.range}</dd>
@@ -265,8 +265,7 @@ export function CurrentMeasurement({
             />
           )}
           <p>
-            MTP {Number.isFinite(draft.ctPrimary) ? String(draft.ctPrimary).replace('.', ',') : '—'}
-            /{draft.vn ? 1 : 5} A
+            MTP {formatNumber(draft.ctPrimary)}/{draft.vn ? 1 : 5} A
           </p>
           <SelectField
             label="Rozsah Kyoritsu 8112"

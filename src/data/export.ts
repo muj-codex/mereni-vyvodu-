@@ -1,8 +1,11 @@
+import { formatNumber, parseNumber } from '../core/numbers';
+import { isIntervalCheck, recordVoltage } from '../core/historyView';
+import type { IntervalCheckRecord } from '../core/intervalCheck';
 import type { HistoryRecord, MeasurementRecord } from '../core/types';
 import type { CurrentRecord } from '../core/current';
 import { percentDifference } from '../core/current';
 type Column<T> = { key: string; label: string; value: (record: T) => unknown };
-const number = (v: unknown) => (typeof v === 'number' ? String(v).replace('.', ',') : (v ?? ''));
+const number = (v: unknown) => (typeof v === 'number' ? formatNumber(v) : (v ?? ''));
 const identityColumns: Column<HistoryRecord>[] = [
   {
     key: 'date',
@@ -47,11 +50,15 @@ export const EXPORT_COLUMNS: Column<MeasurementRecord>[] = [
     label: 'Rozdíl %',
     value: (r) => percentDifference(r.input.energis, r.input.kyoritsu),
   },
-  { key: 'mtp', label: 'MTP', value: (r) => `${r.input.config.actualMtp}/5 A` },
+  { key: 'mtp', label: 'MTP', value: (r) => `${formatNumber(r.input.config.actualMtp)}/5 A` },
 ];
 export const CURRENT_COLUMNS: Column<CurrentRecord>[] = [
   ...identityColumns,
-  { key: 'mtp', label: 'MTP', value: (r) => `${r.input.ctPrimary}/${r.input.ctSecondary} A` },
+  {
+    key: 'mtp',
+    label: 'MTP',
+    value: (r) => `${formatNumber(r.input.ctPrimary)}/${r.input.ctSecondary} A`,
+  },
   {
     key: 'mode',
     label: 'Režim',
@@ -76,7 +83,8 @@ export const CURRENT_COLUMNS: Column<CurrentRecord>[] = [
     ).map(([key, label]) => ({
       key: `L${i + 1}-${key}`,
       label: `L${i + 1} ${label}`,
-      value: (r: CurrentRecord) => (r.phases[i].unused ? '' : r.phases[i][key]),
+      value: (r: CurrentRecord) =>
+        r.phases[i].unused ? '' : key === 'raw' ? parseNumber(r.phases[i].raw) : r.phases[i][key],
     })),
   ),
   ...([0, 1, 2] as const).flatMap((i) => [
@@ -106,18 +114,67 @@ export const CURRENT_COLUMNS: Column<CurrentRecord>[] = [
 ];
 export const isCurrent = (r: HistoryRecord): r is CurrentRecord =>
   'kind' in r && r.kind === 'current';
-const exportPercent = (value: unknown) =>
+export const exportPercent = (value: unknown) =>
   typeof value === 'number' && Number.isFinite(value)
-    ? `${value > 0 ? '+' : ''}${String(value).replace('.', ',')}`
+    ? `${value > 0 ? '+' : ''}${formatNumber(value, 2, true)} %`
     : (value ?? '');
 const columnValue = (key: string, value: unknown) =>
   key === 'percent' || key.endsWith('-differencePercent') ? exportPercent(value) : value;
 const safeCell = (value: unknown) => String(number(value)).replace(/[\t\r\n]/g, ' ');
+export const INTERVAL_COLUMNS: Column<IntervalCheckRecord>[] = [
+  ...identityColumns,
+  { key: 'recordType', label: 'Typ záznamu', value: () => 'Kontrola stavů' },
+  { key: 'network', label: 'Síť [V]', value: (r) => r.input.config.voltage },
+  { key: 'actualMtp', label: 'MTP primár [A]', value: (r) => r.input.config.actualMtp },
+  { key: 'meterMtp', label: 'MTP elektroměr [A]', value: (r) => r.input.config.meterMtp },
+  ...(['from', 'to', 'start', 'end'] as const).map((key) => ({
+    key: `interval-${key}`,
+    label: { from: 'Interval OD', to: 'Interval DO', start: 'Stav OD [kWh]', end: 'Stav DO [kWh]' }[
+      key
+    ],
+    value: (r: IntervalCheckRecord) => r.input.interval[key],
+  })),
+  ...(
+    [
+      'registerDelta',
+      'correction',
+      'meterEnergy',
+      'energisEnergy',
+      'difference',
+      'percent',
+    ] as const
+  ).map((key) => ({
+    key,
+    label: {
+      registerDelta: 'Rozdíl stavů [kWh]',
+      correction: 'Korekční koeficient MTP',
+      meterEnergy: 'Spotřeba elektroměru po korekci [kWh]',
+      energisEnergy: 'Spotřeba Energis [kWh]',
+      difference: 'Rozdíl [kWh]',
+      percent: 'Rozdíl %',
+    }[key],
+    value: (r: IntervalCheckRecord) => r.result[key],
+  })),
+  { key: 'summary', label: 'Výsledek', value: (r) => r.assessment.summary },
+  {
+    key: 'recommendations',
+    label: 'Doporučení',
+    value: (r) => r.assessment.recommendations.join(' '),
+  },
+];
 function columns(r: HistoryRecord): Column<HistoryRecord>[] {
-  return (isCurrent(r) ? CURRENT_COLUMNS : EXPORT_COLUMNS) as Column<HistoryRecord>[];
+  return (
+    isIntervalCheck(r) ? INTERVAL_COLUMNS : isCurrent(r) ? CURRENT_COLUMNS : EXPORT_COLUMNS
+  ) as Column<HistoryRecord>[];
 }
 export function toTSV(records: HistoryRecord[]) {
-  if (records.some(isCurrent) && records.some((r) => !isCurrent(r)))
+  if (
+    new Set(
+      records.map((r) =>
+        isIntervalCheck(r) ? 'interval' : isCurrent(r) ? 'current' : 'measurement',
+      ),
+    ).size > 1
+  )
     return backupTSV(records).split('\n').slice(1).join('\n');
   return records
     .map((r) =>
@@ -135,10 +192,14 @@ export function mailtoLink(records: HistoryRecord[]) {
 }
 // A unified backup keeps one row per record and one stable header, even for mixed modes.
 export function backupTSV(records: HistoryRecord[]) {
-  const keys = [...new Set([...EXPORT_COLUMNS, ...CURRENT_COLUMNS].map((c) => c.key))];
-  const labels = new Map([...EXPORT_COLUMNS, ...CURRENT_COLUMNS].map((c) => [c.key, c.label]));
-  const hasVN = records.some((r) => isCurrent(r) && r.input.vn);
-  const hasNN = records.some((r) => !isCurrent(r) || !r.input.vn);
+  const keys = [
+    ...new Set([...EXPORT_COLUMNS, ...CURRENT_COLUMNS, ...INTERVAL_COLUMNS].map((c) => c.key)),
+  ];
+  const labels = new Map(
+    [...EXPORT_COLUMNS, ...CURRENT_COLUMNS, ...INTERVAL_COLUMNS].map((c) => [c.key, c.label]),
+  );
+  const hasVN = records.some((r) => recordVoltage(r) > 500);
+  const hasNN = records.some((r) => recordVoltage(r) <= 500);
   labels.set('location', hasVN ? (hasNN ? 'Trafostanice / Rozvodna' : 'Rozvodna') : 'Trafostanice');
   const header = keys.map((k) => safeCell(labels.get(k))).join('\t');
   return (

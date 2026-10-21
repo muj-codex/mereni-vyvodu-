@@ -127,7 +127,7 @@ test('PWA se znovu načte offline a uchová historii', async ({ page, context })
   await expect(page.getByLabel('VÝROBNÍ ČÍSLO ELEKTROMĚRU', { exact: true })).toHaveValue('');
   await context.setOffline(true);
   await page.reload();
-  await expect(page.getByRole('heading', { name: 'Základ / pulz' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Základ / kontrola stavů' })).toBeVisible();
   await page.getByRole('button', { name: 'Výsledky měření', exact: false }).last().click();
   await expect(page.locator('.history-item')).toHaveCount(1);
   await page.getByRole('button', { name: 'Nové měření', exact: true }).click();
@@ -140,20 +140,22 @@ test('PWA se znovu načte offline a uchová historii', async ({ page, context })
   await expect(page.locator('.history-item')).toHaveCount(2);
 });
 
-test('volitelný interval, MTP, pulz X a nezávislá historie při rozpracovaném měření', async ({
+test('volitelný interval bez pulzů, MTP a nezávislá historie při rozpracovaném měření', async ({
   page,
 }) => {
   await page.goto('/');
   await page.getByLabel('VÝROBNÍ ČÍSLO ELEKTROMĚRU', { exact: true }).fill('00042');
   await page.getByRole('combobox', { name: 'MTP primár', exact: true }).selectOption('200');
-  await page.getByRole('combobox', { name: 'Váha pulzu Energis', exact: true }).selectOption('X');
   await page.getByRole('checkbox', { name: 'Porovnat stavy s Energis', exact: false }).check();
   await page.getByLabel('Datum a čas OD', { exact: true }).fill('2026-10-17T08:00');
   await page.getByLabel('Datum a čas DO', { exact: true }).fill('2026-10-17T08:15');
   await page.getByLabel('Stav elektroměru OD', { exact: true }).fill('100');
   await page.getByLabel('Stav elektroměru DO', { exact: true }).fill('110');
   await page.getByLabel('Spotřeba Energis za interval', { exact: true }).fill('20');
-  await expect(page.getByText('Nejbližší smysluplná váha: 200 Wh', { exact: false })).toBeVisible();
+  await expect(
+    page.getByText('Spotřeba elektroměru a Energis odpovídá.', { exact: true }),
+  ).toBeVisible();
+  await expect(page.getByText(/Odhad váhy|Nejbližší smysluplná/)).toHaveCount(0);
   await noOverflow(page);
   await page.getByRole('button', { name: 'Použít kontrolu stavů a pokračovat' }).click();
   await expect(page.getByRole('heading', { name: 'Napětí a proudy' })).toBeVisible();
@@ -220,8 +222,8 @@ test('500 V automaticky ARON, informační MTP, fyzické barvy a historie offlin
   });
   await page.getByRole('button', { name: 'CO PROVĚŘIT NA ELEKTROMĚRU', exact: true }).click();
   await page.getByRole('button', { name: 'DETAIL VÝSLEDKU', exact: true }).click();
-  await expect(page.getByText('12,90 A', { exact: true })).toBeVisible();
-  await expect(page.getByText('UL2 506,60 V', { exact: true })).toBeVisible();
+  await expect(page.getByText('12,9 A', { exact: true })).toBeVisible();
+  await expect(page.getByText('UL2 506,6 V', { exact: true })).toBeVisible();
   await page.getByText('Všech 8 scénářů · technický detail').click();
   await expect(page.locator('.scenario-list li')).toHaveCount(8);
   await noOverflow(page);
@@ -234,7 +236,7 @@ test('500 V automaticky ARON, informační MTP, fyzické barvy a historie offlin
   await page.locator('.record-open').click();
   await expect(page.locator('.aron-center').first()).toHaveText('ARON');
   await page.getByRole('button', { name: 'Data / detail', exact: true }).click();
-  await expect(page.getByText('12,90 A', { exact: true })).toBeVisible();
+  await expect(page.getByText('12,9 A', { exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Nové měření', exact: true }).click();
   await page
     .getByRole('combobox', { name: 'Režim sítě / napětí', exact: true })

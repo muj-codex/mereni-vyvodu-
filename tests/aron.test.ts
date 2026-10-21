@@ -1,3 +1,4 @@
+import { isIntervalCheck } from '../src/core/historyView';
 import { isCurrent } from '../src/data/export';
 import 'fake-indexeddb/auto';
 import { describe, expect, it } from 'vitest';
@@ -235,7 +236,7 @@ describe('ARON vzhled, informace MTP a zachování dat', () => {
     await store.close();
     const reopened = createHistory(name);
     const [saved] = await reopened.all();
-    if (isCurrent(saved)) throw Error('Expected power record');
+    if (isCurrent(saved) || isIntervalCheck(saved)) throw Error('Expected power record');
     expect(saved.input.phases).toEqual(parsed.phases);
     expect(saved.diagnosis.mode).toBe('aron');
     const cells = toTSV([saved]).split('\t');

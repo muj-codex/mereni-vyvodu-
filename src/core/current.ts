@@ -42,7 +42,7 @@ export type InputUnit = 'mV' | 'V';
 export function signedPercent(value: number | null | undefined) {
   return value == null || !Number.isFinite(value)
     ? '—'
-    : `${value > 0 ? '+' : value < 0 ? '−' : ''}${formatNumber(Math.abs(value), 1)} %`;
+    : `${value > 0 ? '+' : value < 0 ? '−' : ''}${formatNumber(Math.abs(value), 1, true)} %`;
 }
 export function percentDifference(actual: number, reference: number): number | null {
   if (![actual, reference].every(Number.isFinite) || reference === 0) return null;
@@ -309,12 +309,9 @@ export function evaluateCurrent(d: CurrentDraft, date = new Date()): CurrentReco
 export const currentTerminals = (phase: number) => ['1–3', '4–6', '7–9'][phase];
 export function currentInstructions(record: CurrentRecord): string[] {
   return record.phases.flatMap((phase, index) => {
-    if (phase.unused) return [];
+    if (phase.unused || (record.input.networkVoltage === 500 && index === 1)) return [];
     const band = workingBand(phase.differencePercent);
-    if (band === 'success')
-      return [
-        `IL${index + 1}: měřicí převod a proudová větev odpovídají. Rozdíl proti Energis může být způsoben nesouběžností nebo zpracováním dat.`,
-      ];
+    if (band === 'success') return [`IL${index + 1}: měřicí převod a proudová větev odpovídají.`];
     if (band === 'unknown')
       return [
         `IL${index + 1}: při nulové referenci nelze určit procentní rozdíl. Znovu změřte primár i sekundár.`,

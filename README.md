@@ -31,7 +31,7 @@ HTTP adresa počítače v místní síti umožní prohlédnout rozhraní, ale Sa
 
 ## Pracovní tok
 
-1. **Základ / pulz:** povinné výrobní číslo jako řetězec, převody MTP, napětí, váhy pulzu; volitelná kontrola stavů se shodným intervalem Energis.
+1. **Základ / kontrola stavů:** společná identifikace, převody MTP a napětí; volitelná samostatná kontrola spotřeby za shodný interval Energis bez vah pulzu.
 2. **Napětí a proudy:** U1–U3 a I1–I3, každá fyzická fáze vlastní pevnou barvou.
 3. **PF a výkony:** znaménkové PF a P po fázích, celkové Kyoritsu a trend Energis. Tlačítka ± pomáhají na číselné klávesnici iPhonu.
 4. **Vizuální výsledek:** při 400 V původní tříproudový model (48 scénářů); při 500 V automaticky ARON (8 scénářů dvou wattmetrových členů). Přímá tolerance ±15 %, mimo toleranci upozornění na souběžnost a možné příčiny, bez jistého verdiktu o zapojení. Čísla modelu zůstávají v detailu.
@@ -39,7 +39,7 @@ HTTP adresa počítače v místní síti umožní prohlédnout rozhraní, ale Sa
 6. **Detail:** skutečná data, model, všech 48 scénářů a předpoklady.
 7. **Výsledky měření:** samostatná hlavní záložka s historií, plným uloženým záznamem, výběrem, e-mailem a TSV.
 
-**ULOŽIT MĚŘENÍ** nejprve dokončí transakci IndexedDB, poté vyčistí údaje konkrétního měření a připraví nový elektroměr. Zachovává provozní nastavení MTP/napětí/pulzů. Při selhání zápisu vstupy zůstanou. Historie obsahuje nezávislé kopie vstupů i tehdejší diagnostiky s verzí modelu; nová měření stará nepřepočítávají.
+**ULOŽIT MĚŘENÍ** nejprve dokončí transakci IndexedDB, poté vyčistí údaje konkrétního měření a připraví nový elektroměr. Zachovává provozní nastavení MTP/napětí. Při selhání zápisu vstupy zůstanou. Historie obsahuje nezávislé kopie vstupů i tehdejší diagnostiky s verzí modelu; nová měření stará nepřepočítávají.
 
 ## Export a ochrana dat
 
@@ -79,7 +79,7 @@ tests/          unit testy a testy úložiště
 e2e/            reálné prohlížečové scénáře
 ```
 
-Informační **Korekční koeficient** na úvodní kartě zobrazuje `MTP primár / MTP elektroměr` na tři desetinná místa. Je pouze vizuální, nepřidává se do záznamu a neškáluje diagnostiku nebo export. Existující volitelná intervalová korekce MTP zůstává beze změny.
+Informační **Korekční koeficient** na úvodní kartě zobrazuje `MTP primár / MTP elektroměr` na tři desetinná místa. V kontrole stavů skutečně násobí rozdíl registru; ukládá se do jejího snapshotu a TSV. Okamžité 3f/1f měření tímto koeficientem neškálujeme.
 
 Režim se pro nové měření vybírá pouze napětím: **400 V → tříproudový**, **500 V → ARON**. U 500 V se proudová IL2 nezadává ani nevyhodnocuje; primární napětí zůstává dostupné. Výsledková ARON tabulka má prostřední šedé pole pouze „ARON“; nejde o chybějící ani vyzkratovanou L2. Nové záznamy nesou režim a verzi modelu 1.1.1. Staré záznamy bez režimu zůstávají ve své původní interpretaci, včetně dříve uložených 500 V měření; historie se zpětně nepřepočítává.
 
@@ -102,3 +102,11 @@ IndexedDB používá stejný název a store jako původní aplikace. Upgrade z v
 Offline E2E čeká po kliknutí na uložení na potvrzený reset: u 3f vyčištění čísla, u 1f odstranění tlačítka uložení po dokončení IndexedDB transakce. Samotné dokončení kliknutí nečeká na asynchronní handler a dříve dovolovalo reload během zápisu. Testy neobsahují pevná časová čekání.
 
 Podrobnosti oprav persistence a meze určení příčiny terénního incidentu jsou v [docs/PROMPT_1_1.md](docs/PROMPT_1_1.md).
+
+## Verze 1.2.2 – samostatná Kontrola stavů
+
+Na první straně lze kontrolu stavů uložit bez pokračování ke Kyoritsu nebo odeslat pouze tuto kontrolu jako čisté TSV v těle systémového sdílení, bez přílohy. Bez sdílení se TSV zkopíruje; při nedostupné schránce se zobrazí text pro ruční kopírování. Výpočet používá `(stav DO − stav OD) × MTP skutečný / MTP elektroměr`. Například 20 kWh × 300/600 = 10 kWh. Váhy ani odhad pulzů se nezadávají a nejsou součástí nového typu záznamu.
+
+Historie zobrazuje všechny dny od nejnovějších a rozlišuje 3f, 1f a Kontrolu stavů. Filtry umístění a napětí lze kombinovat a zrušit; pouze mění zobrazení. Výsledek / Prověřit / Data-detail mají vlastní obsah. DB zůstává ve schématu v2 bez přepisu uložených objektů, včetně starých pulzních polí.
+
+Výstupy používají centrální formátování s nejvýše třemi desetinnými místy, procenta TSV/e-mailu přesně dvě. Interní výpočty a uložená čísla se nezaokrouhlují. 1f diagnostika nezmiňuje Energis; ARON používá pouze IL1 (1–3) a IL3 (7–9). Sazby zůstávají připravený placeholder.

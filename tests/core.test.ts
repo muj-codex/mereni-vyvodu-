@@ -9,7 +9,7 @@ import {
 } from '../src/core/diagnosis';
 import { branchPower, currentAngle, equivalentPhaseVoltage } from '../src/core/physics';
 import { PHASE_COLORS, phaseColor, SHORT_COLOR, CONFIG } from '../src/core/config';
-import { compareEnergy, estimateEnergisPulse, mtpCorrection } from '../src/core/energy';
+import { compareEnergy, mtpCorrection } from '../src/core/energy';
 import { emptyDraft, readDraft, createRecord, saveAndReset } from '../src/core/measurement';
 import { parseNumber, localTimestamp } from '../src/core/numbers';
 import { EXPORT_COLUMNS, toTSV, emailBody, mailtoLink } from '../src/data/export';
@@ -173,7 +173,7 @@ describe('C1 fyzické barvy', () => {
     }
   });
 });
-describe('Stavy, korekce MTP a pulzy', () => {
+describe('Stavy a korekce MTP', () => {
   const interval = {
     from: '2026-10-17T08:00',
     to: '2026-10-17T08:15',
@@ -195,18 +195,18 @@ describe('Stavy, korekce MTP a pulzy', () => {
   });
   it('nulová spotřeba nedělí nulou', () =>
     expect(compareEnergy({ ...interval, end: 100 }, reference.config).percent).toBeNull());
-  it('odhad efektivní váhy a standardu', () => {
-    const r = estimateEnergisPulse(10, 20, 0.1)!;
-    expect(r.effective).toBe(0.2);
-    expect(r.nearest.value).toBe(0.2);
-    expect(r.meaningful).toBe(true);
-  });
-  it('nejbližší nesmysluplnou váhu nevydává za shodu', () =>
-    expect(estimateEnergisPulse(10, 80, 0.1)!.meaningful).toBe(false));
-  it('nedefinované pulzy a špatný interval odmítá', () => {
-    expect(estimateEnergisPulse(0, 20, 0.1)).toBeNull();
+  it('kontrola stavů odmítá špatný interval a pokles registru', () => {
     expect(() => compareEnergy({ ...interval, to: interval.from }, reference.config)).toThrow();
     expect(() => compareEnergy({ ...interval, end: 90 }, reference.config)).toThrow();
+  });
+  it('staré pulse hodnoty nemají vliv na porovnání', () => {
+    expect(compareEnergy(interval, reference.config)).toEqual(
+      compareEnergy(interval, {
+        ...reference.config,
+        meterPulse: 999,
+        energisPulse: 'X',
+      } as typeof reference.config),
+    );
   });
 });
 describe('Data, čas, reset a export', () => {

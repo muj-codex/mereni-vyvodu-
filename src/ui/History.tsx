@@ -1,3 +1,11 @@
+import {
+  isIntervalCheck,
+  filterHistory,
+  recordTypeLabel,
+  recordVoltage,
+  voltageLabel,
+} from '../core/historyView';
+import { IntervalResult } from './Interval';
 import { CurrentResult } from './CurrentMeasurement';
 import { IdentificationSummary } from './Identification';
 import { percentDifference, signedPercent } from '../core/current';
@@ -27,6 +35,9 @@ export function History({
   const [confirm, setConfirm] = useState<'all' | string | null>(null),
     [confirmText, setConfirmText] = useState(''),
     [busy, setBusy] = useState(false);
+  const [location, setLocation] = useState(''),
+    [voltage, setVoltage] = useState('');
+  const visible = filterHistory(records, location, voltage);
   const chosen = records.filter((r) => selected.includes(r.id));
   async function copy(text: string, kind: 'tsv' | 'email') {
     try {
@@ -109,7 +120,9 @@ export function History({
             value={opened.input.identification}
             fallback={opened.localTimestamp}
           />
-          {isCurrent(opened) ? (
+          {isIntervalCheck(opened) ? (
+            <IntervalResult record={opened} section={section} />
+          ) : isCurrent(opened) ? (
             <CurrentResult record={opened} section={section} />
           ) : section === 'result' ? (
             <Result diagnosis={opened.diagnosis} serial={opened.input.serial} />
@@ -134,6 +147,53 @@ export function History({
             <span className="eyebrow">LOKÁLNÍ HISTORIE</span>
             <h1>Výsledky měření</h1>
             <p>{records.length} uložených měření · pouze v tomto zařízení</p>
+          </div>
+          <div className="field-grid card history-filters">
+            <label className="field">
+              <span>Umístění</span>
+              <select
+                aria-label="Filtr umístění"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+              >
+                <option value="">Všechna místa</option>
+                {[
+                  ...new Set(
+                    records
+                      .map((r) => r.input.identification?.location)
+                      .filter((v): v is string => !!v),
+                  ),
+                ]
+                  .sort()
+                  .map((v) => (
+                    <option key={v}>{v}</option>
+                  ))}
+              </select>
+            </label>
+            <label className="field">
+              <span>Režim / napětí</span>
+              <select
+                aria-label="Filtr režim / napětí"
+                value={voltage}
+                onChange={(e) => setVoltage(e.target.value)}
+              >
+                <option value="">Všechny režimy</option>
+                {[400, 500, 6000, 6300, 10000, 10300].map((v) => (
+                  <option key={v} value={v}>
+                    {voltageLabel(v)}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <button
+              className="button secondary"
+              onClick={() => {
+                setLocation('');
+                setVoltage('');
+              }}
+            >
+              Zrušit filtry
+            </button>
           </div>
           <div className="history-toolbar">
             <button
@@ -194,7 +254,8 @@ export function History({
             </div>
           ) : (
             <div className="history-list">
-              {records.map((r) => (
+              {visible.length === 0 && <p>Žádné záznamy neodpovídají filtrům.</p>}
+              {visible.map((r) => (
                 <article
                   key={r.id}
                   className={`history-item ${selected.includes(r.id) ? 'selected' : ''}`}
@@ -224,22 +285,34 @@ export function History({
                       <strong>{r.input.serial}</strong>
                       <Icon name="arrow" size={18} />
                     </div>
+                    <p>
+                      <b>{recordTypeLabel(r)}</b> · {voltageLabel(recordVoltage(r))}
+                    </p>
+                    <p>
+                      Datum měření: {r.input.identification?.date ?? r.localTimestamp.split(' ')[0]}
+                    </p>
                     <time dateTime={r.savedAt}>{r.localTimestamp}</time>
                     <p>
                       {r.input.identification?.location} · {r.input.identification?.placement}
                     </p>
                     <strong className="main-percent">
-                      {isCurrent(r)
-                        ? r.phases
-                            .flatMap((p, i) =>
-                              p.unused ? [] : [`IL${i + 1}: ${signedPercent(p.differencePercent)}`],
-                            )
-                            .join(' · ')
-                        : signedPercent(percentDifference(r.input.energis, r.input.kyoritsu))}
+                      {isIntervalCheck(r)
+                        ? signedPercent(r.result.percent)
+                        : isCurrent(r)
+                          ? r.phases
+                              .flatMap((p, i) =>
+                                p.unused
+                                  ? []
+                                  : [`IL${i + 1}: ${signedPercent(p.differencePercent)}`],
+                              )
+                              .join(' · ')
+                          : signedPercent(percentDifference(r.input.energis, r.input.kyoritsu))}
                     </strong>
-                    {isCurrent(r) ? (
+                    {isIntervalCheck(r) ? (
+                      <p>{r.assessment.summary}</p>
+                    ) : isCurrent(r) ? (
                       <p>
-                        {r.input.vn ? 'VN · SCADA' : 'NN'} · MTP {r.input.ctPrimary}/
+                        {r.input.vn ? 'VN · SCADA' : 'NN'} · MTP {formatNumber(r.input.ctPrimary)}/
                         {r.input.ctSecondary} A
                       </p>
                     ) : (
@@ -259,7 +332,9 @@ export function History({
           )}
           {selecting && (
             <div className="share-actions card">
-              <p className="hint">Sdílí se jen naměřené hodnoty. Diagnostika zůstává v aplikaci.</p>
+              <p className="hint">
+                Sdílí se vybrané záznamy. Kontrola stavů obsahuje také výsledek a doporučení.
+              </p>
               <button
                 className="button primary"
                 disabled={!chosen.length}

@@ -110,7 +110,7 @@ describe('Prompt 1.1 field regressions', () => {
     expect(rangeAdvice(d).join(' ')).toContain('Pro IL1');
     expect(rangeAdvice(d).join(' ')).not.toContain('IL2');
     d.phases[0].raw = '201';
-    expect(() => evaluateCurrent(d)).toThrow(/IL1.*201,0 mA/);
+    expect(() => evaluateCurrent(d)).toThrow(/IL1.*201 mA/);
   });
   it('current form has descriptive labels and no duplicate identification editors', () => {
     const d = draft();

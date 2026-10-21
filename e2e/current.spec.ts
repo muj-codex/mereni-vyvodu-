@@ -178,7 +178,7 @@ test('změna rozsahu vyčistí odečty a upozorní na očekávaný sekundár', a
     await expect(page.getByLabel(`Klešťový ampérmetr L${i} (mV / V)`, { exact: true })).toHaveValue(
       '',
     );
-  await expect(page.getByText(/Pro IL1 je očekáváno přibližně 500,0 mA/)).toBeVisible();
+  await expect(page.getByText(/Pro IL1 je očekáváno přibližně 500 mA/)).toBeVisible();
   await page.getByRole('button', { name: 'VYHODNOTIT PROUDY', exact: true }).click();
   await expect(page.getByRole('alert')).toBeVisible();
 });
@@ -308,7 +308,7 @@ test('starý v1 záznam přežije DB upgrade i offline reload', async ({ page, c
   await expect(page.locator('.history-item')).toHaveCount(1);
   await page.locator('.record-open').click();
   await page.getByRole('button', { name: 'Data / detail' }).click();
-  await expect(page.getByText('0,70 kW', { exact: true })).toBeVisible();
+  await expect(page.getByText('0,7 kW', { exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Nové měření', exact: true }).click();
   await identify(page, '400', '000NEW');
   await current(page);

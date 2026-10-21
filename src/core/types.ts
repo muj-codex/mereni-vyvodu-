@@ -1,3 +1,4 @@
+import type { IntervalCheckRecord } from './intervalCheck';
 import type { CurrentRecord } from './current';
 import type { Phase } from './config';
 export type Triple<T> = [T, T, T];
@@ -29,7 +30,7 @@ export interface Identification {
   location: string;
   placement: string;
 }
-export type HistoryRecord = MeasurementRecord | CurrentRecord;
+export type HistoryRecord = MeasurementRecord | CurrentRecord | IntervalCheckRecord;
 export interface MeasurementInput {
   identification?: Identification;
   serial: string;

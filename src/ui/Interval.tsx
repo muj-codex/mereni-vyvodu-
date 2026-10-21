@@ -1,44 +1,135 @@
-import { compareEnergy, estimateEnergisPulse, mtpCorrection } from '../core/energy';
-import { parseNumber, formatNumber } from '../core/numbers';
+import { useMemo, useState } from 'react';
+import { createIntervalCheck, type IntervalCheckRecord } from '../core/intervalCheck';
+import { formatNumber } from '../core/numbers';
 import type { FormDraft } from '../core/types';
+import { toTSV } from '../data/export';
 import { Field } from './Fields';
+export function IntervalResult({
+  record,
+  section = 'result',
+}: {
+  record: IntervalCheckRecord;
+  section?: string;
+}) {
+  const { input, result, assessment } = record;
+  if (section === 'inspection')
+    return (
+      <section className="card">
+        <h2>Prověřit</h2>
+        <p>{assessment.summary}</p>
+        {assessment.recommendations.map((r) => (
+          <p key={r}>{r}</p>
+        ))}
+      </section>
+    );
+  return (
+    <section className="card interval-result">
+      <h3>{section === 'detail' ? 'Data / detail kontroly stavů' : 'Výsledek kontroly stavů'}</h3>
+      <dl className="data-list">
+        {section === 'detail' && (
+          <>
+            <dt>MTP primár</dt>
+            <dd>
+              {formatNumber(input.config.actualMtp)}/{input.config.voltage > 500 ? 1 : 5} A
+            </dd>
+            <dt>MTP elektroměr</dt>
+            <dd>
+              {formatNumber(input.config.meterMtp)}/{input.config.voltage > 500 ? 1 : 5} A
+            </dd>
+            <dt>Interval OD</dt>
+            <dd>{input.interval.from.replace('T', ' ')}</dd>
+            <dt>Interval DO</dt>
+            <dd>{input.interval.to.replace('T', ' ')}</dd>
+            <dt>Stav elektroměru OD</dt>
+            <dd>{formatNumber(input.interval.start)} kWh</dd>
+            <dt>Stav elektroměru DO</dt>
+            <dd>{formatNumber(input.interval.end)} kWh</dd>
+          </>
+        )}
+        <dt>Rozdíl stavů elektroměru</dt>
+        <dd>{formatNumber(result.registerDelta)} kWh</dd>
+        <dt>Korekce MTP</dt>
+        <dd>× {formatNumber(result.correction, 3, true)}</dd>
+        <dt>Spotřeba elektroměru po korekci</dt>
+        <dd>{formatNumber(result.meterEnergy)} kWh</dd>
+        <dt>Spotřeba Energis</dt>
+        <dd>{formatNumber(result.energisEnergy)} kWh</dd>
+        <dt>Rozdíl kWh</dt>
+        <dd>{formatNumber(result.difference)} kWh</dd>
+        <dt>Procentní rozdíl</dt>
+        <dd>{formatNumber(result.percent)} %</dd>
+      </dl>
+      <p className={`notice ${assessment.band}`}>{assessment.summary}</p>
+      {assessment.recommendations.map((r) => (
+        <p key={r}>{r}</p>
+      ))}
+    </section>
+  );
+}
 export function Interval({
   draft,
   onChange,
+  onSave,
+  notify,
 }: {
   draft: FormDraft;
   onChange: (value: FormDraft['interval']) => void;
+  onSave: (record: IntervalCheckRecord) => Promise<void>;
+  notify: (text: string) => void;
 }) {
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  const [fallback, setFallback] = useState('');
+  const [saved, setSaved] = useState('');
   const values = draft.interval;
-  let result: ReturnType<typeof compareEnergy> | undefined,
-    error = '';
-  if (Object.values(values).every(Boolean)) {
+  const { result, validation } = useMemo(() => {
+    if (!Object.values(draft.interval).every(Boolean)) return { result: undefined, validation: '' };
     try {
-      result = compareEnergy(
-        {
-          ...values,
-          start: parseNumber(values.start),
-          end: parseNumber(values.end),
-          energis: parseNumber(values.energis),
-        },
-        draft.config,
-      );
+      return { result: createIntervalCheck(draft), validation: '' };
     } catch (e) {
-      error = (e as Error).message;
+      return { result: undefined, validation: (e as Error).message };
+    }
+  }, [draft]);
+  const fingerprint = JSON.stringify(result?.input);
+  async function save() {
+    if (!result || busy) return;
+    setBusy(true);
+    setError('');
+    try {
+      await onSave(result);
+      setSaved(fingerprint);
+      notify('Kontrola stavů uložena.');
+    } catch {
+      setError('Kontrola nebyla uložena. Formulář zůstává zachován. Zkuste uložení znovu.');
+    } finally {
+      setBusy(false);
     }
   }
-  const estimate =
-    result && draft.config.energisPulse === 'X'
-      ? estimateEnergisPulse(
-          result.meterEnergy,
-          result.energisEnergy,
-          draft.config.meterPulse * mtpCorrection(draft.config.actualMtp, draft.config.meterMtp),
-        )
-      : null;
+  async function send() {
+    if (!result) return;
+    const text = toTSV([result]);
+    if (navigator.share) {
+      try {
+        await navigator.share({ text });
+        return;
+      } catch (e) {
+        if ((e as Error).name === 'AbortError') return;
+      }
+    }
+    try {
+      await navigator.clipboard.writeText(text);
+      notify('TSV kontroly zkopírováno pro vložení do těla zprávy.');
+    } catch {
+      setFallback(text);
+    }
+  }
   return (
     <section className="card">
       <h3>Kontrola stavů · volitelné</h3>
-      <p className="hint">Použijte přesně shodný interval v Energis. Stavy zadávejte v kWh.</p>
+      <p className="hint">
+        Použijte přesně shodný interval v Energis. Stavy zadávejte v kWh. Registr musí být škálovaný
+        na primární stranu podle MTP elektroměru.
+      </p>
       <div className="field-grid">
         {(['from', 'to'] as const).map((key) => (
           <label className="field" key={key}>
@@ -71,48 +162,42 @@ export function Interval({
           onChange={(energis) => onChange({ ...values, energis })}
         />
       </div>
-      <p className="hint">
-        Předpoklad: registr a pulz jsou škálované na primární stranu podle MTP elektroměru. U jiného
-        typu registru tuto kontrolu nepoužívejte bez ověření převodu.
-      </p>
-      {error && (
+      {(error || validation) && (
         <p className="notice warning" role="alert">
-          {error}
+          {error || validation}
         </p>
       )}
       {result && (
-        <dl className="data-list interval-result">
-          <dt>Rozdíl stavů</dt>
-          <dd>{formatNumber(result.registerDelta)} kWh</dd>
-          <dt>Korekce MTP</dt>
-          <dd>× {formatNumber(result.correction, 3)}</dd>
-          <dt>Spotřeba elektroměru</dt>
-          <dd>{formatNumber(result.meterEnergy)} kWh</dd>
-          <dt>Spotřeba Energis</dt>
-          <dd>{formatNumber(result.energisEnergy)} kWh</dd>
-          <dt>Rozdíl</dt>
-          <dd>{formatNumber(result.difference)} kWh</dd>
-          <dt>Procentní rozdíl</dt>
-          <dd>{formatNumber(result.percent)} %</dd>
-        </dl>
-      )}
-      {estimate && (
-        <div className="notice">
-          <div>
-            Odhad váhy Energis: <strong>{formatNumber(estimate.effective, 4)} kWh/puls</strong>
-            <br />
-            {estimate.meaningful
-              ? `Nejbližší smysluplná váha: ${estimate.nearest.label}`
-              : `Nejbližší standard ${estimate.nearest.label} je vzdálený o ${formatNumber(estimate.distancePercent)} %; bez smysluplné shody.`}
-            <p className="hint">
-              Odhad předpokládá shodný počet přenesených pulzů bez ztrát. Nejde o samostatné ověření
-              nastavení Energis.
-            </p>
+        <>
+          <IntervalResult record={result} />
+          <div className="step-actions">
+            <button
+              className="button primary"
+              disabled={busy || saved === fingerprint}
+              onClick={() => void save()}
+            >
+              {saved === fingerprint ? 'KONTROLA STAVŮ ULOŽENA' : 'ULOŽIT KONTROLU STAVŮ'}
+            </button>
+            <button className="button secondary" onClick={() => void send()}>
+              ODESLAT TUTO KONTROLU
+            </button>
           </div>
-        </div>
+        </>
       )}
-      {result && draft.config.energisPulse === 'X' && !estimate && (
-        <p className="hint">Odhad váhy pulzu vyžaduje kladnou energii obou systémů.</p>
+      {fallback && (
+        <section className="card">
+          <p>Označte a zkopírujte TSV do těla zprávy.</p>
+          <textarea
+            aria-label="TSV kontroly pro ruční zkopírování"
+            readOnly
+            rows={8}
+            value={fallback}
+            onFocus={(e) => e.target.select()}
+          />
+          <button className="button secondary" onClick={() => setFallback('')}>
+            Zavřít TSV
+          </button>
+        </section>
       )}
     </section>
   );

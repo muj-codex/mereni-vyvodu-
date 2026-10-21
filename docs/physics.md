@@ -57,23 +57,23 @@ Tolerance je i zde **±15 %**, nikdy ±25 %. Pořadí, definice shody a mez 5 pr
 
 Starší záznamy bez pole `mode` se nepřepočítávají a zobrazují svůj původní tříproudový výsledek i při tehdejší hodnotě 500 V. Nové záznamy ukládají explicitní režim. Schéma IndexedDB a exportních sloupců se nemění.
 
-## Ruční kontrola stavů a pulzy – předpoklad k potvrzení podle elektroměru
+## Samostatná kontrola stavů (1.2.2)
 
-Registr v kWh se zde předpokládá škálovaný na primární stranu podle **MTP nastaveného v elektroměru**. Pro společný sekundár 5 A:
+Registr musí být primárně škálovaný podle MTP nastaveného v elektroměru.
 
-`korekce = skutečný primár MTP / naprogramovaný primár MTP`
+`korekce = skutečný MTP / MTP elektroměr`
 
-`skutečná energie = (stav DO − stav OD) × korekce`.
+`spotřeba elektroměru = (stav DO − stav OD) × korekce`
 
-Váha pulzu elektroměru se předpokládá ve stejné škálovací bázi jako registr. Pro Energis = X:
+`rozdíl = spotřeba Energis − spotřeba elektroměru`
 
-`počet pulzů = korigovaná energie elektroměru / (váha pulzu elektroměru × korekce)`
+`procentní rozdíl = rozdíl / spotřeba elektroměru × 100`
 
-`efektivní váha Energis = energie Energis / počet pulzů`.
+Příklad: 300/600 = 0,500; rozdíl registru 20 kWh znamená 10 kWh po korekci. Váhy pulzů ani jejich odhad nejsou vstupem nebo výstupem nové kontroly. Staré historické hodnoty pulzů se nemění.
 
-Odhad předpokládá stejný počet pulzů bez ztrát a přesně shodný interval. Nejbližší standard je „smysluplný“, pouze pokud relativní odchylka od standardu nepřesáhne 15 %; jinak se zobrazí vzdálenost bez doporučení standardu. Jednotka všech pulzů je interně kWh/puls.
+Do 15 % včetně spotřeby odpovídají, do 25 % včetně je třeba je ověřit, nad 25 % jde o významný rozdíl. Větší rozdíl vede pouze k ověření nastavení pulzů a případně skutečnému měření vývodu; neurčuje konkrétní elektrickou závadu ani váhu pulzu. Při obou nulových spotřebách jde o shodu; při nulovém elektroměru a nenulovém Energis procento nelze určit.
 
-**Je třeba potvrdit pro konkrétní typ elektroměru:** zda registr a pulz skutečně používají tutéž primární škálovací bázi. Pro sekundární/neškálovaný registr či jinou bázi pulzu je potřeba změnit adaptér `mtpCorrection` a převod pulzu. Aplikace tento předpoklad ukazuje i ve formuláři. Interval je volitelný; jeho přeskočení nebrání diagnostice okamžitých hodnot. Přetočení registru, výměna elektroměru uprostřed intervalu a reset stavů se neodhadují.
+Interval musí být přesně shodný v obou systémech. Přetočení, reset registru nebo výměna elektroměru během intervalu se neodhadují. Pro jinak škálovaný registr je nutné před použitím ověřit převod. Výpočty používají plnou přesnost, zaokrouhlují se jen výstupy.
 
 ## Další rozšíření
 

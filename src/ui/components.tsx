@@ -331,9 +331,9 @@ export function Detail({ record }: { record: MeasurementRecord }) {
         <h3>Pulz / elektroměr</h3>
         <dl className="data-list">
           <dt>MTP primár</dt>
-          <dd>{input.config.actualMtp}/5 A</dd>
+          <dd>{formatNumber(input.config.actualMtp)}/5 A</dd>
           <dt>MTP elektroměr</dt>
-          <dd>{input.config.meterMtp}/5 A</dd>
+          <dd>{formatNumber(input.config.meterMtp)}/5 A</dd>
           <dt>Napětí</dt>
           <dd>{input.config.voltage} V</dd>
           <dt>Pulz elektroměru</dt>

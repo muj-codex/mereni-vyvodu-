@@ -3,7 +3,7 @@ import { CurrentMeasurement } from './ui/CurrentMeasurement';
 import { IdentificationFields, IdentificationSummary } from './ui/Identification';
 import { emptyIdentification, locations, validateIdentification } from './core/current';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { PHASES, PULSE_OPTIONS, type Phase } from './core/config';
+import { PHASES, type Phase } from './core/config';
 import { createRecord, emptyDraft, readDraft, saveAndReset } from './core/measurement';
 import { parseNumber } from './core/numbers';
 import { compareEnergy } from './core/energy';
@@ -15,7 +15,7 @@ import { Interval } from './ui/Interval';
 import { History } from './ui/History';
 import { MtpCoefficient } from './ui/MtpCoefficient';
 const STEPS = [
-  'Základ / pulz',
+  'Základ / kontrola stavů',
   'Napětí a proudy',
   'PF a výkony',
   'Vizuální výsledek',
@@ -372,73 +372,59 @@ export default function App() {
                         <option value={10300}>VN 10,3 kV</option>
                       </SelectField>
                     </section>
-                    {draft.config.voltage > 500 ? (
-                      <p className="notice">
-                        VN: pokračujte na 1f měření. Primární proud a napětí ze SCADA.
-                      </p>
-                    ) : (
-                      <>
-                        <section className="card">
-                          <h3>Převody a pulzy</h3>
-                          <div className="field-grid">
-                            <MtpSelect
-                              label="MTP primár"
-                              value={draft.config.actualMtp}
-                              onChange={(v) => config('actualMtp', v)}
-                            />
-                            <MtpSelect
-                              label="MTP elektroměr"
-                              value={draft.config.meterMtp}
-                              onChange={(v) => config('meterMtp', v)}
-                            />
-                            <SelectField
-                              label="Váha pulzu elektroměru"
-                              value={draft.config.meterPulse}
-                              onChange={(v) => config('meterPulse', Number(v))}
-                            >
-                              {PULSE_OPTIONS.map((p) => (
-                                <option key={p.value} value={p.value}>
-                                  {p.label}
-                                </option>
-                              ))}
-                            </SelectField>
-                            <SelectField
-                              label="Váha pulzu Energis"
-                              value={draft.config.energisPulse}
-                              onChange={(v) => config('energisPulse', v === 'X' ? 'X' : Number(v))}
-                            >
-                              {PULSE_OPTIONS.map((p) => (
-                                <option key={p.value} value={p.value}>
-                                  {p.label}
-                                </option>
-                              ))}
-                              <option value="X">X · neznámá váha</option>
-                            </SelectField>
-                            <MtpCoefficient
-                              primary={draft.config.actualMtp}
-                              meter={draft.config.meterMtp}
-                            />
-                          </div>
-                        </section>
-                        <label className="optional-toggle card">
-                          <span>
-                            <strong>Porovnat stavy s Energis</strong>
-                            <small>Volitelná kontrola spotřeby za interval</small>
-                          </span>
-                          <input
-                            type="checkbox"
-                            checked={draft.intervalEnabled}
-                            onChange={(e) =>
-                              change({ ...draft, intervalEnabled: e.target.checked })
-                            }
+                    <>
+                      <section className="card">
+                        <h3>Převody MTP</h3>
+                        <div className="field-grid">
+                          <MtpSelect
+                            label="MTP primár"
+                            secondary={draft.config.voltage > 500 ? 1 : 5}
+                            value={draft.config.actualMtp}
+                            onChange={(v) => config('actualMtp', v)}
                           />
-                        </label>
-                        {draft.intervalEnabled && (
-                          <Interval
-                            draft={draft}
-                            onChange={(interval) => change({ ...draft, interval })}
+                          <MtpSelect
+                            label="MTP elektroměr"
+                            secondary={draft.config.voltage > 500 ? 1 : 5}
+                            value={draft.config.meterMtp}
+                            onChange={(v) => config('meterMtp', v)}
                           />
-                        )}
+                          <MtpCoefficient
+                            primary={draft.config.actualMtp}
+                            meter={draft.config.meterMtp}
+                          />
+                        </div>
+                      </section>
+                      <label className="optional-toggle card">
+                        <span>
+                          <strong>Porovnat stavy s Energis</strong>
+                          <small>Volitelná kontrola spotřeby za interval</small>
+                        </span>
+                        <input
+                          type="checkbox"
+                          checked={draft.intervalEnabled}
+                          onChange={(e) => change({ ...draft, intervalEnabled: e.target.checked })}
+                        />
+                      </label>
+                      {draft.intervalEnabled && (
+                        <Interval
+                          draft={draft}
+                          onChange={(interval) => change({ ...draft, interval })}
+                          onSave={async (record) => {
+                            await repo.add(record);
+                            setRecords((r) => [record, ...r]);
+                            void navigator.storage
+                              ?.persist?.()
+                              .then(setStoragePersistent)
+                              .catch(() => setStoragePersistent(false));
+                          }}
+                          notify={notify}
+                        />
+                      )}
+                      {draft.config.voltage > 500 ? (
+                        <p className="notice">
+                          VN: pokračujte na 1f měření. Primární proud a napětí ze SCADA.
+                        </p>
+                      ) : (
                         <div className="step-actions">
                           <button className="button primary" onClick={() => navigate(1, true)}>
                             PŘESKOČIT → KYORITSU <Icon name="arrow" />
@@ -466,8 +452,8 @@ export default function App() {
                             </button>
                           )}
                         </div>
-                      </>
-                    )}
+                      )}
+                    </>
                   </>
                 )}
                 {step === 1 && (

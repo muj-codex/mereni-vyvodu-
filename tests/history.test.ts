@@ -1,3 +1,4 @@
+import { isIntervalCheck } from '../src/core/historyView';
 import { emptyCurrent, evaluateCurrent } from '../src/core/current';
 import { isCurrent } from '../src/data/export';
 import { openDB } from 'idb';
@@ -33,7 +34,7 @@ it('IndexedDB ukládá nezávisle, přežije znovuotevření a maže jednotlivě
   expect(all[0].input.serial).toBe('0002');
   expect(all[1].input.serial).toBe('0001');
   const old = all[1];
-  if (isCurrent(old)) throw Error('Expected power record');
+  if (isCurrent(old) || isIntervalCheck(old)) throw Error('Expected power record');
   expect(old.input.phases[0].p).toBe(0.23);
   await expect(reopened.add(second)).rejects.toThrow();
   expect(await reopened.all()).toHaveLength(2);
