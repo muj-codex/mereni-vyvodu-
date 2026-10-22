@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { createIntervalCheck, type IntervalCheckRecord } from '../core/intervalCheck';
+import { intervalLabel, intervalEndpoint, formatIntervalDateTime } from '../core/historyView';
 import { formatNumber } from '../core/numbers';
 import type { FormDraft } from '../core/types';
 import { toTSV, intervalSubject } from '../data/export';
@@ -27,6 +28,7 @@ export function IntervalResult({
   return (
     <section className="card interval-result">
       <h3>{section === 'detail' ? 'Data / detail kontroly stavů' : 'Výsledek kontroly stavů'}</h3>
+      <p>Interval: {intervalLabel(record)}</p>
       <dl className="data-list">
         {section === 'detail' && (
           <>
@@ -39,13 +41,13 @@ export function IntervalResult({
               {formatNumber(input.config.meterMtp)}/{input.config.voltage > 500 ? 1 : 5} A
             </dd>
             <dt>Interval OD</dt>
-            <dd>{input.interval.from.replace('T', ' ')}</dd>
+            <dd>{formatIntervalDateTime(intervalEndpoint(record, 'from'))}</dd>
             <dt>Interval DO</dt>
-            <dd>{input.interval.to.replace('T', ' ')}</dd>
+            <dd>{formatIntervalDateTime(intervalEndpoint(record, 'to'))}</dd>
             <dt>Stav elektroměru OD</dt>
-            <dd>{formatNumber(input.interval.start)} kWh</dd>
+            <dd>{formatNumber(input.interval?.start)} kWh</dd>
             <dt>Stav elektroměru DO</dt>
-            <dd>{formatNumber(input.interval.end)} kWh</dd>
+            <dd>{formatNumber(input.interval?.end)} kWh</dd>
           </>
         )}
         <dt>Rozdíl stavů elektroměru</dt>

@@ -1,3 +1,11 @@
+# Ověření verze 1.2.4
+
+- `npm run test:e2e`: **62 prošlých scénářů** (31 pro iPhone 13 a 31 pro iPad 7. generace v Chromium), včetně nových intervalů ve stejný den / přes půlnoc, sdílení a legacy Kontroly stavů bez intervalových dat.
+
+- `npm test`: **180 prošlých testů**. Nové regrese ověřují stejný den, přechod přes půlnoc, interval v historii / výsledku / detailu, TSV a e-mail bez starého data hlavičky, zachovaný předmět, legacy intervaly i chybějící interval a nezměněné datum 1f/3f.
+- `npm run build`: úspěšný TypeScript, produkční Vite build a offline precache verze 1.2.4.
+- Interval se čte přímo z existujících uložených `input.interval.from` a `to`, bez převodu časového pásma a bez změny IndexedDB. Při chybějícím intervalu se použije původní identifikace nebo lokální timestamp.
+
 # Ověření verze 1.2.3
 
 - `npm test`: **176 prošlých testů**; unit/regresní testy matematiky, vstupů, ARON, rozsahů, vlastní MTP, VN, diagnostiky, TSV a IndexedDB.

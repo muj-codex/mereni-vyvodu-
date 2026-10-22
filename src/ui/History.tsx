@@ -1,5 +1,6 @@
 import {
   isIntervalCheck,
+  intervalLabel,
   filterHistory,
   recordTypeLabel,
   recordVoltage,
@@ -108,7 +109,7 @@ export function History({
           <div className="page-heading">
             <span className="eyebrow">ULOŽENÉ MĚŘENÍ</span>
             <h1>{opened.input.serial}</h1>
-            <p>{opened.localTimestamp}</p>
+            <p>{isIntervalCheck(opened) ? intervalLabel(opened) : opened.localTimestamp}</p>
           </div>
           <div className="segmented" aria-label="Detail uloženého měření">
             {[
@@ -129,6 +130,9 @@ export function History({
             serial={opened.input.serial}
             value={opened.input.identification}
             fallback={opened.localTimestamp}
+            temporalLabel={
+              isIntervalCheck(opened) ? `Interval: ${intervalLabel(opened)}` : undefined
+            }
           />
           {isIntervalCheck(opened) ? (
             <IntervalResult record={opened} section={section} />
@@ -299,9 +303,11 @@ export function History({
                       <b>{recordTypeLabel(r)}</b> · {voltageLabel(recordVoltage(r))}
                     </p>
                     <p>
-                      Datum měření: {r.input.identification?.date ?? r.localTimestamp.split(' ')[0]}
+                      {isIntervalCheck(r)
+                        ? `Interval: ${intervalLabel(r)}`
+                        : `Datum měření: ${r.input.identification?.date ?? r.localTimestamp.split(' ')[0]}`}
                     </p>
-                    <time dateTime={r.savedAt}>{r.localTimestamp}</time>
+                    {!isIntervalCheck(r) && <time dateTime={r.savedAt}>{r.localTimestamp}</time>}
                     <p>
                       {r.input.identification?.location} · {r.input.identification?.placement}
                     </p>

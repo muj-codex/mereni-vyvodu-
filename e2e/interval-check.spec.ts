@@ -249,7 +249,7 @@ test('1f ARON: bez IL2, dobrý výsledek bez Energis a závada IL3 používá 7�
 test('číselný výstup UI/TSV a fallback bez systémového sdílení', async ({ page }) => {
   await page.goto('/');
   await check(page, '000PREC', '400', 'TS 0425/259', '9.967391304347827');
-  expect(await page.locator('.interval-result').innerText()).not.toMatch(/\d+[.,]\d{4}/);
+  expect(await page.locator('.interval-result .data-list').innerText()).not.toMatch(/\d+[.,]\d{4}/);
   await page.evaluate(() => {
     Object.defineProperty(navigator, 'share', { configurable: true, value: undefined });
     Object.defineProperty(navigator, 'clipboard', {
@@ -268,4 +268,88 @@ test('číselný výstup UI/TSV a fallback bez systémového sdílení', async (
   expect(text).toContain('\t');
   expect(text).toContain('-0,33 %');
   expect(text).not.toMatch(/\d+[.,]\d{4}/);
+});
+
+for (const [fromTime, toDate, toTime, label] of [
+  ['14:45', '2026-10-22', '16:45', '22.10.2026 14:45 → 22.10.2026 16:45'],
+  ['23:45', '2026-10-23', '00:30', '22.10.2026 23:45 → 23.10.2026 00:30'],
+]) {
+  test(`1.2.4 interval ${label}: share, history and saved detail`, async ({ page }) => {
+    await page.goto('/');
+    await check(page, '66666777', '400', 'TS 3308/250');
+    await page.getByLabel('DATUM', { exact: true }).fill('2026-10-19');
+    await page.getByLabel('Datum OD', { exact: true }).fill('2026-10-22');
+    await page.getByLabel('Čas OD', { exact: true }).fill(fromTime);
+    await page.getByLabel('Datum DO', { exact: true }).fill(toDate);
+    await page.getByLabel('Čas DO', { exact: true }).fill(toTime);
+    await expect(page.locator('.interval-result')).toContainText(`Interval: ${label}`);
+    await page.evaluate(() =>
+      Object.defineProperty(navigator, 'share', {
+        configurable: true,
+        value: async (data: ShareData) => {
+          (window as any).shared = data;
+        },
+      }),
+    );
+    await page.getByRole('button', { name: 'ODESLAT TUTO KONTROLU', exact: true }).click();
+    const data = await page.evaluate(() => (window as any).shared);
+    expect(data.title).toBe('Kontrola stavů – elektroměr 66666777 – TS 3308/250');
+    expect(data.text.split('\t').slice(0, 2)).toEqual(['2026-10-22', fromTime]);
+    expect(data.text).toContain(`2026-10-22T${fromTime}`);
+    expect(data.text).toContain(`${toDate}T${toTime}`);
+    expect(data.text).not.toContain('2026-10-19');
+    await save(page);
+    await page.reload();
+    await history(page);
+    await expect(page.locator('.record-open')).toContainText(`Interval: ${label}`);
+    await expect(page.locator('.record-open')).not.toContainText('2026-10-19');
+    await page.locator('.record-open').click();
+    await expect(page.locator('.identification-summary')).toContainText(`Interval: ${label}`);
+    await expect(page.locator('.interval-result')).toContainText(`Interval: ${label}`);
+    await page.getByRole('button', { name: 'Data / detail', exact: true }).click();
+    await expect(page.locator('.interval-result')).toContainText(`Interval: ${label}`);
+  });
+}
+
+test('1.2.4 legacy Kontrola stavů: původní interval i chybějící interval se otevřou', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await check(page);
+  await save(page);
+  await page.evaluate(
+    async () =>
+      new Promise<void>((resolve, reject) => {
+        const request = indexedDB.open('mereni-vyvodu-v1');
+        request.onerror = () => reject(request.error);
+        request.onsuccess = () => {
+          const db = request.result;
+          const tx = db.transaction('measurements', 'readwrite');
+          const store = tx.objectStore('measurements');
+          const all = store.getAll();
+          all.onsuccess = () => {
+            const record = all.result[0];
+            record.id = 'missing-interval';
+            record.input.serial = '000MISSING';
+            delete record.input.interval;
+            store.add(record);
+          };
+          tx.oncomplete = () => {
+            db.close();
+            resolve();
+          };
+          tx.onerror = () => reject(tx.error);
+        };
+      }),
+  );
+  await page.reload();
+  await history(page);
+  await expect(page.locator('.history-item')).toHaveCount(2);
+  await expect(page.locator('.record-open').filter({ hasText: '000CHECK' })).toContainText(
+    '20.10.2026 08:00 → 20.10.2026 09:00',
+  );
+  await page.locator('.record-open').filter({ hasText: '000MISSING' }).click();
+  await expect(page.locator('.interval-result')).toContainText('Interval: 2026-10-20');
+  await page.getByRole('button', { name: 'Data / detail', exact: true }).click();
+  await expect(page.locator('.interval-result')).toContainText('Interval: 2026-10-20');
 });

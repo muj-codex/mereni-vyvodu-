@@ -74,8 +74,8 @@ test('uložení kontroly zachová hlavičku/datumy, vyčistí časy a pokračuje
   await expect(page.locator('.history-item')).toHaveCount(1);
   await page.locator('.record-open').click();
   await page.getByRole('button', { name: 'Data / detail', exact: true }).click();
-  await expect(page.locator('main')).toContainText('2026-10-22 09:45');
-  await expect(page.locator('main')).toContainText('2026-10-25 11:15');
+  await expect(page.locator('main')).toContainText('22.10.2026 09:45');
+  await expect(page.locator('main')).toContainText('25.10.2026 11:15');
 });
 test('ON přenese VN identifikaci a MTP do 1f bez pracovních hodnot', async ({ page }) => {
   await setup(page, true);

@@ -15,6 +15,7 @@ import {
 } from '../src/core/historyView';
 import { backupTSV, emailBody, exportPercent, mailtoLink, toTSV } from '../src/data/export';
 import { createHistory } from '../src/data/history';
+import { History } from '../src/ui/History';
 import { IntervalResult } from '../src/ui/Interval';
 function draft(voltage = 400, location = 'TS 0425/259') {
   const d = emptyDraft();
@@ -240,4 +241,79 @@ it('3f and 1f exports round PF, raw inputs and every percent without changing st
   expect(toTSV([power])).toContain('0,77');
   expect(power.input.phases[0].pf).toBe(0.76987654);
   expect(measured.phases[0].raw).toBe('50.1234567');
+});
+
+describe('1.2.4 actual interval presentation', () => {
+  const historyMarkup = (records: import('../src/core/types').HistoryRecord[]) =>
+    renderToStaticMarkup(
+      createElement(History, {
+        records,
+        loading: false,
+        onDelete: async () => {},
+        onClear: async () => {},
+        notify: () => {},
+      }),
+    );
+  it.each([
+    ['2026-10-22T14:45', '2026-10-22T16:45', '22.10.2026 14:45 → 22.10.2026 16:45'],
+    ['2026-10-22T23:45', '2026-10-23T00:30', '22.10.2026 23:45 → 23.10.2026 00:30'],
+  ])('uses saved %s → %s in history, result, detail and exports', (from, to, label) => {
+    const d = draft();
+    d.identification!.date = '2026-10-19';
+    d.interval.from = from;
+    d.interval.to = to;
+    const record = createIntervalCheck(d);
+    expect(historyMarkup([record])).toContain(`Interval: ${label}`);
+    expect(historyMarkup([record])).not.toContain('2026-10-19');
+    for (const section of ['result', 'detail'])
+      expect(renderToStaticMarkup(createElement(IntervalResult, { record, section }))).toContain(
+        `Interval: ${label}`,
+      );
+    for (const text of [toTSV([record]), emailBody([record]), backupTSV([record])]) {
+      expect(text).toContain(from);
+      expect(text).toContain(to);
+      expect(text).not.toContain('2026-10-19');
+    }
+    expect(toTSV([record]).split('\t').slice(0, 2)).toEqual(from.split('T'));
+    expect(new URL(mailtoLink([record])).searchParams.get('subject')).toBe(
+      'Kontrola stavů – elektroměr 00042 – TS 0425/259',
+    );
+  });
+  it('opens legacy combined interval fields and falls back safely when absent', () => {
+    const record = createIntervalCheck(draft());
+    expect(historyMarkup([record])).toContain('20.10.2026 08:00 → 20.10.2026 09:00');
+    delete (record.input as Partial<typeof record.input>).interval;
+    expect(historyMarkup([record])).toContain('2026-10-20');
+    for (const section of ['result', 'detail'])
+      expect(renderToStaticMarkup(createElement(IntervalResult, { record, section }))).toContain(
+        '2026-10-20',
+      );
+    expect(toTSV([record])).toContain('2026-10-20');
+    delete (record.input as Partial<typeof record.input>).identification;
+    expect(historyMarkup([record])).toContain(record.localTimestamp);
+  });
+  it('preserves the original date and timestamp for 1f and 3f history and exports', () => {
+    const current = emptyCurrent();
+    current.serial = 'current';
+    current.identification.date = '2026-10-19';
+    current.phases = current.phases.map(() => ({
+      primary: '30',
+      raw: '50',
+      unit: 'mV',
+    })) as typeof current.phases;
+    const power = createRecord({
+      serial: 'power',
+      config: emptyDraft().config,
+      identification: { date: '2026-10-19', location: 'TS 3308/250', placement: '' },
+      phases: [0, 1, 2].map(() => ({ u: 230, i: 1, pf: 1, p: 0.23 })) as any,
+      kyoritsu: 0.69,
+      energis: 0.7,
+    });
+    for (const record of [evaluateCurrent(current), power]) {
+      const markup = historyMarkup([record]);
+      expect(markup).toContain('Datum měření: 2026-10-19');
+      expect(markup).toContain(record.localTimestamp);
+      expect(toTSV([record]).split('\t')[0]).toBe('2026-10-19');
+    }
+  });
 });

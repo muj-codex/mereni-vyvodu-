@@ -1,5 +1,5 @@
 import { formatNumber, parseNumber } from '../core/numbers';
-import { isIntervalCheck, recordVoltage } from '../core/historyView';
+import { isIntervalCheck, recordVoltage, intervalEndpoint } from '../core/historyView';
 import type { IntervalCheckRecord } from '../core/intervalCheck';
 import type { HistoryRecord, MeasurementRecord } from '../core/types';
 import type { CurrentRecord } from '../core/current';
@@ -122,7 +122,17 @@ const columnValue = (key: string, value: unknown) =>
   key === 'percent' || key.endsWith('-differencePercent') ? exportPercent(value) : value;
 const safeCell = (value: unknown) => String(number(value)).replace(/[\t\r\n]/g, ' ');
 export const INTERVAL_COLUMNS: Column<IntervalCheckRecord>[] = [
-  ...identityColumns,
+  ...identityColumns.map((column) => ({
+    ...column,
+    value: (r: IntervalCheckRecord) => {
+      const from = intervalEndpoint(r, 'from');
+      const to = intervalEndpoint(r, 'to');
+      const endpoint = from || to;
+      if (endpoint && column.key === 'date') return endpoint.split(/[T ]/)[0];
+      if (endpoint && column.key === 'time') return endpoint.split(/[T ]/)[1] ?? '';
+      return column.value(r);
+    },
+  })),
   { key: 'recordType', label: 'Typ záznamu', value: () => 'Kontrola stavů' },
   { key: 'network', label: 'Síť [V]', value: (r) => r.input.config.voltage },
   { key: 'actualMtp', label: 'MTP primár [A]', value: (r) => r.input.config.actualMtp },
@@ -132,7 +142,8 @@ export const INTERVAL_COLUMNS: Column<IntervalCheckRecord>[] = [
     label: { from: 'Interval OD', to: 'Interval DO', start: 'Stav OD [kWh]', end: 'Stav DO [kWh]' }[
       key
     ],
-    value: (r: IntervalCheckRecord) => r.input.interval[key],
+    value: (r: IntervalCheckRecord) =>
+      key === 'from' || key === 'to' ? intervalEndpoint(r, key) : r.input.interval?.[key],
   })),
   ...(
     [

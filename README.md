@@ -120,3 +120,7 @@ Kontrola stavů má samostatné editovatelné datum a čas OD/DO; podporuje víc
 Sdílení aktuální nebo jedné uložené kontroly předává `title` s výrobním číslem a TS/rozvodnou, bez přílohy, se stávajícím TSV v těle. Předání tohoto pole do předmětu závisí na cílové iOS aplikaci; ruční kopírování funguje i bez Web Share. E-mailový fallback historie obsahuje i `subject`.
 
 IndexedDB schéma ani historická data se nemění. Výpočty zůstávají v plné přesnosti, výsledky UI mají nejvýše tři desetinná místa, exportovaná procenta přesně dvě. Každý další produkční balík musí zvýšit verzi aplikace; viz `AGENTS.md`.
+
+## Verze 1.2.4 – interval kontroly stavů
+
+Historie, výsledek a sdílení Kontroly stavů používají uložený interval OD → DO. Starší záznamy bez intervalu zobrazí dostupné původní datum; databáze ani výpočty se nemění.

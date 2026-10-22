@@ -26,3 +26,24 @@ export function filterHistory(records: HistoryRecord[], location = '', voltage =
       (!voltage || recordVoltage(r) === Number(voltage)),
   );
 }
+
+// Stored OD/DO are local date-times. Format them without timezone conversion.
+export function intervalEndpoint(
+  r: import('./intervalCheck').IntervalCheckRecord,
+  key: 'from' | 'to',
+) {
+  return r.input.interval?.[key]?.trim() || '';
+}
+export function formatIntervalDateTime(value: string) {
+  return value.replace(/^(\d{4})-(\d{2})-(\d{2})[T ]/, '$3.$2.$1 ');
+}
+export function intervalLabel(r: import('./intervalCheck').IntervalCheckRecord) {
+  const endpoints = (['from', 'to'] as const).map((key) =>
+    formatIntervalDateTime(intervalEndpoint(r, key)),
+  );
+  return (
+    endpoints.filter(Boolean).join(' → ') ||
+    [r.input.identification?.date, r.input.identification?.time].filter(Boolean).join(' ') ||
+    r.localTimestamp
+  );
+}
