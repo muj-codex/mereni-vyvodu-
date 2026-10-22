@@ -108,6 +108,7 @@ export interface VoltageResult {
   diagnosis: string;
 }
 export interface CurrentDraft {
+  sharedHeaderKey?: string;
   serial: string;
   identification: Identification;
   networkVoltage?: number;
@@ -341,4 +342,15 @@ export function rangeAdvice(draft: CurrentDraft): string[] {
       `Pro IL${index + 1} je očekáváno přibližně ${formatNumber(expected, 1)} mA. ${expected <= 2000 ? 'Zvolte rozsah 2 A.' : expected <= 20000 ? 'Zvolte rozsah 20 A.' : 'Překročen i rozsah 20 A.'}`,
     ];
   });
+}
+
+export function resetCurrentDraft(draft: CurrentDraft): CurrentDraft {
+  const next = structuredClone(draft);
+  next.phases = next.phases.map((p) => ({ ...p, primary: '', raw: '' })) as CurrentDraft['phases'];
+  next.voltage.primary = draft.vn
+    ? [draft.voltage.preset, draft.voltage.preset, draft.voltage.preset]
+    : ['', '', ''];
+  next.voltage.secondary = ['', '', ''];
+  next.voltage.secondaryEdited = [false, false, false];
+  return next;
 }

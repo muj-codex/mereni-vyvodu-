@@ -2,7 +2,9 @@ import { useMemo, useState } from 'react';
 import { createIntervalCheck, type IntervalCheckRecord } from '../core/intervalCheck';
 import { formatNumber } from '../core/numbers';
 import type { FormDraft } from '../core/types';
-import { toTSV } from '../data/export';
+import { toTSV, intervalSubject } from '../data/export';
+import { resetInterval } from '../core/measurement';
+import { Info } from './Info';
 import { Field } from './Fields';
 export function IntervalResult({
   record,
@@ -80,24 +82,29 @@ export function Interval({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [fallback, setFallback] = useState('');
-  const [saved, setSaved] = useState('');
+
   const values = draft.interval;
   const { result, validation } = useMemo(() => {
-    if (!Object.values(draft.interval).every(Boolean)) return { result: undefined, validation: '' };
+    if (
+      !Object.values(draft.interval).every(Boolean) ||
+      !draft.interval.from.split('T')[1] ||
+      !draft.interval.to.split('T')[1]
+    )
+      return { result: undefined, validation: '' };
     try {
       return { result: createIntervalCheck(draft), validation: '' };
     } catch (e) {
       return { result: undefined, validation: (e as Error).message };
     }
   }, [draft]);
-  const fingerprint = JSON.stringify(result?.input);
   async function save() {
     if (!result || busy) return;
     setBusy(true);
     setError('');
     try {
       await onSave(result);
-      setSaved(fingerprint);
+      onChange(resetInterval(values));
+      setFallback('');
       notify('Kontrola stavů uložena.');
     } catch {
       setError('Kontrola nebyla uložena. Formulář zůstává zachován. Zkuste uložení znovu.');
@@ -110,7 +117,7 @@ export function Interval({
     const text = toTSV([result]);
     if (navigator.share) {
       try {
-        await navigator.share({ text });
+        await navigator.share({ title: intervalSubject(result), text });
         return;
       } catch (e) {
         if ((e as Error).name === 'AbortError') return;
@@ -130,18 +137,33 @@ export function Interval({
         Použijte přesně shodný interval v Energis. Stavy zadávejte v kWh. Registr musí být škálovaný
         na primární stranu podle MTP elektroměru.
       </p>
-      <div className="field-grid">
+      <fieldset className="field-grid interval-fields" disabled={busy}>
         {(['from', 'to'] as const).map((key) => (
-          <label className="field" key={key}>
-            <span>Datum a čas {key === 'from' ? 'OD' : 'DO'}</span>
-            <input
-              aria-label={`Datum a čas ${key === 'from' ? 'OD' : 'DO'}`}
-              type="datetime-local"
-              step="60"
-              value={values[key]}
-              onChange={(e) => onChange({ ...values, [key]: e.target.value })}
-            />
-          </label>
+          <div key={key} className="two-fields">
+            {(['date', 'time'] as const).map((part) => (
+              <label className="field" key={part}>
+                <span>
+                  {part === 'date' ? 'Datum' : 'Čas'} {key === 'from' ? 'OD' : 'DO'}
+                </span>
+                <input
+                  type={part}
+                  step={part === 'time' ? '60' : undefined}
+                  aria-label={`${part === 'date' ? 'Datum' : 'Čas'} ${key === 'from' ? 'OD' : 'DO'}`}
+                  value={values[key].split('T')[part === 'date' ? 0 : 1] ?? ''}
+                  onChange={(e) => {
+                    const [date = '', time = ''] = values[key].split('T');
+                    onChange({
+                      ...values,
+                      [key]:
+                        part === 'date' ? `${e.target.value}T${time}` : `${date}T${e.target.value}`,
+                    });
+                    setError('');
+                    setFallback('');
+                  }}
+                />
+              </label>
+            ))}
+          </div>
         ))}
         <Field
           label="Stav elektroměru OD"
@@ -161,22 +183,22 @@ export function Interval({
           value={values.energis}
           onChange={(energis) => onChange({ ...values, energis })}
         />
-      </div>
+      </fieldset>
       {(error || validation) && (
         <p className="notice warning" role="alert">
           {error || validation}
         </p>
       )}
+      <Info label="Uložit kontrolu stavů">
+        Uloží aktuální kontrolu do historie. Po úspěšném uložení zůstane identifikace a datumy,
+        pracovní hodnoty, výsledky a časy se vyčistí pro další měření.
+      </Info>
       {result && (
         <>
           <IntervalResult record={result} />
           <div className="step-actions">
-            <button
-              className="button primary"
-              disabled={busy || saved === fingerprint}
-              onClick={() => void save()}
-            >
-              {saved === fingerprint ? 'KONTROLA STAVŮ ULOŽENA' : 'ULOŽIT KONTROLU STAVŮ'}
+            <button className="button primary" disabled={busy} onClick={() => void save()}>
+              ULOŽIT KONTROLU STAVŮ
             </button>
             <button className="button secondary" onClick={() => void send()}>
               ODESLAT TUTO KONTROLU

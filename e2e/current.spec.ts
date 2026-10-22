@@ -160,6 +160,8 @@ test('VN 6,3 a 10,3 kV dědí režim, SCADA a vlastní MTP /1 A', async ({ page 
     await current(page, voltage);
     await expect(page.getByText('MTP 408/1 A', { exact: true })).toBeVisible();
     await page.getByRole('checkbox', { name: 'PŘIDAT MĚŘENÍ NAPĚTÍ', exact: true }).check();
+    for (const pair of ['UL1-L2', 'UL1-L3', 'UL2-L3'])
+      await page.getByLabel(`Sekundární ${pair}`, { exact: true }).fill('100');
     await save(page);
   }
   await history(page);

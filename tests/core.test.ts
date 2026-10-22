@@ -244,7 +244,17 @@ describe('Data, čas, reset a export', () => {
       saved = r;
     });
     expect(saved).toBeDefined();
-    expect(result.nextDraft).toEqual(emptyDraft(draft.config));
+    expect(result.nextDraft.serial).toBe(draft.serial);
+    expect(result.nextDraft.identification).toEqual(draft.identification);
+    expect(result.nextDraft.config).toEqual(draft.config);
+    expect(result.nextDraft.phases).toEqual(emptyDraft().phases);
+    expect(result.nextDraft.interval).toEqual({
+      from: '2026-10-17T',
+      to: '2026-10-17T',
+      start: '',
+      end: '',
+      energis: '',
+    });
     expect(result.record.input.serial).toBe(reference.serial);
   });
   it('při selhání úložiště neresetuje', async () => {

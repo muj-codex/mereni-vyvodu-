@@ -16,17 +16,18 @@ async function check(
   await page.getByLabel('MTP primár', { exact: true }).selectOption('300');
   await page.getByLabel('MTP elektroměr', { exact: true }).selectOption('600');
   await page.getByRole('checkbox', { name: 'Porovnat stavy s Energis' }).check();
-  await page.getByLabel('Datum a čas OD', { exact: true }).fill('2026-10-20T08:00');
-  await page.getByLabel('Datum a čas DO', { exact: true }).fill('2026-10-20T09:00');
+  await page.getByLabel('Datum OD', { exact: true }).fill('2026-10-20');
+  await page.getByLabel('Čas OD', { exact: true }).fill('08:00');
+  await page.getByLabel('Datum DO', { exact: true }).fill('2026-10-20');
+  await page.getByLabel('Čas DO', { exact: true }).fill('09:00');
   await page.getByLabel('Stav elektroměru OD', { exact: true }).fill('100');
   await page.getByLabel('Stav elektroměru DO', { exact: true }).fill('120');
   await page.getByLabel('Spotřeba Energis za interval', { exact: true }).fill(energy);
 }
 async function save(page: Page) {
   await page.getByRole('button', { name: 'ULOŽIT KONTROLU STAVŮ', exact: true }).click();
-  await expect(
-    page.getByRole('button', { name: 'KONTROLA STAVŮ ULOŽENA', exact: true }),
-  ).toBeDisabled();
+  await expect(page.getByLabel('Čas OD', { exact: true })).toHaveValue('');
+  await expect(page.locator('.interval-result')).toHaveCount(0);
 }
 async function history(page: Page) {
   await page.getByRole('button', { name: 'Výsledky měření', exact: false }).last().click();
@@ -96,7 +97,8 @@ test('odeslání aktuální kontroly obsahuje čisté TSV a žádné files/pří
   );
   await page.getByRole('button', { name: 'ODESLAT TUTO KONTROLU', exact: true }).click();
   const data = await page.evaluate(() => (window as any).shared);
-  expect(Object.keys(data)).toEqual(['text']);
+  expect(Object.keys(data)).toEqual(['title', 'text']);
+  expect(data.title).toBe('Kontrola stavů – elektroměr 000MAIL – TS 0425/259');
   expect(data.text).toContain('\t');
   expect(data.text).toContain('-0,33 %');
   expect(data.text).not.toMatch(/\d+[.,]\d{4}/);

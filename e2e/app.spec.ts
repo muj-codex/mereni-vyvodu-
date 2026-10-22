@@ -60,7 +60,9 @@ test('sériové měření, historie, výběr, export a bezpečné mazání', asy
     fullPage: true,
   });
   await page.getByRole('button', { name: 'ULOŽIT MĚŘENÍ', exact: true }).click();
-  await expect(page.getByLabel('VÝROBNÍ ČÍSLO ELEKTROMĚRU', { exact: true })).toHaveValue('');
+  await expect(page.getByLabel('VÝROBNÍ ČÍSLO ELEKTROMĚRU', { exact: true })).toHaveValue(
+    '0012345678',
+  );
   await enterMeasurement(page, '00000002', '5');
   await expect(
     page.getByRole('heading', { name: 'MIMO TOLERANCI – PROVĚŘIT ZAPOJENÍ' }),
@@ -123,8 +125,10 @@ test('PWA se znovu načte offline a uchová historii', async ({ page, context })
   await enterMeasurement(page);
   await page.getByRole('button', { name: 'ULOŽIT MĚŘENÍ', exact: true }).click();
   // Click completion does not await the IndexedDB transaction in the async handler.
-  // The cleared serial is the app's acknowledgement that tx.done completed.
-  await expect(page.getByLabel('VÝROBNÍ ČÍSLO ELEKTROMĚRU', { exact: true })).toHaveValue('');
+  // Returning to the identification card acknowledges that tx.done completed.
+  await expect(page.getByLabel('VÝROBNÍ ČÍSLO ELEKTROMĚRU', { exact: true })).toHaveValue(
+    '0012345678',
+  );
   await context.setOffline(true);
   await page.reload();
   await expect(page.getByRole('heading', { name: 'Základ / kontrola stavů' })).toBeVisible();
@@ -147,8 +151,10 @@ test('volitelný interval bez pulzů, MTP a nezávislá historie při rozpracova
   await page.getByLabel('VÝROBNÍ ČÍSLO ELEKTROMĚRU', { exact: true }).fill('00042');
   await page.getByRole('combobox', { name: 'MTP primár', exact: true }).selectOption('200');
   await page.getByRole('checkbox', { name: 'Porovnat stavy s Energis', exact: false }).check();
-  await page.getByLabel('Datum a čas OD', { exact: true }).fill('2026-10-17T08:00');
-  await page.getByLabel('Datum a čas DO', { exact: true }).fill('2026-10-17T08:15');
+  await page.getByLabel('Datum OD', { exact: true }).fill('2026-10-17');
+  await page.getByLabel('Čas OD', { exact: true }).fill('08:00');
+  await page.getByLabel('Datum DO', { exact: true }).fill('2026-10-17');
+  await page.getByLabel('Čas DO', { exact: true }).fill('08:15');
   await page.getByLabel('Stav elektroměru OD', { exact: true }).fill('100');
   await page.getByLabel('Stav elektroměru DO', { exact: true }).fill('110');
   await page.getByLabel('Spotřeba Energis za interval', { exact: true }).fill('20');
@@ -228,7 +234,7 @@ test('500 V automaticky ARON, informační MTP, fyzické barvy a historie offlin
   await expect(page.locator('.scenario-list li')).toHaveCount(8);
   await noOverflow(page);
   await page.getByRole('button', { name: 'ULOŽIT MĚŘENÍ', exact: true }).click();
-  await expect(page.getByLabel('VÝROBNÍ ČÍSLO ELEKTROMĚRU', { exact: true })).toHaveValue('');
+  await expect(page.getByLabel('VÝROBNÍ ČÍSLO ELEKTROMĚRU', { exact: true })).toHaveValue('000500');
   await expect(page.getByText('Offline připraveno', { exact: true })).toBeVisible();
   await context.setOffline(true);
   await page.reload();

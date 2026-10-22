@@ -1,3 +1,5 @@
+import { SaveInfo } from './Info';
+import { resetCurrentDraft, locations } from '../core/current';
 import { useEffect, useState } from 'react';
 import { PHASES, phaseColor } from '../core/config';
 import {
@@ -17,7 +19,7 @@ import {
 } from '../core/current';
 import { formatNumber, parseNumber } from '../core/numbers';
 import type { Identification } from '../core/types';
-import { IdentificationSummary } from './Identification';
+import { IdentificationFields, IdentificationSummary } from './Identification';
 import { Field, SelectField } from './Fields';
 const pairs = ['UL1-L2', 'UL1-L3', 'UL2-L3'];
 export function CurrentResult({
@@ -119,9 +121,9 @@ export function CurrentResult({
     </>
   );
 }
-function restore(): CurrentDraft {
+function restore(key = 'mereni-current-draft-v1'): CurrentDraft {
   try {
-    const d = JSON.parse(localStorage.getItem('mereni-current-draft-v1') ?? 'null');
+    const d = JSON.parse(localStorage.getItem(key) ?? 'null');
     if (d?.phases?.length === 3 && d.identification && d.voltage) return d;
   } catch {
     /* retain session */
@@ -133,44 +135,69 @@ export function CurrentMeasurement({
   notify,
   shared,
 }: {
-  shared: { serial: string; identification: Identification };
+  shared?: { serial: string; identification: Identification; actualMtp?: number };
   onSave: (r: CurrentRecord) => Promise<void>;
   notify: (s: string) => void;
 }) {
-  const [draft, setDraft] = useState<CurrentDraft>(restore),
+  const storageKey = shared ? 'mereni-current-draft-v1' : 'mereni-current-independent-v1';
+  const [draft, setDraft] = useState<CurrentDraft>(() => restore(storageKey)),
     [result, setResult] = useState<CurrentRecord | null>(null),
     [error, setError] = useState(''),
     [busy, setBusy] = useState(false);
-  const networkVoltage = shared.identification.networkVoltage ?? 400;
+  const networkVoltage = shared?.identification.networkVoltage ?? draft.networkVoltage ?? 400;
   useEffect(() => {
+    if (!shared) return;
     setResult(null);
-    setDraft((d) => ({
-      ...d,
-      serial: shared.serial,
-      identification: { ...shared.identification },
-      vn: networkVoltage > 500,
+    const sharedHeaderKey = JSON.stringify([
+      shared.serial,
+      shared.identification.date,
+      shared.identification.location,
+      shared.identification.placement,
       networkVoltage,
-      voltage: {
-        ...d.voltage,
-        ...(networkVoltage > 500
-          ? {
-              preset: String(networkVoltage / 1000),
-              primary: [
-                String(networkVoltage / 1000),
-                String(networkVoltage / 1000),
-                String(networkVoltage / 1000),
-              ] as [string, string, string],
-            }
-          : {}),
-      },
-    }));
+      shared.actualMtp,
+    ]);
+    setDraft((d) => {
+      // Reopening the same header keeps an unfinished measurement and its chosen MTP.
+      if (d.sharedHeaderKey === sharedHeaderKey) return d;
+      const next = d.serial ? resetCurrentDraft(d) : d;
+      return {
+        ...next,
+        sharedHeaderKey,
+        ctPrimary: shared.actualMtp ?? d.ctPrimary,
+        serial: shared.serial,
+        identification: { ...shared.identification },
+        vn: networkVoltage > 500,
+        networkVoltage,
+        voltage: {
+          ...next.voltage,
+          ...(networkVoltage > 500
+            ? {
+                preset: String(networkVoltage / 1000),
+                primary: [
+                  String(networkVoltage / 1000),
+                  String(networkVoltage / 1000),
+                  String(networkVoltage / 1000),
+                ] as [string, string, string],
+              }
+            : {}),
+        },
+      };
+    });
   }, [
-    shared.serial,
-    shared.identification.date,
-    shared.identification.location,
-    shared.identification.placement,
+    shared?.serial,
+    shared?.actualMtp,
+    shared?.identification.date,
+    shared?.identification.location,
+    shared?.identification.placement,
     networkVoltage,
   ]);
+  useEffect(() => {
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(draft));
+    } catch {
+      /* session remains usable */
+    }
+  }, [draft, storageKey]);
   const [customMtp, setCustomMtp] = useState(false);
   const [mtpText, setMtpText] = useState(() => String(draft.ctPrimary));
   function change(d: CurrentDraft) {
@@ -178,7 +205,7 @@ export function CurrentMeasurement({
     setResult(null);
     setError('');
     try {
-      localStorage.setItem('mereni-current-draft-v1', JSON.stringify(d));
+      localStorage.setItem(storageKey, JSON.stringify(d));
     } catch {
       /* saving history still available */
     }
@@ -197,28 +224,7 @@ export function CurrentMeasurement({
     setBusy(true);
     try {
       await onSave(result);
-      change({
-        ...emptyCurrent(draft.vn),
-        ctPrimary: draft.ctPrimary,
-        range: draft.range,
-        serial: shared.serial,
-        identification: { ...shared.identification },
-        vn: draft.vn,
-        networkVoltage,
-        voltage: {
-          ...emptyCurrent(draft.vn).voltage,
-          ...(draft.vn
-            ? {
-                preset: String(networkVoltage / 1000),
-                primary: [
-                  String(networkVoltage / 1000),
-                  String(networkVoltage / 1000),
-                  String(networkVoltage / 1000),
-                ] as [string, string, string],
-              }
-            : {}),
-        },
-      });
+      change(resetCurrentDraft(draft));
       notify('Proudové měření uloženo.');
     } catch (e) {
       setError(`Měření nebylo uloženo. ${(e as Error).message}`);
@@ -229,8 +235,53 @@ export function CurrentMeasurement({
   return (
     <>
       <h1>Proudová diagnostika NN / VN</h1>
-      <IdentificationSummary serial={shared.serial} value={shared.identification} />
-      <p className="hint">Identifikaci upravíte na kartě 3f měření.</p>
+      {shared ? (
+        <>
+          <IdentificationSummary serial={draft.serial} value={draft.identification} />
+          <p className="hint">Identifikaci upravíte na kartě 3f měření.</p>
+        </>
+      ) : (
+        <>
+          <IdentificationFields
+            serial={draft.serial}
+            value={draft.identification}
+            vn={draft.vn}
+            onSerial={(serial) => change({ ...draft, serial })}
+            onChange={(identification) => change({ ...draft, identification })}
+          />
+          <SelectField
+            label="Režim sítě / napětí"
+            value={networkVoltage}
+            onChange={(v) => {
+              const voltage = Number(v),
+                vn = voltage > 500;
+              change({
+                ...resetCurrentDraft(draft),
+                vn,
+                networkVoltage: voltage,
+                identification: {
+                  ...draft.identification,
+                  networkVoltage: voltage,
+                  location: locations(vn)[0],
+                },
+                voltage: {
+                  ...resetCurrentDraft(draft).voltage,
+                  preset: String(voltage / 1000),
+                  primary: vn
+                    ? ([v, v, v].map(() => String(voltage / 1000)) as [string, string, string])
+                    : ['', '', ''],
+                },
+              });
+            }}
+          >
+            {[400, 500, 6000, 6300, 10000, 10300].map((v) => (
+              <option key={v} value={v}>
+                {v > 500 ? `VN ${v / 1000} kV` : `NN ${v} V${v === 500 ? ' – ARON' : ''}`}
+              </option>
+            ))}
+          </SelectField>
+        </>
+      )}
       <section className="card">
         <div className="field-grid">
           <SelectField
@@ -257,7 +308,7 @@ export function CurrentMeasurement({
             !currentOptions(draft.vn).some((ct) => ct.primary === draft.ctPrimary)) && (
             <Field
               label="Vlastní primár MTP"
-              value={mtpText}
+              value={customMtp ? mtpText : String(draft.ctPrimary)}
               onChange={(v) => {
                 setMtpText(v);
                 change({ ...draft, ctPrimary: parseNumber(v) });
@@ -438,6 +489,7 @@ export function CurrentMeasurement({
           <button className="button primary" disabled={busy} onClick={() => void save()}>
             {busy ? 'UKLÁDÁM…' : 'ULOŽIT PROUDOVÉ MĚŘENÍ'}
           </button>
+          <SaveInfo />
         </>
       )}
     </>

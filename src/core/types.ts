@@ -80,6 +80,7 @@ export interface MeasurementRecord {
   diagnosis: Diagnosis;
 }
 export interface FormDraft {
+  carryIdentification?: boolean;
   identification?: Identification;
   serial: string;
   config: MeterConfig;

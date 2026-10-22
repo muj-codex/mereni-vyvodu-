@@ -20,6 +20,7 @@ export const DEFAULT_CONFIG: MeterConfig = {
 export function emptyDraft(config: MeterConfig = DEFAULT_CONFIG): FormDraft {
   return {
     serial: '',
+    carryIdentification: true,
     identification: emptyIdentification(),
     config: structuredClone(config),
     intervalEnabled: false,
@@ -104,5 +105,34 @@ export async function saveAndReset(
   const record = createRecord(input, date);
   record.originalDraft = structuredClone(draft);
   await persist(record);
-  return { record, nextDraft: emptyDraft(draft.config) };
+  return { record, nextDraft: resetPowerDraft(draft) };
+}
+
+export function resetInterval(interval: FormDraft['interval']): FormDraft['interval'] {
+  return {
+    from: interval.from.split('T')[0] ? interval.from.split('T')[0] + 'T' : '',
+    to: interval.to.split('T')[0] ? interval.to.split('T')[0] + 'T' : '',
+    start: '',
+    end: '',
+    energis: '',
+  };
+}
+export function resetPowerDraft(draft: FormDraft): FormDraft {
+  return {
+    ...emptyDraft(draft.config),
+    serial: draft.serial,
+    identification: structuredClone(draft.identification),
+    carryIdentification: draft.carryIdentification ?? true,
+    intervalEnabled: draft.intervalEnabled,
+    interval: resetInterval(draft.interval),
+  };
+}
+// Explicit allowlist: never carry working readings or a previous evaluation.
+export function followingPowerDraft(draft: FormDraft): FormDraft {
+  if (draft.carryIdentification === false) return { ...emptyDraft(), carryIdentification: false };
+  const next = resetPowerDraft(draft);
+  next.intervalEnabled = false;
+  next.interval = emptyDraft().interval;
+  if (next.identification) delete next.identification.time;
+  return next;
 }

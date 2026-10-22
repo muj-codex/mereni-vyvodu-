@@ -12,7 +12,15 @@ import { percentDifference, signedPercent } from '../core/current';
 import { useState } from 'react';
 import type { HistoryRecord } from '../core/types';
 import { formatNumber } from '../core/numbers';
-import { emailBody, mailtoLink, toTSV, isCurrent, downloadBackup, backupTSV } from '../data/export';
+import {
+  shareSubject,
+  emailBody,
+  mailtoLink,
+  toTSV,
+  isCurrent,
+  downloadBackup,
+  backupTSV,
+} from '../data/export';
 import { Detail, Icon, Inspection, Result } from './components';
 export function History({
   records,
@@ -60,7 +68,9 @@ export function History({
       const file = new File([backupTSV(chosen)], 'mereni.tsv', {
         type: 'text/tab-separated-values',
       });
-      if (navigator.canShare?.({ files: [file] }))
+      if (chosen.length === 1 && 'kind' in chosen[0] && chosen[0].kind === 'interval-check')
+        await navigator.share({ title: shareSubject(chosen), text: emailBody(chosen) });
+      else if (navigator.canShare?.({ files: [file] }))
         await navigator.share({ files: [file], title: 'Naměřená data' });
       else await navigator.share({ title: 'Naměřená data', text: emailBody(chosen) });
     } catch (e) {

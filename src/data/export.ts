@@ -187,8 +187,16 @@ export function toTSV(records: HistoryRecord[]) {
 export function emailBody(records: HistoryRecord[]) {
   return toTSV(records);
 }
+export function intervalSubject(record: IntervalCheckRecord) {
+  return `Kontrola stavů – elektroměr ${record.input.serial} – ${record.input.identification.location}`;
+}
+export function shareSubject(records: HistoryRecord[]) {
+  return records.length === 1 && isIntervalCheck(records[0])
+    ? intervalSubject(records[0])
+    : `Naměřená data – ${records.length} měření`;
+}
 export function mailtoLink(records: HistoryRecord[]) {
-  return `mailto:?subject=${encodeURIComponent(`Naměřená data – ${records.length} měření`)}&body=${encodeURIComponent(emailBody(records))}`;
+  return `mailto:?subject=${encodeURIComponent(shareSubject(records))}&body=${encodeURIComponent(emailBody(records))}`;
 }
 // A unified backup keeps one row per record and one stable header, even for mixed modes.
 export function backupTSV(records: HistoryRecord[]) {

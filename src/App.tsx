@@ -1,3 +1,5 @@
+import { Info, SaveInfo } from './ui/Info';
+import { followingPowerDraft, resetInterval } from './core/measurement';
 import { MtpSelect } from './ui/MtpSelect';
 import { CurrentMeasurement } from './ui/CurrentMeasurement';
 import { IdentificationFields, IdentificationSummary } from './ui/Identification';
@@ -54,6 +56,7 @@ export default function App() {
   const repo = useMemo(() => createHistory(), []);
   const noticeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const heading = useRef<HTMLHeadingElement>(null);
+  const baseDraft = useRef<FormDraft | null>(null);
   const notify = (text: string) => {
     setMessage(text);
     if (noticeTimer.current) clearTimeout(noticeTimer.current);
@@ -129,12 +132,12 @@ export default function App() {
         i === index ? { ...p, [key]: value } : p,
       ) as FormDraft['phases'],
     });
-  function navigate(next: number, skipInterval = false) {
-    if (next > 0 && !draft.serial.trim()) {
+  function navigate(next: number) {
+    if (next > 0 && !(step === 0 && draft.carryIdentification === false) && !draft.serial.trim()) {
       setError('Vyplňte číslo elektroměru.');
       return;
     }
-    if (next > 0) {
+    if (next > 0 && !(step === 0 && draft.carryIdentification === false)) {
       try {
         validateIdentification(draft.identification ?? emptyIdentification());
       } catch (e) {
@@ -164,7 +167,18 @@ export default function App() {
       setError(evaluation.error);
       return;
     }
-    if (skipInterval) change({ ...draft, intervalEnabled: false });
+    if (step === 0 && next === 1) {
+      baseDraft.current = structuredClone(draft);
+      change(followingPowerDraft(draft));
+    }
+    if (next === 0 && baseDraft.current) {
+      change({
+        ...baseDraft.current,
+        phases: draft.phases,
+        kyoritsu: draft.kyoritsu,
+        energis: draft.energis,
+      });
+    }
     setError('');
     setStep(next);
   }
@@ -174,10 +188,14 @@ export default function App() {
     try {
       const { record, nextDraft } = await saveAndReset(draft, (r) => repo.add(r));
       setRecords((r) => [record, ...r]);
-      setDraft(nextDraft);
+      const ready = baseDraft.current
+        ? { ...nextDraft, interval: resetInterval(baseDraft.current.interval) }
+        : nextDraft;
+      setDraft(ready);
+      baseDraft.current = null;
       setStep(0);
       setError('');
-      notify(`Měření ${record.input.serial} uloženo. Připraveno pro další elektroměr.`);
+      notify(`Měření ${record.input.serial} uloženo. Připraveno pro další měření.`);
       if (navigator.storage?.persist) {
         // Persistence permission is independent from the completed measurement transaction.
         void navigator.storage
@@ -275,13 +293,18 @@ export default function App() {
             {mode === 'current' ? (
               <CurrentMeasurement
                 notify={notify}
-                shared={{
-                  serial: draft.serial,
-                  identification: {
-                    ...(draft.identification ?? emptyIdentification()),
-                    networkVoltage: draft.config.voltage,
-                  },
-                }}
+                shared={
+                  draft.carryIdentification === false
+                    ? undefined
+                    : {
+                        actualMtp: draft.config.actualMtp,
+                        serial: draft.serial,
+                        identification: {
+                          ...(draft.identification ?? emptyIdentification()),
+                          networkVoltage: draft.config.voltage,
+                        },
+                      }
+                }
                 onSave={async (r) => {
                   await repo.add(r);
                   void navigator.storage
@@ -344,6 +367,22 @@ export default function App() {
                       onSerial={(serial) => change({ ...draft, serial })}
                       onChange={(identification) => change({ ...draft, identification })}
                     />
+                    <div className="card">
+                      <label className="check-label">
+                        <input
+                          type="checkbox"
+                          checked={draft.carryIdentification !== false}
+                          onChange={(e) =>
+                            change({ ...draft, carryIdentification: e.target.checked })
+                          }
+                        />
+                        Použít tuto identifikaci i pro následující měření
+                      </label>
+                      <Info label="přenos identifikace">
+                        Přenese pouze identifikaci a konfiguraci do následujícího 1f/3f měření.
+                        Nepřenáší naměřené hodnoty ani výsledek předchozí kontroly.
+                      </Info>
+                    </div>
                     <section className="card" aria-label="Režim sítě v identifikaci">
                       <SelectField
                         label="Režim sítě / napětí"
@@ -426,7 +465,7 @@ export default function App() {
                         </p>
                       ) : (
                         <div className="step-actions">
-                          <button className="button primary" onClick={() => navigate(1, true)}>
+                          <button className="button primary" onClick={() => navigate(1)}>
                             PŘESKOČIT → KYORITSU <Icon name="arrow" />
                           </button>
                           {draft.intervalEnabled && (
@@ -458,6 +497,43 @@ export default function App() {
                 )}
                 {step === 1 && (
                   <>
+                    {draft.carryIdentification !== false ? (
+                      <IdentificationSummary
+                        serial={draft.serial}
+                        value={{ ...draft.identification!, networkVoltage: draft.config.voltage }}
+                      />
+                    ) : (
+                      <>
+                        <IdentificationFields
+                          serial={draft.serial}
+                          value={draft.identification ?? emptyIdentification()}
+                          onSerial={(serial) => change({ ...draft, serial })}
+                          onChange={(identification) => change({ ...draft, identification })}
+                        />
+                        <section className="card field-grid">
+                          <SelectField
+                            label="Režim sítě / napětí"
+                            value={draft.config.voltage}
+                            onChange={(v) => config('voltage', Number(v))}
+                          >
+                            <option value={400}>NN 400 V</option>
+                            <option value={500}>NN 500 V – ARON</option>
+                          </SelectField>
+                          <MtpSelect
+                            label="MTP primár"
+                            secondary={5}
+                            value={draft.config.actualMtp}
+                            onChange={(v) => config('actualMtp', v)}
+                          />
+                          <MtpSelect
+                            label="MTP elektroměr"
+                            secondary={5}
+                            value={draft.config.meterMtp}
+                            onChange={(v) => config('meterMtp', v)}
+                          />
+                        </section>
+                      </>
+                    )}
                     <div className="phase-inputs">
                       {PHASES.map((p) => (
                         <section className="card phase-input-card" key={p}>
@@ -604,6 +680,7 @@ export default function App() {
                         <Icon name="check" />
                         {busy ? 'UKLÁDÁM…' : 'ULOŽIT MĚŘENÍ'}
                       </button>
+                      <SaveInfo />
                       <button
                         className="text-button centered"
                         onClick={() => navigate(step === 3 ? 2 : step - 1)}

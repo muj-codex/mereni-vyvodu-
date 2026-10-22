@@ -1155,3 +1155,18 @@ fieldset:disabled {
 [hidden] {
   display: none !important;
 }
+
+.action-info {
+  display: block;
+}
+.action-info .notice {
+  display: block;
+  text-align: left;
+}
+
+.interval-fields {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}

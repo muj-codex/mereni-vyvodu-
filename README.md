@@ -99,7 +99,7 @@ IndexedDB používá stejný název a store jako původní aplikace. Upgrade z v
 
 **ZÁLOHOVAT HISTORII** stáhne TSV s hlavičkou a jednotnými sloupci pro smíšenou historii. **KOPÍROVAT PRO EXCEL** kopíruje řádky podle typu měření bez hlavičky. Centrální definice sloupců jsou v `src/data/export.ts`. TS/R a umístění jsou vždy samostatné buňky. Systémové sdílení nabídne soubor TSV, pokud ho prohlížeč podporuje, jinak text; při nepodporovaném sdílení zůstává ruční kopírování a e-mail. Verze aplikace a čas buildu jsou v nápovědě.
 
-Offline E2E čeká po kliknutí na uložení na potvrzený reset: u 3f vyčištění čísla, u 1f odstranění tlačítka uložení po dokončení IndexedDB transakce. Samotné dokončení kliknutí nečeká na asynchronní handler a dříve dovolovalo reload během zápisu. Testy neobsahují pevná časová čekání.
+Offline E2E čeká po kliknutí na uložení na potvrzený reset: u 3f návrat na kartu identifikace, u 1f odstranění tlačítka uložení po dokončení IndexedDB transakce. Samotné dokončení kliknutí nečeká na asynchronní handler a dříve dovolovalo reload během zápisu. Testy neobsahují pevná časová čekání.
 
 Podrobnosti oprav persistence a meze určení příčiny terénního incidentu jsou v [docs/PROMPT_1_1.md](docs/PROMPT_1_1.md).
 
@@ -110,3 +110,13 @@ Na první straně lze kontrolu stavů uložit bez pokračování ke Kyoritsu neb
 Historie zobrazuje všechny dny od nejnovějších a rozlišuje 3f, 1f a Kontrolu stavů. Filtry umístění a napětí lze kombinovat a zrušit; pouze mění zobrazení. Výsledek / Prověřit / Data-detail mají vlastní obsah. DB zůstává ve schématu v2 bez přepisu uložených objektů, včetně starých pulzních polí.
 
 Výstupy používají centrální formátování s nejvýše třemi desetinnými místy, procenta TSV/e-mailu přesně dvě. Interní výpočty a uložená čísla se nezaokrouhlují. 1f diagnostika nezmiňuje Energis; ARON používá pouze IL1 (1–3) a IL3 (7–9). Sazby zůstávají připravený placeholder.
+
+## Verze 1.2.3 – navazující měření
+
+Na první kartě je standardně zapnuté „Použít tuto identifikaci i pro následující měření“. Do 1f/3f se přenáší pouze výrobní číslo, identifikační datum, TS/rozvodna, umístění, režim sítě a odpovídající MTP. Převzatou hlavičku ukazuje informační souhrn. Při vypnutí lze navazující měření identifikovat samostatně.
+
+Kontrola stavů má samostatné editovatelné datum a čas OD/DO; podporuje vícedenní interval a odmítá DO před OD. Časy se nikdy nevyplňují aktuálním časem. Po potvrzeném uložení zůstávají identifikace a oba datumy, časy a pracovní hodnoty se vyčistí. Stejně se po uložení 1f/3f zachovají hlavička a konfigurace a vyčistí odečty i výsledky. Při neúspěšné validaci nebo zápisu zůstávají vstupy zachované. Krátké informace ⓘ vysvětlují přenos i ukládání.
+
+Sdílení aktuální nebo jedné uložené kontroly předává `title` s výrobním číslem a TS/rozvodnou, bez přílohy, se stávajícím TSV v těle. Předání tohoto pole do předmětu závisí na cílové iOS aplikaci; ruční kopírování funguje i bez Web Share. E-mailový fallback historie obsahuje i `subject`.
+
+IndexedDB schéma ani historická data se nemění. Výpočty zůstávají v plné přesnosti, výsledky UI mají nejvýše tři desetinná místa, exportovaná procenta přesně dvě. Každý další produkční balík musí zvýšit verzi aplikace; viz `AGENTS.md`.
