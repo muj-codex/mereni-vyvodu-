@@ -52,9 +52,9 @@ export function percentDifference(actual: number, reference: number): number | n
 export function workingBand(percent: number | null) {
   return percent === null
     ? 'unknown'
-    : Math.abs(percent) <= 15
+    : Math.abs(percent) <= 15 + 1e-9
       ? 'success'
-      : Math.abs(percent) <= 25
+      : Math.abs(percent) <= 25 + 1e-9
         ? 'intermediate'
         : 'warning';
 }

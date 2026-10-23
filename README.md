@@ -2,6 +2,16 @@
 
 Česká mobile-first aplikace v Reactu a TypeScriptu. Samostatná PWA pro iPhone na výšku a iPad: výpočty, rozpracovaný formulář a historie jsou lokální. Nevyžaduje backend, účet ani API klíče.
 
+## Verze 1.2.7 – fyzikální kontrola výkonu Kyoritsu
+
+Před celkovým verdiktem se nezávisle kontroluje výkon z U/I/|PF| proti zadaným kW každé aktivní větve i celku. ARON používá pouze větve 1 a 3: `P1 = U1 × I1 × |PF1| / 1000`, `P3 = U3 × I3 × |PF3| / 1000`. U1/U3 a PF1/PF3 musí patřit odpovídajícím Aronovým výkonovým větvím. Znaménko PF zůstává nezávislé na znaménku P; směr při součtu určuje P.
+
+NN 400 V vyžaduje výslovnou volbu typu zadaných napětí: skutečná fázová napětí se použijí přímo, sdružená napětí pouze pro symetrickou soustavu s dělením √3. Neurčená topologie ani neplatné vstupy nevytvoří zelený verdikt. Stávající 1f/VN workflow měří proudy a případně napětí; bez PF a činného výkonu se tato kontrola nepřidává.
+
+Rozdíl do 15 % odpovídá, nad 15 % do 25 % vyžaduje ověření, nad 25 % znamená významný nesoulad. Při nesouladu se zobrazí **OVĚŘIT HODNOTY KYORITSU**, výpočet, zadání, procenta a doporučení zkontrolovat hodnoty bez určování konkrétní závady zapojení. Kontrolují se i větve, jejichž chyby se mohou v součtu vyrušit.
+
+Výsledek je součástí uložené diagnostiky, IndexedDB a JSON zálohy/importu; starší záznamy se otevírají s původními uloženými výsledky. Export/share přidává stav, výpočet, zadání a odchylky s procenty na dvě desetinná místa. Porovnání Kyoritsu ↔ Energis i Elektroměr ↔ Energis zůstává zachováno; odstraněný řádek Elektroměr ↔ Kyoritsu se do UI nevrací.
+
 ## Verze 1.2.6 – zjednodušení porovnání
 
 Sekce **Porovnání** zobrazuje pouze Elektroměr ↔ Energis a Kyoritsu ↔ Energis. Řádek Elektroměr ↔ Kyoritsu a jeho vysvětlení byly odstraněny z UI; výpočty, přenesená Kontrola stavů, export a starší uložené záznamy zůstávají beze změny.

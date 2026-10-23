@@ -36,3 +36,11 @@ Ověření balíku: `npm test` – **203/203**, `npm run test:e2e` – **72/72**
 Nové testy zahrnují explicitní propojení Kontrola stavů → Kyoritsu → uložený výsledek → reload, přímé Kyoritsu bez kontroly, všechny tři položky porovnání včetně věcně nedostupného elektroměr ↔ Kyoritsu (kWh versus kW), úplný JSON export a obnovu do čisté DB, opakovaný a souběžný import bez duplicit, částečné sloučení, fallback bez ID, kompatibilitu diagnostických scénářů 400/500 V, odmítnutí neplatné zálohy a atomický rollback při chybě zápisu. Skutečná výměna service workeru a buildové cache zachovala původní v1 záznam, následný upgrade DB i offline otevření historie.
 
 Test souborového Web Share používá mock systémového rozhraní. Fyzický iPhone/iPad a nativní dialog **Uložit do Souborů** nebyly v tomto prostředí dostupné.
+
+## Ověření 1.2.7 – konzistence výkonu Kyoritsu
+
+- `npm test`: **228/228** testů, všech 10 souborů úspěšných. Nových 25 kontrol pokrývá ARON A–D, nezávislé větve i celkový výkon, skutečné napětí každé větve, hranice ±15/±25 %, znaménka PF/P, nuly, chybějící a neplatné vstupy, NN 400 V podle typu napětí, IndexedDB, JSON a exportní procenta na dvě desetinná místa.
+- `npm run build`: úspěšný TypeScript, Vite produkční build a offline precache verze **1.2.7**. Závislosti ani verze databáze se nemění.
+- `npm run test:e2e`: **78/78** scénářů (39 iPhone + 39 iPad, Chromium), celý suite nad finálním produkčním buildem. Zahrnuje NN 400 V, ARON IL1/IL3 bez IL2, VN/1f, kontrolu stavů, obě zachovaná porovnání, historii, zálohu/import JSON, IndexedDB, skutečný update service workeru, offline režim a export/share.
+- Nové E2E: 24,14 kW vypočteno proti 4 kW Kyoritsu i Energis znamená varování bez zeleného výsledku, také po uložení a otevření detailu. Správných 18 kW projde; fyzikálně správných 18 kW proti Energis 10 kW rozliší interní kontrolu od externího nesouladu.
+- Sdružená napětí v NN 400 V vyžadují výslovně deklarovanou symetrickou soustavu; bez určení typu napětí se kontrola označí neutrálně jako neověřitelná. Starší záznamy bez nové diagnostiky se otevírají beze změny uloženého výsledku.

@@ -7,6 +7,8 @@ async function noOverflow(page: Page) {
 async function enterMeasurement(page: Page, serial = '0012345678', energis = '9,17') {
   await page.getByLabel('VÝROBNÍ ČÍSLO ELEKTROMĚRU', { exact: true }).fill(serial);
   await page.getByRole('button', { name: 'MĚŘENÍ KYORITSU' }).click();
+  if (await page.getByLabel('Typ zadaného napětí U1–U3').count())
+    await page.getByLabel('Typ zadaného napětí U1–U3').selectOption('line-line');
   for (const [i, [u, current]] of [
     ['506', '15,2'],
     ['506,6', '9,2'],
@@ -201,9 +203,7 @@ test('500 V automaticky ARON, informační MTP, fyzické barvy a historie offlin
     .getByRole('combobox', { name: 'Režim sítě / napětí', exact: true })
     .selectOption('500');
   await enterMeasurement(page, '000500', '5');
-  await expect(
-    page.getByRole('heading', { name: 'MIMO TOLERANCI – PROVĚŘIT ZAPOJENÍ' }),
-  ).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'OVĚŘIT HODNOTY KYORITSU' })).toBeVisible();
   const cards = page.locator('.aron-mapping');
   expect(await cards.count()).toBeGreaterThan(0);
   expect(await cards.count()).toBeLessThanOrEqual(2);

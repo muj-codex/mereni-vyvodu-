@@ -543,6 +543,32 @@ export default function App() {
                         </section>
                       </>
                     )}
+                    {draft.config.voltage === 500 ? (
+                      <p className="hint">
+                        U1 = napětí větve L1–L2, U3 = napětí větve L3–L2; PF1/PF3 patří stejným
+                        výkonovým větvím.
+                      </p>
+                    ) : (
+                      <section className="card">
+                        <SelectField
+                          label="Typ zadaného napětí U1–U3"
+                          value={draft.voltageBasis ?? 'unknown'}
+                          onChange={(v) =>
+                            change({ ...draft, voltageBasis: v as FormDraft['voltageBasis'] })
+                          }
+                        >
+                          <option value="unknown">Vyberte typ napětí</option>
+                          <option value="phase-neutral">Fázová napětí L1/L2/L3 vůči N</option>
+                          <option value="line-line">
+                            Sdružená napětí – symetrická 3f soustava
+                          </option>
+                        </SelectField>
+                        <p className="hint">
+                          Sdružená napětí lze přepočítat dělením √3 pouze u symetrické soustavy. Pro
+                          nesymetrickou soustavu zadejte skutečná fázová napětí.
+                        </p>
+                      </section>
+                    )}
                     <div className="phase-inputs">
                       {PHASES.map((p) => (
                         <section className="card phase-input-card" key={p}>

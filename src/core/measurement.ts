@@ -21,6 +21,7 @@ export const DEFAULT_CONFIG: MeterConfig = {
 export function emptyDraft(config: MeterConfig = DEFAULT_CONFIG): FormDraft {
   return {
     serial: '',
+    voltageBasis: 'unknown',
     carryIdentification: true,
     identification: emptyIdentification(),
     config: structuredClone(config),
@@ -75,6 +76,7 @@ export function readDraft(
   return {
     stateCheck: draft.stateCheck ? structuredClone(draft.stateCheck) : undefined,
     serial: draft.serial,
+    voltageBasis: draft.voltageBasis ?? 'unknown',
     identification: draft.identification ? structuredClone(draft.identification) : undefined,
     config: structuredClone(draft.config),
     phases,
@@ -122,6 +124,7 @@ export function resetInterval(interval: FormDraft['interval']): FormDraft['inter
 export function resetPowerDraft(draft: FormDraft): FormDraft {
   return {
     ...emptyDraft(draft.config),
+    voltageBasis: draft.voltageBasis,
     serial: draft.serial,
     identification: structuredClone(draft.identification),
     carryIdentification: draft.carryIdentification ?? true,

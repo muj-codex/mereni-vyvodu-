@@ -181,7 +181,7 @@ describe('1.2.5 persistent DB and complete backup', () => {
       data = JSON.parse(json);
     expect(data).toMatchObject({
       backupVersion: 1,
-      appVersion: '1.2.6',
+      appVersion: '1.2.7',
       database: { name: 'mereni-vyvodu-v1', version: 2 },
     });
     expect(data.exportedAt).toBeTruthy();

@@ -21,6 +21,7 @@ async function base(page: Page, serial = '000125') {
     await page.getByLabel(label, { exact: true }).fill(value);
 }
 async function power(page: Page) {
+  await page.getByLabel('Typ zadaného napětí U1–U3').selectOption('phase-neutral');
   for (const i of [1, 2, 3]) {
     await page.getByLabel(`U${i}`, { exact: true }).fill('230');
     await page.getByLabel(`IL${i}`, { exact: true }).fill('10');

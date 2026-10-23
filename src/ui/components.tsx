@@ -1,3 +1,4 @@
+import { measurementIsOk, powerNeedsVerification, powerSummary } from '../core/powerConsistency';
 import { signedPercent, workingBand } from '../core/current';
 import type { ReactNode } from 'react';
 import { PHASES, phaseColor, type Phase } from '../core/config';
@@ -184,21 +185,27 @@ export function scenarioLabel(s: Scenario): string {
     .join(' · ');
 }
 export function Result({ diagnosis, serial }: { diagnosis: Diagnosis; serial: string }) {
-  const ok = diagnosis.status === 'ok';
+  const ok = measurementIsOk(diagnosis);
+  const powerIssue = powerNeedsVerification(diagnosis);
   return (
     <>
-      <div className={`result-banner ${workingBand(diagnosis.differencePercent)}`}>
+      <div
+        className={`result-banner ${powerIssue ? (diagnosis.powerConsistency?.status === 'unavailable' ? 'unknown' : diagnosis.powerConsistency?.status === 'verify' ? 'intermediate' : 'warning') : workingBand(diagnosis.differencePercent)}`}
+      >
         <Icon name={ok ? 'check' : 'alert'} size={28} />
         <h2>
-          {ok
-            ? 'MĚŘENÍ V POŘÁDKU'
-            : diagnosis.differencePercent !== null && Math.abs(diagnosis.differencePercent) <= 25
-              ? 'OVĚŘIT SOUBĚŽNOST MĚŘENÍ'
-              : diagnosis.status === 'near-zero'
-                ? 'VÝKON TÉMĚŘ NULOVÝ'
-                : 'MIMO TOLERANCI – PROVĚŘIT ZAPOJENÍ'}
+          {powerIssue
+            ? 'OVĚŘIT HODNOTY KYORITSU'
+            : ok
+              ? 'MĚŘENÍ V POŘÁDKU'
+              : diagnosis.differencePercent !== null && Math.abs(diagnosis.differencePercent) <= 25
+                ? 'OVĚŘIT SOUBĚŽNOST MĚŘENÍ'
+                : diagnosis.status === 'near-zero'
+                  ? 'VÝKON TÉMĚŘ NULOVÝ'
+                  : 'MIMO TOLERANCI – PROVĚŘIT ZAPOJENÍ'}
         </h2>
       </div>
+      <PowerConsistencyResult diagnosis={diagnosis} />
       <p className="main-percent">{signedPercent(diagnosis.differencePercent)}</p>
       <p className="hint">
         + = Energis ukazuje více · − = Energis ukazuje méně. Pracovní pomůcka; konečné rozhodnutí
@@ -225,8 +232,9 @@ export function Result({ diagnosis, serial }: { diagnosis: Diagnosis; serial: st
             title="Referenční zapojení – nepotvrzuje příčinu rozdílu"
           />
           <p className="notice warning">
-            Rozdíl proti Energis je významný. Z tohoto porovnání nelze jednoznačně určit chybu
-            zapojení.
+            {powerIssue
+              ? 'Nejprve prověř hodnoty Kyoritsu. Shoda s Energis sama nepotvrzuje správnost měření.'
+              : 'Rozdíl proti Energis je významný. Z tohoto porovnání nelze jednoznačně určit chybu zapojení.'}
           </p>
         </>
       )}
@@ -236,6 +244,38 @@ export function Result({ diagnosis, serial }: { diagnosis: Diagnosis; serial: st
         </p>
       ))}
     </>
+  );
+}
+export function PowerConsistencyResult({ diagnosis }: { diagnosis: Diagnosis }) {
+  const check = diagnosis.powerConsistency;
+  if (!check) return null;
+  return (
+    <section className="card" aria-label="Kontrola výkonu Kyoritsu">
+      <h3>Kontrola výkonu Kyoritsu</h3>
+      <p>
+        U / I / PF ↔ výkon Kyoritsu: <strong>{powerSummary(check)}</strong>
+      </p>
+      {check.status !== 'consistent' && check.total && (
+        <>
+          <p>Výkon Kyoritsu neodpovídá zadanému napětí, proudu a PF.</p>
+          <p>Vypočtený výkon z U/I/PF: {formatNumber(check.total.expected)} kW</p>
+          <p>Zadaný výkon Kyoritsu: {formatNumber(check.total.entered)} kW</p>
+          <p>Rozdíl: {formatNumber(check.total.percent, 2)} %</p>
+          {check.branches
+            .filter((b) => b.band !== 'success')
+            .map((b) => (
+              <p key={b.phase}>
+                P{b.phase + 1}: vypočteno {formatNumber(b.expected)} kW · zadáno |P|{' '}
+                {formatNumber(b.entered)} kW · rozdíl {formatNumber(b.percent, 2)} %
+              </p>
+            ))}
+          <p>
+            Prověř zadané hodnoty U, I, PF a výkon Kyoritsu. Z tohoto nesouladu nelze jednoznačně
+            určit chybu zapojení.
+          </p>
+        </>
+      )}
+    </section>
   );
 }
 export function Inspection({ diagnosis }: { diagnosis: Diagnosis }) {
@@ -277,6 +317,7 @@ export function Detail({ record }: { record: MeasurementRecord }) {
           členy 1–3 a 7–9. Napěťový sekundár 100 V.
         </p>
       )}
+      <PowerConsistencyResult diagnosis={d} />
       <section className="card">
         <h3>Porovnání výkonů</h3>
         <dl className="data-list">
@@ -400,10 +441,11 @@ export function Detail({ record }: { record: MeasurementRecord }) {
           </p>
         )}
         <p>
-          Ekvivalentní fázové napětí každé fáze je |P| × 1000 / (I × |PF|). Zadaných přibližně 500 V
-          se nepoužívá jako napětí fáze vůči neutrálu. Při 400 V se používá ekvivalentní napětí
-          cílové fáze a úhel a proud zdrojové fyzické fáze. V režimu ARON se nejprve vytvoří
-          rozdílové fázory V1−V2 a V3−V2.
+          Ekvivalentní fázové napětí každé fáze je |P| × 1000 / (I × |PF|). Pro samostatnou kontrolu
+          konzistence se používají skutečně zadaná napětí větví a |PF|. Následující scénářový model
+          je oddělený: zadaných přibližně 500 V se nepoužívá jako napětí fáze vůči neutrálu. Při 400
+          V se používá ekvivalentní napětí cílové fáze a úhel a proud zdrojové fyzické fáze. V
+          režimu ARON se nejprve vytvoří rozdílové fázory V1−V2 a V3−V2.
         </p>
         <p>
           Nulové I, PF nebo P mohou znemožnit kalibraci napětí. V takovém případě se neodhaduje

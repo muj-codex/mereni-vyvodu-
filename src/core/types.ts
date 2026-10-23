@@ -1,3 +1,4 @@
+import type { PowerConsistency, VoltageBasis } from './powerConsistency';
 import type { IntervalCheckRecord } from './intervalCheck';
 import type { CurrentRecord } from './current';
 import type { Phase } from './config';
@@ -32,6 +33,7 @@ export interface Identification {
 }
 export type HistoryRecord = MeasurementRecord | CurrentRecord | IntervalCheckRecord;
 export interface MeasurementInput {
+  voltageBasis?: VoltageBasis;
   stateCheck?: IntervalCheckRecord;
   identification?: Identification;
   serial: string;
@@ -62,6 +64,8 @@ export interface AronScenario extends ScenarioResult {
 }
 export type Scenario = ThreeCurrentScenario | AronScenario;
 export interface Diagnosis {
+  powerConsistency?: PowerConsistency;
+  // status and differencePercent retain the independent Kyoritsu ↔ Energis comparison.
   // Absent on legacy records: retain their original three-current interpretation.
   mode?: 'three-current' | 'aron';
   status: 'ok' | 'outside' | 'near-zero';
@@ -81,6 +85,7 @@ export interface MeasurementRecord {
   diagnosis: Diagnosis;
 }
 export interface FormDraft {
+  voltageBasis?: VoltageBasis;
   stateCheck?: IntervalCheckRecord;
   carryIdentification?: boolean;
   identification?: Identification;

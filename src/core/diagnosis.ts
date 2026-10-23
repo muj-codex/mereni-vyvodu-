@@ -1,3 +1,4 @@
+import { checkPowerConsistency, powerNeedsVerification } from './powerConsistency';
 import { CONFIG, PHASES } from './config';
 import type { Phase } from './config';
 import { branchPower, equivalentPhaseVoltage } from './physics';
@@ -66,9 +67,13 @@ export function generateScenarios(input: MeasurementInput): ThreeCurrentScenario
   ).sort((a, b) => (a.error ?? Infinity) - (b.error ?? Infinity) || a.id.localeCompare(b.id));
 }
 export function diagnose(input: MeasurementInput): Diagnosis {
+  const powerConsistency = checkPowerConsistency(input);
   const comparison = directComparison(input.kyoritsu, input.energis);
   const warnings: string[] = [];
-  const sum = input.phases.reduce((s, p) => s + p.p, 0);
+  const sum = input.phases.reduce(
+    (s, p, index) => s + (input.config.voltage === 500 && index === 1 ? 0 : p.p),
+    0,
+  );
   if (Math.abs(sum - input.kyoritsu) > Math.max(0.05, Math.abs(input.kyoritsu) * 0.05))
     warnings.push(
       'Součet P1–P3 se od celkového výkonu Kyoritsu liší o více než 5 % (min. 0,05 kW). Ověřte souběžnost a opis hodnot.',
@@ -97,6 +102,7 @@ export function diagnose(input: MeasurementInput): Diagnosis {
       : undefined;
   return {
     ...comparison,
+    powerConsistency,
     mode,
     scenarios,
     best,
@@ -106,11 +112,18 @@ export function diagnose(input: MeasurementInput): Diagnosis {
   };
 }
 export function inspectionInstructions(diagnosis: Diagnosis): string[] {
+  const physical = powerNeedsVerification(diagnosis)
+    ? [
+        'Prověř zadané hodnoty U, I, PF a výkon Kyoritsu. Z tohoto nesouladu nelze jednoznačně určit chybu zapojení.',
+      ]
+    : [];
   if (diagnosis.status === 'ok')
     return [
+      ...physical,
       'Přímé porovnání je v toleranci ±15 %. Samotné porovnání nepotvrzuje správné zapojení.',
     ];
   return [
+    ...physical,
     'Rozdíl proti Energis je významný. Z tohoto porovnání nelze jednoznačně určit chybu zapojení.',
     'Ověřte souběžnost měření, časový posun a agregaci / vyhlazení Energis.',
     'Možné příčiny: převod, proudový nebo napěťový obvod, zapojení či více závad současně. Změřte místně primár a sekundár přes MTP.',

@@ -240,7 +240,7 @@ describe('ARON vzhled, informace MTP a zachování dat', () => {
     expect(saved.input.phases).toEqual(parsed.phases);
     expect(saved.diagnosis.mode).toBe('aron');
     const cells = toTSV([saved]).split('\t');
-    expect(cells).toHaveLength(31);
+    expect(cells).toHaveLength(41);
     expect(cells.slice(6, 12)).toEqual(['500', '500', '500', '10', '', '10']);
     expect(emailBody([saved])).toBe(toTSV([saved]));
     await reopened.close();

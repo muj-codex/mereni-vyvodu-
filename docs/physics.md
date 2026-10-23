@@ -78,3 +78,15 @@ Interval musí být přesně shodný v obou systémech. Přetočení, reset regi
 ## Další rozšíření
 
 Import z KEW/Bluetooth má vracet normalizovaný `MeasurementInput`; nesmí obcházet validaci nebo barvy. Bez veřejně potvrzeného protokolu se připojení neimplementuje. Nové skutečné fázové úhly, typy chyb, báze registru nebo PDF patří do samostatných adaptérů a exportních modulů. Historický záznam obsahuje verzi modelu a uloženou diagnostiku, proto jej budoucí aktualizace bez výslovného kroku nepřepisují.
+
+## Nezávislá kontrola konzistence od verze 1.2.7
+
+Kontrola `checkPowerConsistency` používá **zadané U**, nikoli ekvivalentní napětí odvozené z P. Předchozí scénářový model je zachován odděleně; jeho kalibrace z P nesmí nahrazovat tuto kontrolu ani potvrzovat konzistenci vstupů.
+
+- ARON: pro aktivní větve 1 a 3 platí `|P_vyp| = U_větve × I × |PF_větve| / 1000`. Jde o skutečné napětí L1–L2 nebo L3–L2 a účiník téže větve. IL2 se nepoužívá.
+- Ostatní 3f: volba `phase-neutral` znamená součet skutečných fázových příspěvků. Volba `line-line` předpokládá symetrii a přepočítá U/√3; při shodných U/I/PF je součet přesně √3 × U × I × |PF| / 1000. Nesymetrická sdružená napětí neumožňují tento přepočet, musí se zadat skutečná fázová napětí.
+- Absolutní hodnoty větví se porovnávají se zadaným |P|. Pro algebraický součet se použije samostatné znaménko P, nikdy znaménko PF.
+- Odchylka je `(zadáno − vypočteno) / vypočteno × 100`; hranice sdílí `workingBand` (15 % / 25 % s numerickou rezervou 1e-9 procentního bodu). Nulová reference a nulový výkon odpovídají; nenulový výkon proti nulové referenci je nesoulad bez nekonečného procenta.
+- Chybějící/neplatné vstupy a neznámý typ napětí mají neutrální stav `unavailable`. Úplný formulář nadále vyžaduje platné PF/P. 1f proudové workflow bez PF/P kontrolu nevynucuje.
+
+`Diagnosis.status` a `differencePercent` nadále vyjadřují samostatné porovnání Kyoritsu ↔ Energis. Celkový verdikt získává UI přes `measurementIsOk`, který u nových výsledků navíc vyžaduje `powerConsistency.status === consistent` a žádná stávající diagnostická upozornění. Nová diagnostika se ukládá beze ztráty interní přesnosti; nepřítomnost pole u historických záznamů nezpůsobí migraci ani přepis původního výsledku.

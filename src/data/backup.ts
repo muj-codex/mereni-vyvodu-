@@ -53,6 +53,24 @@ function validScenario(s: unknown) {
     s.shorted.every((p: unknown) => typeof p === 'boolean')
   );
 }
+function validPowerConsistency(v: unknown) {
+  if (
+    !object(v) ||
+    !['consistent', 'verify', 'mismatch', 'unavailable'].includes(v.status) ||
+    !['aron', 'unknown', 'phase-neutral', 'line-line'].includes(v.topology) ||
+    !Array.isArray(v.branches)
+  )
+    return false;
+  const comparison = (b: unknown) =>
+    object(b) &&
+    numeric(b, ['expected', 'entered']) &&
+    nullableNumber(b.percent) &&
+    ['success', 'intermediate', 'warning', 'unknown'].includes(b.band);
+  return (
+    v.branches.every((b: unknown) => comparison(b) && object(b) && [0, 1, 2].includes(b.phase)) &&
+    (v.total === undefined || comparison(v.total))
+  );
+}
 function validRecord(r: unknown): r is HistoryRecord {
   if (
     !object(r) ||
@@ -138,6 +156,8 @@ function validRecord(r: unknown): r is HistoryRecord {
     numeric(i, ['kyoritsu', 'energis']) &&
     object(r.diagnosis) &&
     ['ok', 'outside', 'near-zero'].includes(r.diagnosis.status) &&
+    (r.diagnosis.powerConsistency === undefined ||
+      validPowerConsistency(r.diagnosis.powerConsistency)) &&
     Array.isArray(r.diagnosis.scenarios) &&
     r.diagnosis.scenarios.every(validScenario) &&
     strings(r.diagnosis.warnings) &&

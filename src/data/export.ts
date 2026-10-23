@@ -1,3 +1,4 @@
+import { powerSummary } from '../core/powerConsistency';
 import { measurementComparisons } from '../core/comparisons';
 import { formatNumber, parseNumber } from '../core/numbers';
 import { isIntervalCheck, recordVoltage, intervalEndpoint } from '../core/historyView';
@@ -79,6 +80,40 @@ export const EXPORT_COLUMNS: Column<MeasurementRecord>[] = [
       return c.percent === null ? c.note : c.percent;
     },
   })),
+  {
+    key: 'physics-status',
+    label: 'Kontrola výkonu Kyoritsu',
+    value: (r) => (r.diagnosis.powerConsistency ? powerSummary(r.diagnosis.powerConsistency) : ''),
+  },
+  {
+    key: 'physics-expected',
+    label: 'Kyoritsu vypočteno z U/I/PF [kW]',
+    value: (r) => r.diagnosis.powerConsistency?.total?.expected,
+  },
+  {
+    key: 'physics-entered',
+    label: 'Kyoritsu zadáno [kW]',
+    value: (r) => r.diagnosis.powerConsistency?.total?.entered,
+  },
+  {
+    key: 'physics-percent',
+    label: 'U/I/PF ↔ Kyoritsu rozdíl %',
+    value: (r) => r.diagnosis.powerConsistency?.total?.percent,
+  },
+  ...[0, 1, 2].flatMap((phase) => [
+    {
+      key: `physics-P${phase + 1}-expected`,
+      label: `P${phase + 1} z U/I/PF [kW]`,
+      value: (r: MeasurementRecord) =>
+        r.diagnosis.powerConsistency?.branches.find((b) => b.phase === phase)?.expected,
+    },
+    {
+      key: `physics-P${phase + 1}-percent`,
+      label: `P${phase + 1} fyzikální rozdíl %`,
+      value: (r: MeasurementRecord) =>
+        r.diagnosis.powerConsistency?.branches.find((b) => b.phase === phase)?.percent,
+    },
+  ]),
 ];
 export const CURRENT_COLUMNS: Column<CurrentRecord>[] = [
   ...identityColumns,
