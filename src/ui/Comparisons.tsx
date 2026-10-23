@@ -31,17 +31,19 @@ export function Comparisons({ record }: { record: MeasurementRecord }) {
         Měření Kyoritsu: {formatNumber(record.input.kyoritsu)} kW · Trend Energis:{' '}
         {formatNumber(record.input.energis)} kW
       </p>
-      {measurementComparisons(record).map((c) => (
-        <div key={c.key}>
-          <strong>
-            {c.label}:{' '}
-            {c.percent === null
-              ? 'Porovnání není dostupné'
-              : `${c.percent > 0 ? '+' : ''}${formatNumber(c.percent)} %`}
-          </strong>
-          <p className="hint">{c.note}</p>
-        </div>
-      ))}
+      {measurementComparisons(record)
+        .filter((c) => c.key !== 'meter-kyoritsu')
+        .map((c) => (
+          <div key={c.key}>
+            <strong>
+              {c.label}:{' '}
+              {c.percent === null
+                ? 'Porovnání není dostupné'
+                : `${c.percent > 0 ? '+' : ''}${formatNumber(c.percent)} %`}
+            </strong>
+            <p className="hint">{c.note}</p>
+          </div>
+        ))}
     </section>
   );
 }

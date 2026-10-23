@@ -109,13 +109,15 @@ describe('1.2.5 measurement continuity', () => {
     ).rejects.toThrow('quota');
     expect(d.stateCheck).toBeDefined();
   });
-  it('three comparisons: interval kWh cannot be compared to instantaneous kW; export uses two decimal places', () => {
+  it('UI shows only meaningful comparisons while internal data and export stay compatible', () => {
     const r = createRecord(readDraft(complete(startKyoritsu(draft(), true)))),
       c = measurementComparisons(r);
     expect(c.map((x) => x.percent)).toEqual([-1.5, ((6.8 - 6.9) / 6.9) * 100, null]);
     expect(c[2].note).toContain('kWh');
     const html = renderToStaticMarkup(createElement(Comparisons, { record: r }));
-    for (const x of c) expect(html).toContain(x.label);
+    for (const x of c.slice(0, 2)) expect(html).toContain(x.label);
+    expect(html).not.toContain('Elektroměr ↔ Kyoritsu');
+    expect(html).not.toContain('Porovnání není dostupné');
     expect(html).toContain('Kyoritsu: 6,9 kW');
     expect(emailBody([r])).toContain('-1,50 %');
     expect(emailBody([r])).toContain('-1,45 %');
@@ -141,6 +143,14 @@ describe('1.2.5 measurement continuity', () => {
     expect(
       renderToStaticMarkup(createElement(Detail, { record: all[0] as MeasurementRecord })),
     ).toBeTruthy();
+    const legacyHtml = renderToStaticMarkup(
+      createElement(Comparisons, {
+        record: saved.find((r) => r.id === all[0].id) as MeasurementRecord,
+      }),
+    );
+    expect(legacyHtml).toContain('Elektroměr ↔ Energis');
+    expect(legacyHtml).toContain('Kyoritsu ↔ Energis');
+    expect(legacyHtml).not.toContain('Elektroměr ↔ Kyoritsu');
     await reopened.close();
   });
 });
@@ -171,7 +181,7 @@ describe('1.2.5 persistent DB and complete backup', () => {
       data = JSON.parse(json);
     expect(data).toMatchObject({
       backupVersion: 1,
-      appVersion: '1.2.5',
+      appVersion: '1.2.6',
       database: { name: 'mereni-vyvodu-v1', version: 2 },
     });
     expect(data.exportedAt).toBeTruthy();

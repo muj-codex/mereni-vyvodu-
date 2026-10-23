@@ -60,7 +60,8 @@ async function comparisons(page: Page) {
   const c = page.getByRole('region', { name: 'Porovnání', exact: true });
   await expect(c).toContainText('Elektroměr ↔ Energis: -1,5 %');
   await expect(c).toContainText('Kyoritsu ↔ Energis: -1,449 %');
-  await expect(c).toContainText('Elektroměr ↔ Kyoritsu: Porovnání není dostupné');
+  await expect(c).not.toContainText('Elektroměr ↔ Kyoritsu');
+  await expect(c).not.toContainText('Porovnání není dostupné');
   await expect(c).toContainText('EM 100 kWh');
   await expect(c).toContainText('Energis 98,5 kWh');
 }
@@ -317,6 +318,12 @@ test('skutečný update service worker/cache zachová stejnou instalaci a Indexe
     await history(page);
     await expect(page.locator('.history-item')).toHaveCount(1);
     expect(await snapshot(page)).toEqual([old]);
+    await page.locator('.record-open').click();
+    const comparison = page.getByRole('region', { name: 'Porovnání', exact: true });
+    await expect(comparison).toContainText('Elektroměr ↔ Energis');
+    await expect(comparison).toContainText('Kyoritsu ↔ Energis');
+    await expect(comparison).not.toContainText('Elektroměr ↔ Kyoritsu');
+    await page.getByRole('button', { name: 'Zpět na výsledky měření' }).click();
     const manifest = await page.evaluate(async () =>
       (await fetch('./manifest.webmanifest')).json(),
     );
@@ -327,6 +334,7 @@ test('skutečný update service worker/cache zachová stejnou instalaci a Indexe
     await page.locator('.record-open').click();
     await expect(page.locator('main')).toContainText('000LEGACY');
     expect(await snapshot(page)).toEqual([old]);
+
   } finally {
     await context.setOffline(false);
     server.closeAllConnections();

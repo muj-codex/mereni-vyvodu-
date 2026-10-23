@@ -2,6 +2,10 @@
 
 Česká mobile-first aplikace v Reactu a TypeScriptu. Samostatná PWA pro iPhone na výšku a iPad: výpočty, rozpracovaný formulář a historie jsou lokální. Nevyžaduje backend, účet ani API klíče.
 
+## Verze 1.2.6 – zjednodušení porovnání
+
+Sekce **Porovnání** zobrazuje pouze Elektroměr ↔ Energis a Kyoritsu ↔ Energis. Řádek Elektroměr ↔ Kyoritsu a jeho vysvětlení byly odstraněny z UI; výpočty, přenesená Kontrola stavů, export a starší uložené záznamy zůstávají beze změny.
+
 ## Verze 1.2.5 – stabilizace měření a obnovitelná historie
 
 **MĚŘENÍ KYORITSU** pokračuje bez kontroly stavů. **Použít kontrolu stavů a pokračovat** připojí neměnný snapshot kontroly včetně intervalu, korekce MTP, obou spotřeb, rozdílu a vyhodnocení. Souhrn je na kartách Kyoritsu; oba zdroje se společně uloží a otevřou z historie. Detail obsahuje také původní stavy a převody.
