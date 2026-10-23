@@ -1,3 +1,6 @@
+import { Comparisons } from './Comparisons';
+import { Info } from './Info';
+import { downloadJSONBackup, parseBackup, planImport } from '../data/backup';
 import {
   isIntervalCheck,
   intervalLabel,
@@ -10,32 +13,30 @@ import { IntervalResult } from './Interval';
 import { CurrentResult } from './CurrentMeasurement';
 import { IdentificationSummary } from './Identification';
 import { percentDifference, signedPercent } from '../core/current';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import type { HistoryRecord } from '../core/types';
 import { formatNumber } from '../core/numbers';
-import {
-  shareSubject,
-  emailBody,
-  mailtoLink,
-  toTSV,
-  isCurrent,
-  downloadBackup,
-  backupTSV,
-} from '../data/export';
+import { shareSubject, emailBody, mailtoLink, toTSV, isCurrent, backupTSV } from '../data/export';
 import { Detail, Icon, Inspection, Result } from './components';
 export function History({
   records,
   loading,
   onDelete,
   onClear,
+  onImport,
   notify,
 }: {
   records: HistoryRecord[];
   loading: boolean;
   onDelete: (id: string) => Promise<void>;
   onClear: () => Promise<void>;
+  onImport: (records: HistoryRecord[]) => Promise<{ added: number; existing: number }>;
   notify: (text: string) => void;
 }) {
+  const fileInput = useRef<HTMLInputElement>(null);
+  const [pending, setPending] = useState<HistoryRecord[] | null>(null);
+  const [importError, setImportError] = useState('');
+  const preview = pending ? planImport(records, pending) : null;
   const [opened, setOpened] = useState<HistoryRecord | null>(null),
     [section, setSection] = useState('result');
   const [selecting, setSelecting] = useState(false),
@@ -134,6 +135,14 @@ export function History({
               isIntervalCheck(opened) ? `Interval: ${intervalLabel(opened)}` : undefined
             }
           />
+          {!isIntervalCheck(opened) && !isCurrent(opened) && (
+            <>
+              <Comparisons record={opened} />
+              {section === 'detail' && opened.input.stateCheck && (
+                <IntervalResult record={opened.input.stateCheck} section="detail" />
+              )}
+            </>
+          )}
           {isIntervalCheck(opened) ? (
             <IntervalResult record={opened} section={section} />
           ) : isCurrent(opened) ? (
@@ -212,11 +221,46 @@ export function History({
           <div className="history-toolbar">
             <button
               className="button secondary"
-              disabled={!records.length}
-              onClick={() => downloadBackup(records)}
+              disabled={loading || busy}
+              onClick={() =>
+                void downloadJSONBackup(records).catch((e) => setImportError((e as Error).message))
+              }
             >
-              ZÁLOHOVAT HISTORII
+              ZÁLOHOVAT DATA
             </button>
+            <Info label="záloha dat">
+              Uloží kompletní historii měření do souboru. Soubor lze později použít k obnovení dat.
+            </Info>
+            <button
+              className="button secondary"
+              disabled={loading || busy}
+              onClick={() => fileInput.current?.click()}
+            >
+              IMPORTOVAT / OBNOVIT DATA
+            </button>
+            <input
+              ref={fileInput}
+              type="file"
+              aria-label="IMPORTOVAT / OBNOVIT DATA"
+              accept=".json,application/json"
+              disabled={loading || busy}
+              hidden
+              onChange={async (e) => {
+                const file = e.target.files?.[0];
+                e.target.value = '';
+                setImportError('');
+                setPending(null);
+                if (!file) return;
+                try {
+                  setPending(parseBackup(await file.text()));
+                } catch (error) {
+                  setImportError((error as Error).message);
+                }
+              }}
+            />
+            <Info label="import dat">
+              Načte zálohu a doplní chybějící záznamy. Existující měření se automaticky nemažou.
+            </Info>
             <button
               className="button secondary"
               onClick={() => {
@@ -376,6 +420,45 @@ export function History({
             </div>
           )}
         </>
+      )}
+      {importError && (
+        <p className="notice error" role="alert">
+          {importError}
+        </p>
+      )}
+      {preview && pending && (
+        <div className="modal-backdrop">
+          <section className="modal" role="dialog" aria-modal="true" aria-labelledby="import-title">
+            <h2 id="import-title">Obnova historie</h2>
+            <p>Soubor obsahuje {preview.total} záznamů</p>
+            <p>Nové: {preview.added}</p>
+            <p>Již existující: {preview.existing}</p>
+            <button
+              className="button primary"
+              disabled={busy}
+              onClick={async () => {
+                setBusy(true);
+                try {
+                  const result = await onImport(pending);
+                  setPending(null);
+                  notify(
+                    `Import dokončen. Přidáno: ${result.added}, již existující: ${result.existing}.`,
+                  );
+                } catch (error) {
+                  setPending(null);
+                  setImportError(`Obnova selhala. ${(error as Error).message}`);
+                } finally {
+                  setBusy(false);
+                }
+              }}
+            >
+              IMPORTOVAT
+            </button>
+            <button className="button secondary" disabled={busy} onClick={() => setPending(null)}>
+              ZRUŠIT
+            </button>
+          </section>
+        </div>
       )}
       {confirm && (
         <div className="modal-backdrop">

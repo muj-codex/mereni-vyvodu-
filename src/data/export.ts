@@ -1,3 +1,4 @@
+import { measurementComparisons } from '../core/comparisons';
 import { formatNumber, parseNumber } from '../core/numbers';
 import { isIntervalCheck, recordVoltage, intervalEndpoint } from '../core/historyView';
 import type { IntervalCheckRecord } from '../core/intervalCheck';
@@ -51,6 +52,33 @@ export const EXPORT_COLUMNS: Column<MeasurementRecord>[] = [
     value: (r) => percentDifference(r.input.energis, r.input.kyoritsu),
   },
   { key: 'mtp', label: 'MTP', value: (r) => `${formatNumber(r.input.config.actualMtp)}/5 A` },
+  ...(['from', 'to'] as const).map((key) => ({
+    key: `check-${key}`,
+    label: key === 'from' ? 'Kontrola stavů OD' : 'Kontrola stavů DO',
+    value: (r: MeasurementRecord) => r.input.stateCheck?.input.interval?.[key],
+  })),
+  ...(['meterEnergy', 'energisEnergy', 'difference'] as const).map((key) => ({
+    key: `check-${key}`,
+    label: {
+      meterEnergy: 'Elektroměr po MTP [kWh]',
+      energisEnergy: 'Energis za interval [kWh]',
+      difference: 'Rozdíl za interval [kWh]',
+    }[key],
+    value: (r: MeasurementRecord) => r.input.stateCheck?.result[key],
+  })),
+  {
+    key: 'check-summary',
+    label: 'Kontrola stavů – výsledek',
+    value: (r) => r.input.stateCheck?.assessment.summary,
+  },
+  ...[0, 1, 2].map((index) => ({
+    key: `comparison-${index}-percent`,
+    label: ['Elektroměr ↔ Energis %', 'Kyoritsu ↔ Energis %', 'Elektroměr ↔ Kyoritsu %'][index],
+    value: (r: MeasurementRecord) => {
+      const c = measurementComparisons(r)[index];
+      return c.percent === null ? c.note : c.percent;
+    },
+  })),
 ];
 export const CURRENT_COLUMNS: Column<CurrentRecord>[] = [
   ...identityColumns,
@@ -119,7 +147,9 @@ export const exportPercent = (value: unknown) =>
     ? `${value > 0 ? '+' : ''}${formatNumber(value, 2, true)} %`
     : (value ?? '');
 const columnValue = (key: string, value: unknown) =>
-  key === 'percent' || key.endsWith('-differencePercent') ? exportPercent(value) : value;
+  key === 'percent' || key.endsWith('-differencePercent') || key.endsWith('-percent')
+    ? exportPercent(value)
+    : value;
 const safeCell = (value: unknown) => String(number(value)).replace(/[\t\r\n]/g, ' ');
 export const INTERVAL_COLUMNS: Column<IntervalCheckRecord>[] = [
   ...identityColumns.map((column) => ({
@@ -232,14 +262,4 @@ export function backupTSV(records: HistoryRecord[]) {
       })
       .join('\n')
   );
-}
-export function downloadBackup(records: HistoryRecord[]) {
-  const url = URL.createObjectURL(
-    new Blob([backupTSV(records)], { type: 'text/tab-separated-values;charset=utf-8' }),
-  );
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = 'mereni-zaloha.tsv';
-  link.click();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }

@@ -266,16 +266,16 @@ describe('Data, čas, reset a export', () => {
     ).rejects.toThrow('full');
     expect(draft.serial).toBe(reference.serial);
   });
-  it('TSV jeden záznam, 22 skutečných tabulátorových sloupců', () => {
+  it('TSV jeden záznam, 31 skutečných tabulátorových sloupců', () => {
     const r = createRecord(reference);
     const t = toTSV([r]);
-    expect(t.split('\t')).toHaveLength(22);
+    expect(t.split('\t')).toHaveLength(31);
     expect(t.split('\t')[4]).toBe('0012345678');
     expect(t.split('\t')[6]).toBe('506');
     expect(t.split('\t')[18]).toBe('9,2');
   });
   it('TSV více řádků a centrální pořadí', () => {
-    expect(EXPORT_COLUMNS).toHaveLength(22);
+    expect(EXPORT_COLUMNS).toHaveLength(31);
     expect(
       toTSV([createRecord(reference), createRecord({ ...reference, serial: '0002' })]).split('\n'),
     ).toHaveLength(2);

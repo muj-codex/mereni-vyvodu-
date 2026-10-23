@@ -1,5 +1,6 @@
+import { Comparisons, StateCheckSummary } from './ui/Comparisons';
 import { Info, SaveInfo } from './ui/Info';
-import { followingPowerDraft, resetInterval } from './core/measurement';
+import { startKyoritsu, resetInterval } from './core/measurement';
 import { MtpSelect } from './ui/MtpSelect';
 import { CurrentMeasurement } from './ui/CurrentMeasurement';
 import { IdentificationFields, IdentificationSummary } from './ui/Identification';
@@ -13,7 +14,7 @@ import type { FormDraft, HistoryRecord, MeterConfig } from './core/types';
 import { createHistory } from './data/history';
 import { Field, SelectField } from './ui/Fields';
 import { Detail, Icon, Inspection, PhaseBadge, Result } from './ui/components';
-import { Interval } from './ui/Interval';
+import { Interval, IntervalResult } from './ui/Interval';
 import { History } from './ui/History';
 import { MtpCoefficient } from './ui/MtpCoefficient';
 const STEPS = [
@@ -132,7 +133,7 @@ export default function App() {
         i === index ? { ...p, [key]: value } : p,
       ) as FormDraft['phases'],
     });
-  function navigate(next: number) {
+  function navigate(next: number, useStateCheck = false) {
     if (next > 0 && !(step === 0 && draft.carryIdentification === false) && !draft.serial.trim()) {
       setError('Vyplňte číslo elektroměru.');
       return;
@@ -169,7 +170,7 @@ export default function App() {
     }
     if (step === 0 && next === 1) {
       baseDraft.current = structuredClone(draft);
-      change(followingPowerDraft(draft));
+      change(startKyoritsu(draft, useStateCheck));
     }
     if (next === 0 && baseDraft.current) {
       change({
@@ -274,6 +275,11 @@ export default function App() {
             onClear={async () => {
               await repo.removeAllExplicitly();
               setRecords([]);
+            }}
+            onImport={async (incoming) => {
+              const result = await repo.merge(incoming);
+              setRecords(await repo.all());
+              return result;
             }}
             notify={notify}
           />
@@ -466,7 +472,7 @@ export default function App() {
                       ) : (
                         <div className="step-actions">
                           <button className="button primary" onClick={() => navigate(1)}>
-                            PŘESKOČIT → KYORITSU <Icon name="arrow" />
+                            MĚŘENÍ KYORITSU <Icon name="arrow" />
                           </button>
                           {draft.intervalEnabled && (
                             <button
@@ -481,7 +487,7 @@ export default function App() {
                                   /* Full interval check independent of phase inputs. */ validateInterval(
                                     draft,
                                   );
-                                  navigate(1);
+                                  navigate(1, true);
                                 } catch (e) {
                                   setError((e as Error).message);
                                 }
@@ -494,6 +500,9 @@ export default function App() {
                       )}
                     </>
                   </>
+                )}
+                {step > 0 && step < 3 && draft.stateCheck && (
+                  <StateCheckSummary record={draft.stateCheck} />
                 )}
                 {step === 1 && (
                   <>
@@ -658,6 +667,13 @@ export default function App() {
                       serial={draft.serial}
                       value={evaluation.record.input.identification}
                     />
+                    <Comparisons record={evaluation.record} />
+                    {step === 5 && evaluation.record.input.stateCheck && (
+                      <IntervalResult
+                        record={evaluation.record.input.stateCheck}
+                        section="detail"
+                      />
+                    )}
                     {step === 3 ? (
                       <Result diagnosis={evaluation.record.diagnosis} serial={draft.serial} />
                     ) : step === 4 ? (

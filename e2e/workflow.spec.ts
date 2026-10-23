@@ -64,7 +64,7 @@ test('uložení kontroly zachová hlavičku/datumy, vyčistí časy a pokračuje
   await page.reload();
   await expect(page.getByLabel('Čas OD', { exact: true })).toHaveValue('');
   await expect(page.getByLabel('Datum DO', { exact: true })).toHaveValue('2026-10-25');
-  await page.getByRole('button', { name: 'PŘESKOČIT → KYORITSU' }).click();
+  await page.getByRole('button', { name: 'MĚŘENÍ KYORITSU' }).click();
   await expect(page.locator('.identification-summary')).toContainText('66666777');
   await expect(page.locator('.identification-summary')).toContainText('TS 3308/250');
   await expect(page.locator('.identification-summary')).toContainText('NN 500 V – ARON');
@@ -114,7 +114,7 @@ test('OFF nepřenese hlavičku ani konfiguraci do 1f a umožní vlastní identif
 test('OFF nepřenese hlavičku ani MTP do 3f', async ({ page }) => {
   await setup(page);
   await page.getByRole('checkbox', { name: carryLabel, exact: true }).uncheck();
-  await page.getByRole('button', { name: 'PŘESKOČIT → KYORITSU' }).click();
+  await page.getByRole('button', { name: 'MĚŘENÍ KYORITSU' }).click();
   await expect(page.getByLabel('VÝROBNÍ ČÍSLO ELEKTROMĚRU', { exact: true })).toHaveValue('');
   await expect(page.getByLabel('POLE / UMÍSTĚNÍ', { exact: true })).toHaveValue('');
   await expect(page.getByLabel('MTP primár', { exact: true })).toHaveValue('100');

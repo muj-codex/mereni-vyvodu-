@@ -1,3 +1,4 @@
+import { createIntervalCheck } from './intervalCheck';
 import { emptyIdentification, validateIdentification } from './current';
 import { parseNumber, localTimestamp } from './numbers';
 import { diagnose } from './diagnosis';
@@ -72,6 +73,7 @@ export function readDraft(
     : undefined;
   if (interval) compareEnergy(interval, draft.config);
   return {
+    stateCheck: draft.stateCheck ? structuredClone(draft.stateCheck) : undefined,
     serial: draft.serial,
     identification: draft.identification ? structuredClone(draft.identification) : undefined,
     config: structuredClone(draft.config),
@@ -134,5 +136,19 @@ export function followingPowerDraft(draft: FormDraft): FormDraft {
   next.intervalEnabled = false;
   next.interval = emptyDraft().interval;
   if (next.identification) delete next.identification.time;
+  return next;
+}
+
+// The explicit action snapshots the check independently from identification carry-over.
+export function startKyoritsu(draft: FormDraft, useStateCheck = false): FormDraft {
+  const next = followingPowerDraft(draft);
+  if (useStateCheck) {
+    next.stateCheck = createIntervalCheck(draft);
+    // Keep both sources attached to the same meter and measurement configuration.
+    next.serial = draft.serial;
+    next.identification = structuredClone(draft.identification);
+    next.config = structuredClone(draft.config);
+    next.carryIdentification = true;
+  }
   return next;
 }

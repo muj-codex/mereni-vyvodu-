@@ -6,7 +6,7 @@ async function noOverflow(page: Page) {
 }
 async function enterMeasurement(page: Page, serial = '0012345678', energis = '9,17') {
   await page.getByLabel('VÝROBNÍ ČÍSLO ELEKTROMĚRU', { exact: true }).fill(serial);
-  await page.getByRole('button', { name: 'PŘESKOČIT → KYORITSU' }).click();
+  await page.getByRole('button', { name: 'MĚŘENÍ KYORITSU' }).click();
   for (const [i, [u, current]] of [
     ['506', '15,2'],
     ['506,6', '9,2'],

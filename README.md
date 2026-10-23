@@ -2,6 +2,20 @@
 
 Česká mobile-first aplikace v Reactu a TypeScriptu. Samostatná PWA pro iPhone na výšku a iPad: výpočty, rozpracovaný formulář a historie jsou lokální. Nevyžaduje backend, účet ani API klíče.
 
+## Verze 1.2.5 – stabilizace měření a obnovitelná historie
+
+**MĚŘENÍ KYORITSU** pokračuje bez kontroly stavů. **Použít kontrolu stavů a pokračovat** připojí neměnný snapshot kontroly včetně intervalu, korekce MTP, obou spotřeb, rozdílu a vyhodnocení. Souhrn je na kartách Kyoritsu; oba zdroje se společně uloží a otevřou z historie. Detail obsahuje také původní stavy a převody.
+
+Sekce **Porovnání** uvádí elektroměr ↔ Energis (spotřeby za shodný interval, původní znaménko) a Kyoritsu ↔ Energis (existující okamžité výkony). Elektroměr ↔ Kyoritsu uvádí nedostupnost: intervalové kWh nelze korektně porovnat s okamžitými kW bez souběžných dat. Nevytváříme odhad výkonu ani nový verdikt o chybě. UI používá nejvýše tři desetinná místa, procentní export dvě; JSON zachovává plnou přesnost.
+
+**ZÁLOHOVAT DATA** vytvoří `mereni-zaloha.json` s celou historií všech typů, vstupy, výsledky, vazbami a metadaty `backupVersion`, `appVersion`, `exportedAt` i verzí DB schématu. Na podporovaném iOS/iPadOS otevře systémové sdílení souboru, kde lze zvolit **Uložit do Souborů** a libovolné dostupné umístění (například iCloud Drive). Jinak nabídne běžné stažení. Nejde o TSV pro Excel; sdílení naměřených hodnot a kopírování TSV zůstává samostatně dostupné.
+
+**IMPORTOVAT / OBNOVIT DATA** otevře výběr JSON souboru. Nejdříve proběhne validace a náhled počtu nových a již existujících záznamů. Teprve po **IMPORTOVAT** proběhne atomické doplnění chybějících dat. Existující ID se nepřepisují; starší záznamy bez ID se porovnávají podle úplného obsahu měření včetně času, vstupů a výsledku. Více měření jednoho elektroměru zůstane zachováno. Neplatný JSON, neznámý `backupVersion` nebo nepodporovaný záznam se odmítnou před zápisem. TSV není obnovitelná JSON záloha.
+
+Běžná aktualizace stejné HTTPS adresy zachovává manifest `id`, `scope`, `start_url`, databázi **mereni-vyvodu-v1**, store **measurements** a schéma **2**. Verze aplikace není verzí databáze. Existující migrace 1 → 2 nic nemaže; nový balík změnu schématu nepotřebuje. Service worker kontroluje aktualizaci při spuštění i návratu do aplikace a mění pouze vlastní buildovou cache. **Při aktualizaci použijte stávající ikonu; nová instalace ani import historie nejsou potřeba.**
+
+Regresní testy pokrývají migraci, všechny typy historie, opakovaný i souběžný import, částečné sloučení a poškozené zálohy. E2E scénáře ověřují propojené měření po reloadu, přenos zálohy do čistého prohlížečového kontextu a skutečnou výměnu service workeru/cache se zachováním IndexedDB. iPhone/iPad jsou emulované v Chromium; ověření nativního dialogu Souborů na fyzickém iOS zařízení je nadále ruční.
+
 ## Spuštění
 
 Node.js 24 a npm (verze je připnutá v `.nvmrc`; závislosti v `package-lock.json`).

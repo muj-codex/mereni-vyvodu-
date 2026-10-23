@@ -28,3 +28,11 @@ nebo chování externího poštovního klienta. Web Share test ověřuje předan
 zařízení nebyla dostupná, proto příčina jeho incidentu zůstává nepotvrzená.
 
 Ověřeno 22. 10. 2026. Snímky iPhone/iPad ověřují původní pracovní tok i novou kartu Kontroly stavů. Filtry na úzké obrazovce přecházejí do jednoho sloupce. Původní pulzní pole starého v1 objektu se po uložení nového typu ani reloadu nemění. Databázový kód nebyl pro verzi 1.2.3 změněn.
+
+## Stabilizační vydání 1.2.5
+
+Ověření balíku: `npm test` – **203/203**, `npm run test:e2e` – **72/72** (36 scénářů na každém z profilů iPhone/iPad v Chromium), `npm run build` – úspěšný TypeScript, Vite i generování PWA precache. Manifest zachovává identitu instalace; všech 7 precachovaných souborů existuje a vygenerovaný service worker nepřistupuje k IndexedDB.
+
+Nové testy zahrnují explicitní propojení Kontrola stavů → Kyoritsu → uložený výsledek → reload, přímé Kyoritsu bez kontroly, všechny tři položky porovnání včetně věcně nedostupného elektroměr ↔ Kyoritsu (kWh versus kW), úplný JSON export a obnovu do čisté DB, opakovaný a souběžný import bez duplicit, částečné sloučení, fallback bez ID, kompatibilitu diagnostických scénářů 400/500 V, odmítnutí neplatné zálohy a atomický rollback při chybě zápisu. Skutečná výměna service workeru a buildové cache zachovala původní v1 záznam, následný upgrade DB i offline otevření historie.
+
+Test souborového Web Share používá mock systémového rozhraní. Fyzický iPhone/iPad a nativní dialog **Uložit do Souborů** nebyly v tomto prostředí dostupné.

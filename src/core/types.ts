@@ -32,6 +32,7 @@ export interface Identification {
 }
 export type HistoryRecord = MeasurementRecord | CurrentRecord | IntervalCheckRecord;
 export interface MeasurementInput {
+  stateCheck?: IntervalCheckRecord;
   identification?: Identification;
   serial: string;
   config: MeterConfig;
@@ -80,6 +81,7 @@ export interface MeasurementRecord {
   diagnosis: Diagnosis;
 }
 export interface FormDraft {
+  stateCheck?: IntervalCheckRecord;
   carryIdentification?: boolean;
   identification?: Identification;
   serial: string;

@@ -251,6 +251,7 @@ describe('1.2.4 actual interval presentation', () => {
         loading: false,
         onDelete: async () => {},
         onClear: async () => {},
+        onImport: async () => ({ added: 0, existing: 0 }),
         notify: () => {},
       }),
     );

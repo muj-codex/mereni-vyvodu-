@@ -66,8 +66,8 @@ test('NN 400 V: identifikace bez pulzů, vlastní MTP, uložení, tabs, share a 
   expect(detail).not.toBe(inspection);
   await page.getByRole('button', { name: 'Zpět na výsledky měření' }).click();
   const download = page.waitForEvent('download');
-  await page.getByRole('button', { name: 'ZÁLOHOVAT HISTORII' }).click();
-  expect((await download).suggestedFilename()).toBe('mereni-zaloha.tsv');
+  await page.getByRole('button', { name: 'ZÁLOHOVAT DATA' }).click();
+  expect((await download).suggestedFilename()).toBe('mereni-zaloha.json');
   await page.getByRole('button', { name: 'SDÍLET', exact: true }).click();
   await page.getByLabel('Vybrat všechna', { exact: true }).check();
   await page.evaluate(() => {
