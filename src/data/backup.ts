@@ -1,8 +1,11 @@
+import { emptySeries, validateSeries, type SeriesData } from '../series/model';
 import type { HistoryRecord } from '../core/types';
-export const BACKUP_VERSION = 1;
-export const DATABASE_NAME = 'mereni-vyvodu-v1';
-export const DATABASE_VERSION = 2;
-export function backupJSON(records: HistoryRecord[], date = new Date()) {
+export const BACKUP_VERSION = 2;
+import { DATABASE_NAME, DATABASE_VERSION } from './schema';
+export { DATABASE_NAME, DATABASE_VERSION } from './schema';
+import { createSeriesStore } from '../series/store';
+export type BackupRecords = HistoryRecord[] & { seriesData?: SeriesData };
+export function backupJSON(records: HistoryRecord[], date = new Date(), seriesData?: SeriesData) {
   return JSON.stringify(
     {
       backupVersion: BACKUP_VERSION,
@@ -10,6 +13,7 @@ export function backupJSON(records: HistoryRecord[], date = new Date()) {
       exportedAt: date.toISOString(),
       database: { name: DATABASE_NAME, version: DATABASE_VERSION, store: 'measurements' },
       records,
+      ...(seriesData ? { seriesData: validateSeries(seriesData) } : {}),
     },
     null,
     2,
@@ -177,14 +181,14 @@ export function validateRecords(records: unknown): HistoryRecord[] {
     throw Error('Záloha obsahuje neplatný nebo nepodporovaný záznam. Nic nebylo zapsáno.');
   return structuredClone(records);
 }
-export function parseBackup(text: string): HistoryRecord[] {
+export function parseBackup(text: string): BackupRecords {
   let backup: unknown;
   try {
     backup = JSON.parse(text.replace(/^\uFEFF/, ''));
   } catch {
     throw Error('Soubor není platný JSON. Nic nebylo zapsáno.');
   }
-  if (!object(backup) || backup.backupVersion !== BACKUP_VERSION)
+  if (!object(backup) || ![1, BACKUP_VERSION].includes(backup.backupVersion))
     throw Error('Nekompatibilní backupVersion. Vyberte podporovanou JSON zálohu historie.');
   if (
     typeof backup.appVersion !== 'string' ||
@@ -192,7 +196,9 @@ export function parseBackup(text: string): HistoryRecord[] {
     !Number.isFinite(Date.parse(backup.exportedAt))
   )
     throw Error('Neplatná metadata zálohy.');
-  return validateRecords(backup.records);
+  const records: BackupRecords = validateRecords(backup.records);
+  if (backup.seriesData !== undefined) records.seriesData = validateSeries(backup.seriesData);
+  return records;
 }
 function canonical(v: any): string {
   if (Array.isArray(v)) return '[' + v.map(canonical).join(',') + ']';
@@ -247,7 +253,16 @@ export function planImport(existing: HistoryRecord[], incoming: HistoryRecord[])
   };
 }
 export async function downloadJSONBackup(records: HistoryRecord[]) {
-  const file = new File([backupJSON(records)], 'mereni-zaloha.json', { type: 'application/json' });
+  const series = createSeriesStore();
+  let seriesData = emptySeries();
+  try {
+    seriesData = await series.all();
+  } finally {
+    await series.close();
+  }
+  const file = new File([backupJSON(records, new Date(), seriesData)], 'mereni-zaloha.json', {
+    type: 'application/json',
+  });
   if (navigator.share && navigator.canShare?.({ files: [file] })) {
     try {
       await navigator.share({ files: [file], title: 'Záloha historie měření' });

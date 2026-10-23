@@ -1,7 +1,13 @@
+import { planSeriesMerge, upgradeSeries } from '../series/store';
 import { DATABASE_NAME, DATABASE_VERSION, planImport, validateRecords } from './backup';
 import { openDB, type DBSchema } from 'idb';
+import { emptySeries, validateSeries } from '../series/model';
+import type { BackupRecords } from './backup';
 import type { HistoryRecord } from '../core/types';
 interface HistoryDB extends DBSchema {
+  series: { key: string; value: import('../series/model').Batch };
+  meters: { key: string; value: import('../series/model').Meter };
+  readings: { key: string; value: import('../series/model').Reading };
   measurements: { key: string; value: HistoryRecord; indexes: { 'by-time': string } };
 }
 export function createHistory(name = DATABASE_NAME) {
@@ -11,6 +17,7 @@ export function createHistory(name = DATABASE_NAME) {
       void db.then((database) => database.close());
     },
     upgrade(database) {
+      upgradeSeries(database);
       // Version 2 widens stored records. Existing v1 objects remain readable unchanged.
       if (!database.objectStoreNames.contains('measurements')) {
         const store = database.createObjectStore('measurements', { keyPath: 'id' });
@@ -26,10 +33,25 @@ export function createHistory(name = DATABASE_NAME) {
     async merge(incoming: HistoryRecord[]) {
       // Validate the complete file before opening a write transaction; all additions are atomic.
       const valid = validateRecords(incoming);
-      const tx = (await db).transaction('measurements', 'readwrite');
+      const seriesData = (incoming as BackupRecords).seriesData;
+      if (seriesData) validateSeries(seriesData);
+      const tx = (await db).transaction(
+        ['measurements', 'series', 'meters', 'readings'],
+        'readwrite',
+      );
       try {
-        const plan = planImport(await tx.store.getAll(), valid);
-        for (const record of plan.additions) await tx.store.add(record);
+        const plan = planImport(await tx.objectStore('measurements').getAll(), valid);
+        if (seriesData) {
+          const existing = emptySeries();
+          existing.batches = await tx.objectStore('series').getAll();
+          existing.meters = await tx.objectStore('meters').getAll();
+          existing.readings = await tx.objectStore('readings').getAll();
+          const additions = planSeriesMerge(existing, seriesData);
+          for (const b of additions.batches) await tx.objectStore('series').add(b);
+          for (const m of additions.meters) await tx.objectStore('meters').put(m);
+          for (const r of additions.readings) await tx.objectStore('readings').add(r);
+        }
+        for (const record of plan.additions) await tx.objectStore('measurements').add(record);
         await tx.done;
         return { total: plan.total, added: plan.added, existing: plan.existing };
       } catch (error) {

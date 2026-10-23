@@ -1170,3 +1170,77 @@ fieldset:disabled {
   margin: 0;
   min-width: 0;
 }
+
+.series-workflow {
+  width: 100%;
+}
+.series-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-block: 0.8rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+.series-field input,
+.series-field textarea,
+.series-workflow select {
+  font: inherit;
+  min-height: 54px;
+  padding: 12px;
+  border: 2px solid #64748b;
+  border-radius: 10px;
+  background: #fff;
+  color: #142235;
+  width: 100%;
+  box-sizing: border-box;
+}
+.series-field textarea {
+  min-height: 240px;
+  line-height: 1.8;
+}
+.series-workflow input[type='checkbox'] {
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+}
+.series-workflow fieldset {
+  border: 2px solid #94a3b8;
+  border-radius: 12px;
+  margin-block: 1rem;
+}
+.series-workflow fieldset input {
+  background: #eef2f6;
+  opacity: 1;
+  -webkit-text-fill-color: #334155;
+}
+.series-workflow .segmented {
+  flex-wrap: wrap;
+}
+.series-round-heading {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  border: 2px solid #1760ba;
+}
+.series-round-heading .series-field {
+  margin-block: 0.2rem;
+}
+.series-meter {
+  margin-block: 1.25rem;
+}
+.series-batch {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+.series-workflow .button {
+  margin-block: 0.4rem;
+}
+.series-workflow .notice {
+  overflow-wrap: anywhere;
+}

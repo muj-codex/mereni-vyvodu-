@@ -152,3 +152,45 @@ IndexedDB schéma ani historická data se nemění. Výpočty zůstávají v pln
 ## Verze 1.2.4 – interval kontroly stavů
 
 Historie, výsledek a sdílení Kontroly stavů používají uložený interval OD → DO. Starší záznamy bez intervalu zobrazí dostupné původní datum; databáze ani výpočty se nemění.
+
+## Verze 1.3.0 – odečtové série
+
+Na úvodní obrazovce jsou volby **JEDNOTLIVÝ ODEČET**, **SÉRIE ODEČTŮ** a **STYLUS**.
+První dílčí odečet nevyžaduje druhý stav. TS/R a datum zůstávají po uložení,
+pole, EM, nepovinný UZEL, ručně zadaný čas a stav se vyčistí. Balíky vznikají
+podle TS/R a data prvního odečtu. UZEL je řetězec číslic, včetně dlouhých ID a úvodních nul.
+
+V historii odečtů nebo ve Výsledcích měření vyberte elektroměry (hledání podle UZLU,
+pole, čísla EM), potom **POKRAČOVAT DALŠÍM ODEČTEM**. Všechny vybrané elektroměry
+se otevřou na jedné stránce s velkými kartami. Předchozí data jsou zamčená.
+Čas nového odečtu se nikdy nedoplňuje automaticky. Společné datum lze upravit i individuálně.
+Uloží se validní vyplněné řádky; prázdné se přeskočí a chybné zůstanou rozepsané.
+Vypnutí pokračování ponechá úplnou historii; nové pokračování elektroměr znovu aktivuje.
+Volitelné MTP používá výhradně existující matematiku Kontroly stavů; výchozí převody 1/1
+znamenají žádnou korekci. Výsledky série jsou konzervativní bez automatického procentního verdiktu.
+
+**IMPORT ENERGIS** podporuje XLSX a oddělený TXT/TSV/CSV se společným parserem.
+Hledá hlavičky UZEL, Měřák, Popis uzlu, Jednotka a časové intervaly dynamicky;
+podporuje řádkové i oddělené metadata/datové struktury. Importuje jen vybrané UZLY.
+Zobrazí skutečné OD/DO a časový rozdíl vůči novému odečtu. Volba předchozí/následující
+hranice zaznamenává zvolený kontext exportu; nemění časové údaje souboru ani je nezaokrouhluje.
+SUMA se porovnává s vlastním součtem. Konflikty, chybějící hodnoty či nejednoznačné
+časové intervaly se nedoplňují naslepo. Již vyplněná ruční SUMA se importem nepřepisuje.
+Hodnoty označené kW se bez jednoznačných metadat nenásobí 0,25.
+Nerozpoznanou strukturu je nutné zkontrolovat a hodnoty případně zadat ručně.
+
+STYLUS používá běžné HTML textarea/input a systémový Apple Scribble. Rozpoznání
+textu pouze připraví opravitelný náhled; následuje převod do běžného formuláře a výslovné
+uložení. Existující EM/UZEL otevře pokračování posledního odečtu. Vlastní OCR není součástí.
+Automatické testy emulují iPhone/iPad v Chromiu; fyzický Pencil/Scribble je třeba ověřit na iPadOS.
+
+**EXPORTOVAT VYBRANÉ XLSX/TXT** exportuje celou historii vybraných elektroměrů,
+intervaly, MTP korigovanou spotřebu, Energis, rozdíly, časový posun a pokračování.
+**ZÁLOHOVAT DATA** ve Výsledcích měření zahrnuje také všechny série a jejich vazby.
+Nový JSON formát 2 podporuje obnovu formátu 1 z verzí 1.2.5+. Obnova je atomická
+přes všechny stores, opakovatelná bez duplicit a konfliktní ID nepřepisuje.
+
+IndexedDB zůstává `mereni-vyvodu-v1`, schéma se bezpečně zvýšilo na 3 s novými stores
+`series`, `meters`, `readings`. Původní `measurements` se nemaže ani nepřepočítává.
+Nové zápisy aktualizují UI přírůstkově; párování a čtení historie elektroměru používá indexy.
+ExcelJS se načítá odděleně a PWA jej zahrnuje do offline precache.

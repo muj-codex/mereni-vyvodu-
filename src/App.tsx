@@ -1,3 +1,4 @@
+import { Series } from './series/Series';
 import { Comparisons, StateCheckSummary } from './ui/Comparisons';
 import { Info, SaveInfo } from './ui/Info';
 import { startKyoritsu, resetInterval } from './core/measurement';
@@ -41,6 +42,7 @@ function restoreDraft(): FormDraft {
 }
 export default function App() {
   const [mainSection, setMainSection] = useState('measurement');
+  const [readingMode, setReadingMode] = useState<'single' | 'series' | 'stylus'>('series');
   const [mode, setMode] = useState<'power' | 'current'>('power');
   const [draft, setDraft] = useState<FormDraft>(restoreDraft),
     [step, setStep] = useState(0),
@@ -257,6 +259,24 @@ export default function App() {
           VÝPOČET SPOTŘEBY A SAZEB
         </button>
       </div>
+      <div className="segmented" aria-label="Odečty">
+        {(['single', 'series', 'stylus'] as const).map((v, i) => (
+          <button
+            key={v}
+            onClick={() => {
+              setReadingMode(v);
+              setMainSection('readings');
+            }}
+          >
+            {['JEDNOTLIVÝ ODEČET', 'SÉRIE ODEČTŮ', 'STYLUS'][i]}
+          </button>
+        ))}
+      </div>
+      {mainSection === 'readings' && (
+        <main>
+          <Series initial={readingMode} />
+        </main>
+      )}
       {mainSection === 'rates' && (
         <section className="card">
           <h1>Výpočet spotřeby a sazeb</h1>
@@ -265,24 +285,27 @@ export default function App() {
       )}
       <main hidden={mainSection !== 'measurement'}>
         {tab === 'history' ? (
-          <History
-            records={records}
-            loading={loading}
-            onDelete={async (id) => {
-              await repo.remove(id);
-              setRecords((r) => r.filter((x) => x.id !== id));
-            }}
-            onClear={async () => {
-              await repo.removeAllExplicitly();
-              setRecords([]);
-            }}
-            onImport={async (incoming) => {
-              const result = await repo.merge(incoming);
-              setRecords(await repo.all());
-              return result;
-            }}
-            notify={notify}
-          />
+          <>
+            <Series historyOnly />
+            <History
+              records={records}
+              loading={loading}
+              onDelete={async (id) => {
+                await repo.remove(id);
+                setRecords((r) => r.filter((x) => x.id !== id));
+              }}
+              onClear={async () => {
+                await repo.removeAllExplicitly();
+                setRecords([]);
+              }}
+              onImport={async (incoming) => {
+                const result = await repo.merge(incoming);
+                setRecords(await repo.all());
+                return result;
+              }}
+              notify={notify}
+            />
+          </>
         ) : (
           <>
             <div className="segmented" aria-label="Režim měření">

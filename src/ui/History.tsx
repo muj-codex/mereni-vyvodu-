@@ -36,6 +36,8 @@ export function History({
   const fileInput = useRef<HTMLInputElement>(null);
   const [pending, setPending] = useState<HistoryRecord[] | null>(null);
   const [importError, setImportError] = useState('');
+  const seriesCount =
+    (pending as import('../data/backup').BackupRecords | null)?.seriesData?.readings.length ?? 0;
   const preview = pending ? planImport(records, pending) : null;
   const [opened, setOpened] = useState<HistoryRecord | null>(null),
     [section, setSection] = useState('result');
@@ -229,7 +231,8 @@ export function History({
               ZÁLOHOVAT DATA
             </button>
             <Info label="záloha dat">
-              Uloží kompletní historii měření do souboru. Soubor lze později použít k obnovení dat.
+              Uloží kompletní historii měření i odečtové série do souboru. Soubor lze později použít
+              k obnovení dat.
             </Info>
             <button
               className="button secondary"
@@ -431,6 +434,7 @@ export function History({
           <section className="modal" role="dialog" aria-modal="true" aria-labelledby="import-title">
             <h2 id="import-title">Obnova historie</h2>
             <p>Soubor obsahuje {preview.total} záznamů</p>
+            <p>Odečty v sériích: {seriesCount}</p>
             <p>Nové: {preview.added}</p>
             <p>Již existující: {preview.existing}</p>
             <button
@@ -440,6 +444,7 @@ export function History({
                 setBusy(true);
                 try {
                   const result = await onImport(pending);
+                  window.dispatchEvent(new Event('series-updated'));
                   setPending(null);
                   notify(
                     `Import dokončen. Přidáno: ${result.added}, již existující: ${result.existing}.`,
