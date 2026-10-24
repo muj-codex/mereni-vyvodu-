@@ -46,7 +46,7 @@ test('NN/VN presets, custom MTP, correction, TEĎ and normalized hour', async ({
   ).toBeVisible();
   await expect(s.getByText('2026-10-23 08:32 – 100 kWh', { exact: true })).toBeVisible();
 });
-test('shared date, individual override, explicit skip and next visit use the last saved reading', async ({
+test('shared sticky date, explicit skip and next visit use the last saved reading', async ({
   page,
 }) => {
   await page.goto('/');
@@ -61,10 +61,7 @@ test('shared date, individual override, explicit skip and next visit use the las
   await begin();
   const cards = s.locator('.series-meter');
   await s.getByLabel('Datum nového odečtu', { exact: true }).fill('2026-10-24');
-  for (const input of await s.getByLabel('Nové datum', { exact: true }).all())
-    await expect(input).toHaveValue('2026-10-24');
-  await cards.nth(1).getByLabel('Nové datum', { exact: true }).fill('2026-10-25');
-  await expect(cards.nth(1).getByLabel('Nové datum', { exact: true })).toHaveValue('2026-10-25');
+  await expect(s.getByLabel('Nové datum', { exact: true })).toHaveCount(0);
   await cards.nth(1).getByRole('checkbox', { name: 'ODEČÍST', exact: true }).uncheck();
   await expect(cards.nth(1).getByLabel('Nový čas', { exact: true })).toBeDisabled();
   await cards.first().getByLabel('Nový čas', { exact: true }).fill('8:35');
@@ -86,17 +83,14 @@ test('global live search, compact rows and results navigation', async ({ page })
   await first(page, '222', '999', '8:35');
   await page.getByRole('button', { name: /Výsledky měření/ }).click();
   await expect(page.getByRole('button', { name: 'SÉRIE ODEČTŮ', exact: true })).toHaveCount(0);
-  await expect(page.locator('.record-open').first()).toContainText('999');
+  await expect(page.locator('.record-open').first()).toContainText('23.10.2026 08:35');
   for (const query of ['3831', '257', '21210034', '766']) {
     await page.getByLabel('Hledat ve všech výsledcích a odečtech').fill(query);
-    await expect(page.locator('.record-open')).toHaveCount(
-      query === '3831' || query === '257' ? 2 : 1,
-    );
+    await expect(page.locator('.record-open')).toHaveCount(1);
   }
-  await expect(page.locator('.record-open')).toHaveText(
-    '2121003423.10.2026 08:32TS 3831/257 · pole 777666',
-  );
+  await expect(page.locator('.record-open')).toContainText('série 2 vývodů');
   await page.locator('.record-open').click();
+  await scope(page).getByRole('button', { name: 'Historie EM 777666', exact: true }).click();
   await expect(
     scope(page).getByRole('heading', { name: 'UZEL 21210034', exact: true }),
   ).toBeVisible();

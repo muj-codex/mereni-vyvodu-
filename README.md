@@ -208,3 +208,15 @@ ExcelJS se načítá odděleně a PWA jej zahrnuje do offline precache.
 - Energis XLSX/TXT pouze podle UZLU aktivních řádků; doplněný UZEL se uloží. Výsledek ukazuje podepsaný počet minut E pro importovanou i ruční hranici.
 - IndexedDB zůstává ve verzi 3: přidaná volitelná metadata nevyžadují změnu object stores. Starší data a JSON zálohy zůstávají podporované.
 - Výpočetní jádro `src/core` a parser Energisu zůstávají beze změn; matematické regrese i kontrola otisků chrání výsledky verze 1.3.0.
+
+## Verze 1.3.2 – série a pozdější doplnění Energisu (24. 10. 2026)
+
+- Jedna uložená série (`batchId`) má v hlavní historii jednu položku. Čas položky je nejnovější skutečný odečet kteréhokoli vývodu; vyhledávání nadále zahrnuje všechny členy a jejich historii.
+- Otevření série předvybere všechny aktivně sledované vývody. Pokračování zobrazí všechny vybrané vývody na jedné stránce s výchozím ODEČÍST zapnuto. Přeskočení nemění sledování ani poslední skutečný stav.
+- Sticky společné datum zůstává. Pole „Nové datum“ v jednotlivých řádcích je odstraněné; všechny nové odečty kola používají společné datum. TEĎ a ruční editace času zůstávají.
+- SUMA ENERGIS je nepovinná při terénním odečtu. Později ji lze upravit samostatně u posledního intervalu v sérii nebo u libovolného staršího intervalu v historii EM, bez vytváření nového odečtu.
+- Každá série má vlastní IMPORT SUMA ENERGIS pro poslední uložené intervaly. XLSX/TXT používá původní parser, páruje pouze UZLY konkrétní série, ignoruje cizí UZLY a označuje chybějící či nejednoznačné vazby. Import zachovává uložené i rozepsané ruční hodnoty.
+- Malá tlačítka -E / +E nahrazují globální select. Volba patří ke konkrétnímu intervalu, má viditelný aktivní stav a společnou nápovědu. Výsledek uvádí časový posun i konkrétní použitou hranici.
+- Starší série se zobrazují podle existujícího `batchId`. Samotná shoda TS/R neslučuje odlišná ID; záznamy bez doložené vazby se neseskupují odhadem.
+- IndexedDB zůstává ve verzi 3, bez resetu nebo změny object stores. JSON záloha zachovává série, historie, SUMA, import, volbu hranice, sledování a revizi pozdější úpravy Energisu. Starší záloha nevrací nově doplněný Energis zpět.
+- Matematické jádro, MTP korekce a parsery Energisu/STYLUS jsou proti 1.3.1 nezměněné.

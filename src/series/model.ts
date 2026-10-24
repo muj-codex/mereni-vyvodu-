@@ -38,6 +38,7 @@ export interface Reading {
   energis?: number;
   import?: EnergisMeta;
   boundary?: 'previous' | 'next';
+  energisUpdatedAt?: string;
   result?: ReturnType<typeof compareEnergy>;
 }
 export interface SeriesData {
@@ -233,6 +234,11 @@ export function validateSeries(value: unknown): SeriesData {
       (typeof r.energis !== 'number' || !Number.isFinite(r.energis) || r.energis < 0)
     )
       throw Error('Neplatná hodnota Energis.');
+    if (
+      r.energisUpdatedAt !== undefined &&
+      (typeof r.energisUpdatedAt !== 'string' || !Number.isFinite(Date.parse(r.energisUpdatedAt)))
+    )
+      throw Error('Neplatná metadata úpravy Energisu.');
     if (r.boundary !== undefined && !['previous', 'next'].includes(r.boundary))
       throw Error('Neplatná hranice Energisu.');
     if (r.import) {

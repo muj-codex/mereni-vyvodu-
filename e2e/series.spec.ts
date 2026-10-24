@@ -276,5 +276,5 @@ test('historie zobrazí odečet přidaný v jiné části aplikace', async ({ pa
   await page.getByRole('button', { name: 'SÉRIE ODEČTŮ', exact: true }).click();
   await first(page);
   await page.getByRole('button', { name: /Výsledky měření/ }).click();
-  await expect(page.locator('.record-open')).toContainText('21208142');
+  await expect(page.locator('.record-open')).toContainText('série 1 vývodů');
 });

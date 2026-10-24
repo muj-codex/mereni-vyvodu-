@@ -1,5 +1,5 @@
 import { intervalValues, type SeriesData, type Meter } from './model';
-import { timeOffset } from './energis';
+import { readingTimeOffset } from './energisDisplay';
 export function exportRows(meters: Meter[], data: SeriesData) {
   const rows: (string | number)[][] = [
     [
@@ -41,7 +41,7 @@ export function exportRows(meters: Meter[], data: SeriesData) {
         r.energis ?? '',
         r.result?.difference ?? '',
         r.result?.percent ?? '',
-        timeOffset(r.import, r.date, r.time),
+        readingTimeOffset(r.import, r.date, r.time, r.boundary),
         r.active ? 'ano' : 'ne',
         r.import?.from ?? '',
         r.import?.to ?? '',

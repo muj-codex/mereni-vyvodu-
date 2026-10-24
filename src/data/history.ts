@@ -49,7 +49,7 @@ export function createHistory(name = DATABASE_NAME) {
           const additions = planSeriesMerge(existing, seriesData);
           for (const b of additions.batches) await tx.objectStore('series').add(b);
           for (const m of additions.meters) await tx.objectStore('meters').put(m);
-          for (const r of additions.readings) await tx.objectStore('readings').add(r);
+          for (const r of additions.readings) await tx.objectStore('readings').put(r);
         }
         for (const record of plan.additions) await tx.objectStore('measurements').add(record);
         await tx.done;

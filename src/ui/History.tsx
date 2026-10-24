@@ -44,6 +44,7 @@ export function History({
     [confirmText, setConfirmText] = useState(''),
     [busy, setBusy] = useState(false);
   const [search, setSearch] = useState('');
+  const [batchDetail, setBatchDetail] = useState('');
   const [meterDetail, setMeterDetail] = useState('');
   const [browseSeries, setBrowseSeries] = useState(false);
   const [series, setSeries] = useState(emptySeries);
@@ -117,18 +118,24 @@ export function History({
   }
   return (
     <>
-      {meterDetail || browseSeries ? (
+      {meterDetail || batchDetail || browseSeries ? (
         <>
           <button
             className="text-button"
             onClick={() => {
               setMeterDetail('');
+              setBatchDetail('');
               setBrowseSeries(false);
             }}
           >
             Zpět na výsledky měření
           </button>
-          <Series key={meterDetail || 'history'} historyOnly initialDetail={meterDetail} />
+          <Series
+            key={meterDetail || batchDetail || 'history'}
+            historyOnly
+            initialDetail={meterDetail}
+            initialBatch={batchDetail}
+          />
         </>
       ) : opened ? (
         <>
@@ -341,14 +348,25 @@ export function History({
                       if (row.record) {
                         setOpened(row.record);
                         setSection('result');
-                      } else setMeterDetail(row.meterId!);
+                      } else if (row.batchId) setBatchDetail(row.batchId);
+                      else setMeterDetail(row.meterId!);
                     }}
                   >
-                    <span>{row.node || 'UZEL neuveden'}</span>
-                    <span>{formatIntervalDateTime(row.at)}</span>
-                    <span>
-                      {row.location} · {row.placement}
-                    </span>
+                    {row.batchId ? (
+                      <>
+                        <span>{formatIntervalDateTime(row.at)}</span>
+                        <span>{row.location}</span>
+                        <span>série {row.meterCount} vývodů</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>{row.node || 'UZEL neuveden'}</span>
+                        <span>{formatIntervalDateTime(row.at)}</span>
+                        <span>
+                          {row.location} · {row.placement}
+                        </span>
+                      </>
+                    )}
                   </button>
                 </article>
               ))}

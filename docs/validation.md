@@ -66,3 +66,17 @@ Mobilní profily jsou emulace v Chromiu, nikoli fyzické iPadOS/Safari. Apple Pe
 - JSON backup/restore: staré zálohy, úplná historie, doplněné UZLY, ukončené/reaktivované sledování, Energis, opakovaný import bez duplicit a transakční rollback prošly.
 - Nové scénáře pokrývají NN/VN dropdowny, MTP a koeficient, explicitní lokální TEĎ, normalizaci 8:32, společné/individuální datum, přeskočenou návštěvu bez posunu historie, reaktivaci z posledního odečtu, společnou historii jednotlivého/sériového odečtu, částečné live hledání, chronologické řazení, kompaktní řádky, UZEL první v detailu a skrytou horní navigaci ve výsledcích.
 - Reálný Apple Pencil / Scribble nebyl k dispozici; standardní input/textarea a automatické testy parseru zůstaly zachované.
+
+## Ověření 1.3.2 – seskupení a kancelářské doplnění Energisu (24. 10. 2026)
+
+- `npm test`: všech 278 testů v 15 sadách prošlo.
+- `npm run test:e2e -- --workers=2`: všech 106 scénářů prošlo na Chromium profilech iPhone 13 / iPad (gen 7).
+- `npm run build`: TypeScript, produkční Vite build i PWA/service worker prošly; offline precache obsahuje všech 8 souborů včetně XLSX modulu.
+- Celá matematická regrese ARON, 1f, 3f, VN, U/I/PF ↔ Kyoritsu, Kyoritsu ↔ Energis, Kontrola stavů a MTP prošla. Přesné otisky všech souborů `src/core` odpovídají 1.3.1. Parsery Energisu a STYLUS jsou beze změn.
+- IndexedDB migrace v1/v2 → v3 i načtení existujících dat prošly v celé unit/E2E sadě. Verze schématu zůstává 3; nové volitelné údaje využívají existující object stores a nevyžadují destruktivní migraci.
+- Seskupení starších dat používá výhradně existující `batchId`; test ověřuje jednu položku pro dva členy a oddělené položky pro různá ID se stejným TS/R.
+- E2E scénář TS 4601/251, pole 21 / EM123 a pole 54 / EM234 ověřuje jednu hlavní položku, automatický výběr aktivních vývodů, sticky společné datum, chybějící individuální Nové datum, TEĎ, uložení bez SUMA, správné předchozí stavy a přeskočenou návštěvu bez změny sledování.
+- TXT i XLSX import ověřuje UZEL bez závislosti na pořadí řádků, ignorování cizích UZLŮ, přeskočení chybějícího/nejednoznačného UZLU a ochranu uložených i dosud neuložených ručních hodnot.
+- Pozdější ruční doplnění SUMA nevytváří odečet, nemění stav, datum/čas, sledování ani vazby A → B → C. Historie EM nadále obsahuje kompletní řetězec.
+- Testy času 08:37 ověřují -E → 08:30 → -7 min E a +E → 08:45 → +8 min E, uložení volby k intervalu a její zachování v JSON záloze.
+- Backup/restore ověřuje obnovu starší i nové zálohy do prázdné i existující DB, opakovaný import bez duplicit a zachování novější úpravy Energisu při následném importu staré zálohy. Pokus o editaci zastaralého snapshotu je odmítnut.

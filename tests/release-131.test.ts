@@ -99,7 +99,6 @@ it('sort uses actual latest reading time and ignores batch or insertion order', 
   await store.first({ ...entry, serial: '222', node: '222', time: '08:32' });
   expect(resultRows([], await store.all()).map((r) => r.at)).toEqual([
     '2026-10-23T08:35',
-    '2026-10-23T08:32',
   ]);
   await store.close();
 });

@@ -53,7 +53,7 @@ export function createSeriesStore(name = DATABASE_NAME) {
       await tx.done;
       return { batches, meters, readings };
     },
-    async first(e: Entry) {
+    async first(e: Entry, batchId?: string) {
       const db = await promise;
       const tx = db.transaction(['series', 'meters', 'readings'], 'readwrite');
       try {
@@ -67,10 +67,16 @@ export function createSeriesStore(name = DATABASE_NAME) {
         const meters = [...new Map([...bySerial, ...byNode].map((m) => [m.id, m])).values()];
         if (resolveMeter(meters, e.serial, e.node))
           throw Error('Elektroměr již existuje. Pokračujte dalším odečtem z historie.');
-        let batch: SeriesData['batches'][number] | undefined = await tx
-          .objectStore('series')
-          .index('by-location-date')
-          .get([e.location.trim(), e.date]);
+        let batch: SeriesData['batches'][number] | undefined = batchId
+          ? await tx.objectStore('series').get(batchId)
+          : undefined;
+        if (batch && batch.location !== e.location.trim())
+          throw Error('Série patří k jinému TS/R.');
+        if (!batch)
+          batch = await tx
+            .objectStore('series')
+            .index('by-location-date')
+            .get([e.location.trim(), e.date]);
         if (!batch) batch = { id: crypto.randomUUID(), location: e.location.trim(), date: e.date };
         const { meter, reading } = firstReading(e, batch.id);
         await tx.objectStore('series').put(batch);
@@ -139,6 +145,61 @@ export function createSeriesStore(name = DATABASE_NAME) {
         throw e;
       }
     },
+    async updateEnergis(
+      updates: {
+        reading: Reading;
+        energis: string;
+        boundary: 'previous' | 'next';
+        import?: import('./model').EnergisMeta;
+      }[],
+      imported = false,
+    ) {
+      const db = await promise;
+      const tx = db.transaction(['meters', 'readings'], 'readwrite');
+      let changed = 0;
+      try {
+        for (const update of updates) {
+          const stored: Reading | undefined = await tx
+            .objectStore('readings')
+            .get(update.reading.id);
+          if (!stored || JSON.stringify(stored) !== JSON.stringify(update.reading))
+            throw Error('Interval byl mezitím změněn. Obnovte historii.');
+          if (imported && stored.energis !== undefined) continue;
+          const meter: Meter = await tx.objectStore('meters').get(stored.meterId);
+          const previous: Reading | undefined = stored.previousId
+            ? await tx.objectStore('readings').get(stored.previousId)
+            : undefined;
+          if (!previous || !meter)
+            throw Error('SUMA ENERGIS patří až k intervalu mezi dvěma odečty.');
+          const computed = nextReading(meter, previous, {
+            ...stored,
+            value: String(stored.value),
+            energis: update.energis,
+            boundary: update.boundary,
+            import: update.import,
+          });
+          await tx.objectStore('readings').put({
+            ...stored,
+            energis: computed.energis,
+            result: computed.result,
+            boundary: update.boundary,
+            import: update.import,
+            energisUpdatedAt: new Date(
+              Math.max(Date.now(), (Date.parse(stored.energisUpdatedAt || '') || 0) + 1),
+            ).toISOString(),
+          });
+          changed++;
+        }
+        await tx.done;
+        return changed;
+      } catch (error) {
+        try {
+          tx.abort();
+        } catch {}
+        await tx.done.catch(() => {});
+        throw error;
+      }
+    },
     async merge(data: SeriesData) {
       const incoming = validateSeries(data);
       const db = await promise;
@@ -197,7 +258,16 @@ export function planSeriesMerge(existing: SeriesData, incoming: SeriesData): Ser
       const comparable = (v: unknown) =>
         key === 'meters'
           ? { ...(v as Meter), active: undefined, trackingUpdatedAt: undefined, node: undefined }
-          : v;
+          : key === 'readings'
+            ? {
+                ...(v as Reading),
+                energis: undefined,
+                import: undefined,
+                result: undefined,
+                boundary: undefined,
+                energisUpdatedAt: undefined,
+              }
+            : v;
       if (
         key === 'meters' &&
         prev &&
@@ -208,6 +278,34 @@ export function planSeriesMerge(existing: SeriesData, incoming: SeriesData): Ser
         throw Error('Konflikt UZLU stejného elektroměru. Nic nebylo přepsáno.');
       if (prev && canonical(comparable(prev)) !== canonical(comparable(row)))
         throw Error('Konflikt stejného ID série. Nic nebylo přepsáno.');
+      if (key === 'readings' && prev) {
+        const old = prev as Reading,
+          next = row as Reading;
+        const fields = (r: Reading) =>
+          canonical({
+            energis: r.energis,
+            import: r.import,
+            result: r.result,
+            boundary: r.boundary,
+          });
+        if (!old.energisUpdatedAt && !next.energisUpdatedAt && fields(old) !== fields(next))
+          throw Error('Konflikt stejného ID intervalu.');
+        if (
+          old.energisUpdatedAt &&
+          next.energisUpdatedAt &&
+          Date.parse(old.energisUpdatedAt) === Date.parse(next.energisUpdatedAt) &&
+          fields(old) !== fields(next)
+        )
+          throw Error('Konflikt stejné revize Energisu.');
+        if (
+          next.energisUpdatedAt &&
+          (!old.energisUpdatedAt ||
+            Date.parse(next.energisUpdatedAt) > Date.parse(old.energisUpdatedAt))
+        ) {
+          Object.assign(old, next);
+          additions.readings.push(old);
+        }
+      }
       if (!prev) {
         (merged[key] as unknown[]).push(row);
         (additions[key] as unknown[]).push(row);

@@ -1,3 +1,6 @@
+import { EnergisBoundary, type Boundary } from './EnergisBoundary';
+import { SavedEnergis, SavedEnergisImport, usedEnergisBoundary } from './SavedEnergis';
+import { seriesGroups } from './grouping';
 import { readingTimeOffset } from './energisDisplay';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { locations } from '../core/current';
@@ -33,6 +36,7 @@ type Round = {
   active: boolean;
   take: boolean;
   node: string;
+  boundary: Boundary;
   import?: EnergisMeta;
   issue?: string;
 };
@@ -78,11 +82,13 @@ export function Series({
   initial = 'series',
   historyOnly = false,
   initialDetail = '',
+  initialBatch = '',
   onModeChange,
 }: {
   initial?: Mode;
   historyOnly?: boolean;
   initialDetail?: string;
+  initialBatch?: string;
   onModeChange?: (mode: Exclude<Mode, 'history'>) => void;
 }) {
   const repo = useMemo(() => createSeriesStore(), []);
@@ -96,14 +102,16 @@ export function Series({
   const [busy, setBusy] = useState(false);
   const [text, setText] = useState('');
   const [preview, setPreview] = useState(false);
-  const [batch, setBatch] = useState('');
+  const [batch, setBatch] = useState(initialBatch);
   const [search, setSearch] = useState('');
   const [selected, setSelected] = useState<string[]>([]);
   const [roundIds, setRoundIds] = useState<string[]>([]);
   const [round, setRound] = useState<Record<string, Round>>({});
   const [roundDate, setRoundDate] = useState('');
+  const [dirtyEnergis, setDirtyEnergis] = useState<Record<string, boolean>>({});
+  const markEnergisDraft = (id: string, dirty: boolean) =>
+    setDirtyEnergis((current) => ({ ...current, [id]: dirty }));
   const [detail, setDetail] = useState(initialDetail);
-  const [boundary, setBoundary] = useState<'previous' | 'next'>('previous');
   const file = useRef<HTMLInputElement>(null);
   const instanceId = useRef(crypto.randomUUID());
   const broadcast = () =>
@@ -136,6 +144,22 @@ export function Series({
       setDetail('');
     }
   }, [initial, historyOnly]);
+  useEffect(() => {
+    if (initialBatch)
+      setSelected(
+        data.meters.filter((m) => m.batchId === initialBatch && m.active).map((m) => m.id),
+      );
+  }, [initialBatch, data.meters]);
+  const saved = async () => {
+    await reload();
+    broadcast();
+  };
+  const openBatch = (id: string) => {
+    setBatch(id);
+    setDetail('');
+    setSearch('');
+    setSelected(data.meters.filter((m) => m.batchId === id && m.active).map((m) => m.id));
+  };
   const update = (key: keyof Entry, v: string) => setEntry((e) => ({ ...e, [key]: v }));
   const act = async (fn: () => Promise<void>) => {
     if (busy) return;
@@ -152,7 +176,7 @@ export function Series({
   };
   const visible = data.meters.filter(
     (m) =>
-      (!batch || m.location === data.batches.find((b) => b.id === batch)?.location) &&
+      (!batch || m.batchId === batch) &&
       [m.serial, m.node, m.placement, m.location].some((v) =>
         v.toLowerCase().includes(search.toLowerCase()),
       ),
@@ -163,6 +187,8 @@ export function Series({
     const date = preset?.date || roundDate;
     setRoundDate(date);
     meters = meters.filter((m) => m.active);
+    const batchIds = [...new Set(meters.map((m) => m.batchId))];
+    if (batchIds.length === 1) setBatch(batchIds[0]);
     setRoundIds(meters.map((m) => m.id));
     setDetail('');
     setRound(
@@ -177,6 +203,7 @@ export function Series({
             active: true,
             take: true,
             node: m.node,
+            boundary: 'previous' as const,
           },
         ]),
       ),
@@ -191,7 +218,7 @@ export function Series({
     const valid: { meter: Meter; previous: Reading; reading: Reading }[] = [];
     const failures: string[] = [];
     for (const m of roundMeters) {
-      const r = round[m.id];
+      const r = { ...round[m.id], date: roundDate };
       if (!r.take) continue;
       try {
         const previous = latest(data.readings, m.id);
@@ -210,7 +237,7 @@ export function Series({
         valid.push({
           meter: { ...m, node: r.node },
           previous,
-          reading: nextReading(m, previous, { ...r, boundary, import: meta }),
+          reading: nextReading(m, previous, { ...r, import: meta }),
         });
       } catch (e) {
         failures.push(`EM ${m.serial}: ${(e as Error).message}`);
@@ -251,6 +278,7 @@ export function Series({
             · SUMA ENERGIS: {r.energis} kWh · rozdíl {values.difference} kWh ·{' '}
             {values.percent === null ? '—' : values.percent.toFixed(2) + ' %'} ·{' '}
             {readingTimeOffset(r.import, r.date, r.time, r.boundary)}
+            {r.boundary && <> · Použit Energis do {usedEnergisBoundary(r)}.</>}
           </>
         )}
       </p>
@@ -316,85 +344,12 @@ export function Series({
             />
             <p>{roundMeters.length} vybraných elektroměrů</p>
           </section>
-          <section className="card">
-            <button
-              className="button secondary"
-              onClick={() => file.current?.click()}
-              disabled={busy}
-            >
-              IMPORT ENERGIS
-            </button>
-            <Info label="IMPORT ENERGIS">
-              Vyberte export XLSX nebo TXT. Podle UZLU se doplní pouze vybrané elektroměry.
-              Konflikty zkontrolujte ručně. Hodnoty se bez výslovných metadat nepřepočítávají.
-            </Info>
-            <label>
-              Hranice exportu{' '}
-              <select
-                value={boundary}
-                onChange={(e) => setBoundary(e.target.value as typeof boundary)}
-              >
-                <option value="previous">Energis do předchozího intervalu</option>
-                <option value="next">Energis do následujícího intervalu</option>
-              </select>
-            </label>
-            <Info label="hranice Energisu">
-              Ruční odečet 08:37: Energis do 08:30 → -7 min E; Energis do 08:45 → +8 min E.
-            </Info>
-            <input
-              hidden
-              ref={file}
-              type="file"
-              accept=".xlsx,.txt,.csv,.tsv"
-              onChange={(e) => {
-                const f = e.target.files?.[0];
-                e.target.value = '';
-                if (f)
-                  void act(async () => {
-                    const importMeters = roundMeters
-                      .filter((m) => round[m.id].take)
-                      .map((m) => ({ ...m, node: round[m.id].node }));
-                    const results = await parseEnergis(f, importMeters);
-                    setRound((current) => {
-                      const next = { ...current };
-                      for (const m of importMeters) {
-                        const found = results.find((r) => r.node === m.node);
-                        const prev = current[m.id];
-                        if (!m.node)
-                          next[m.id] = { ...prev, issue: 'Bez UZLU – doplňte Energis ručně.' };
-                        else if (found) {
-                          const meta = importMetadata(
-                            found,
-                            f.name,
-                            boundary,
-                            prev.date && prev.time ? `${prev.date}T${prev.time}` : '',
-                          );
-                          if (meta && prev.energis.trim())
-                            next[m.id] = {
-                              ...prev,
-                              issue: 'SUMA již vyplněna – import ji nepřepsal. Ruční kontrola.',
-                            };
-                          else
-                            next[m.id] = {
-                              ...prev,
-                              energis: meta ? String(meta.sum) : prev.energis,
-                              import: meta ?? prev.import,
-                              issue: found.issue,
-                            };
-                        }
-                      }
-                      return next;
-                    });
-                  });
-              }}
-            />
-          </section>
           {roundMeters.map((m) => {
             const p = latest(data.readings, m.id);
-            const r = round[m.id];
+            const r = { ...round[m.id], date: roundDate };
             let calculated: Reading | undefined;
             try {
-              if (r.value && r.time && r.date) calculated = nextReading(m, p, { ...r, boundary });
+              if (r.value && r.time && r.date) calculated = nextReading(m, p, r);
             } catch {}
             return (
               <article className={`card series-meter ${r.take ? '' : 'round-skipped'}`} key={m.id}>
@@ -423,12 +378,6 @@ export function Series({
                   <legend>Nový odečet</legend>
                   <div className="field-grid">
                     <Input
-                      label="Nové datum"
-                      type="date"
-                      value={r.date}
-                      onChange={(date) => editRound(m.id, { date })}
-                    />
-                    <Input
                       label="Nový čas"
                       value={r.time}
                       onChange={(time) => editRound(m.id, { time })}
@@ -446,6 +395,15 @@ export function Series({
                       }
                     />
                   </div>
+                  <EnergisBoundary
+                    value={r.boundary}
+                    onChange={(boundary) =>
+                      editRound(m.id, {
+                        boundary,
+                        import: r.import ? { ...r.import, boundary } : undefined,
+                      })
+                    }
+                  />
                 </fieldset>
                 <Info label="SUMA ENERGIS">
                   Součet za srovnávaný interval. Lze zadat ručně i bez UZLU. Ruční změna nahradí
@@ -455,7 +413,7 @@ export function Series({
                   <p>
                     Energis: {r.import.from.replace('T', ' ')} → {r.import.to.replace('T', ' ')} ·
                     UZEL {r.import.node} · {r.import.sum} {r.import.unit} ·{' '}
-                    {readingTimeOffset(r.import, r.date, r.time, boundary)} ·{' '}
+                    {readingTimeOffset(r.import, r.date, r.time, r.boundary)} ·{' '}
                     {r.import.boundary === 'previous' ? 'předchozí' : 'následující'} hranice
                   </p>
                 )}
@@ -478,6 +436,69 @@ export function Series({
           <button className="button primary" disabled={busy} onClick={() => void act(saveRound)}>
             ULOŽIT VYPLNĚNÉ ODEČTY
           </button>
+          <section className="card">
+            <button
+              className="button secondary"
+              onClick={() => file.current?.click()}
+              disabled={busy}
+            >
+              IMPORT SUMA ENERGIS
+            </button>
+            <p>Přiřazení podle čísla UZLU.</p>
+            <Info label="IMPORT SUMA ENERGIS">
+              Vyberte export XLSX nebo TXT. Podle UZLU se doplní pouze vybrané elektroměry.
+              Konflikty zkontrolujte ručně. Hodnoty se bez výslovných metadat nepřepočítávají.
+            </Info>
+            <input
+              hidden
+              ref={file}
+              type="file"
+              accept=".xlsx,.txt,.csv,.tsv"
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                e.target.value = '';
+                if (f)
+                  void act(async () => {
+                    const importMeters = roundMeters
+                      .filter((m) => round[m.id].take)
+                      .map((m) => ({ ...m, node: round[m.id].node }));
+                    const results = await parseEnergis(f, importMeters);
+                    setRound((current) => {
+                      const next = { ...current };
+                      for (const m of importMeters) {
+                        const found = results.find((r) => r.node === m.node);
+                        const prev = current[m.id];
+                        if (importMeters.filter((other) => other.node === m.node).length > 1)
+                          next[m.id] = { ...prev, issue: 'Nejednoznačný UZEL – ruční kontrola.' };
+                        else if (!m.node)
+                          next[m.id] = { ...prev, issue: 'Bez UZLU – doplňte Energis ručně.' };
+                        else if (found) {
+                          const meta = importMetadata(
+                            found,
+                            f.name,
+                            prev.boundary,
+                            prev.date && prev.time ? `${prev.date}T${prev.time}` : '',
+                          );
+                          if (meta && prev.energis.trim())
+                            next[m.id] = {
+                              ...prev,
+                              issue: 'SUMA již vyplněna – import ji nepřepsal. Ruční kontrola.',
+                            };
+                          else
+                            next[m.id] = {
+                              ...prev,
+                              energis: meta ? String(meta.sum) : prev.energis,
+                              import: meta ?? prev.import,
+                              issue: found.issue,
+                            };
+                        }
+                      }
+                      return next;
+                    });
+                  });
+              }}
+            />
+          </section>
           <button
             className="button secondary"
             onClick={() => {
@@ -510,6 +531,12 @@ export function Series({
                         {r.date} {r.time} – {r.value} kWh
                       </h3>
                       {renderResult(r)}
+                      <SavedEnergis
+                        reading={r}
+                        repo={repo}
+                        onSaved={saved}
+                        onDraft={markEnergisDraft}
+                      />
                       {r.import && (
                         <p>
                           Energis: {r.import.from} → {r.import.to} · {r.import.file}
@@ -546,18 +573,18 @@ export function Series({
         <>
           {!batch ? (
             <div>
-              {data.batches.map((b) => (
+              {seriesGroups(data).map(({ batch: b, at }) => (
                 <button
                   className="card series-batch"
                   key={b.id}
                   onClick={() => {
-                    setBatch(b.id);
-                    setSelected([]);
+                    openBatch(b.id);
                   }}
                 >
                   <strong>Odečtová série · {b.location}</strong>
                   <span>
-                    {b.date} · {data.meters.filter((m) => m.batchId === b.id).length} elektroměrů
+                    {at.replace('T', ' ')} · {data.meters.filter((m) => m.batchId === b.id).length}{' '}
+                    elektroměrů
                   </span>
                 </button>
               ))}
@@ -621,6 +648,17 @@ export function Series({
                   {r?.date} {r?.time} · {r?.value} kWh ·{' '}
                   {m.active ? 'Sledování: AKTIVNÍ' : 'Sledování: UKONČENO'}
                 </p>
+                {batch && r?.previousId && (
+                  <>
+                    {renderResult(r)}
+                    <SavedEnergis
+                      reading={r}
+                      repo={repo}
+                      onSaved={saved}
+                      onDraft={markEnergisDraft}
+                    />
+                  </>
+                )}
                 <button className="button secondary" onClick={() => setDetail(m.id)}>
                   Historie EM {m.serial}
                 </button>
@@ -634,6 +672,15 @@ export function Series({
           >
             POKRAČOVAT DALŠÍM ODEČTEM
           </button>
+          {batch && (
+            <SavedEnergisImport
+              meters={data.meters.filter((m) => m.batchId === batch)}
+              readings={data.readings}
+              repo={repo}
+              onSaved={saved}
+              protectedIds={Object.keys(dirtyEnergis).filter((id) => dirtyEnergis[id])}
+            />
+          )}
           <Info label="POKRAČOVAT DALŠÍM ODEČTEM">
             Otevře všechny vybrané elektroměry na jedné stránce. Předchozí hodnoty zůstávají
             zamčené.
@@ -818,7 +865,10 @@ export function Series({
                     disabled={busy}
                     onClick={() =>
                       void act(async () => {
-                        const created = await repo.first(entry);
+                        const currentBatch = data.batches.find(
+                          (b) => b.id === lastBatch && b.location === entry.location.trim(),
+                        );
+                        const created = await repo.first(entry, currentBatch?.id);
                         setLastBatch(created.batch.id);
                         setData((current) => ({
                           ...current,
@@ -844,7 +894,7 @@ export function Series({
                     className="button secondary"
                     disabled={!lastBatch}
                     onClick={() => {
-                      setBatch(lastBatch);
+                      openBatch(lastBatch);
                       setMode('history');
                       setDetail('');
                     }}

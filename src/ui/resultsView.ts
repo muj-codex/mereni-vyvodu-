@@ -1,3 +1,4 @@
+import { seriesGroups } from '../series/grouping';
 import type { HistoryRecord } from '../core/types';
 import {
   isIntervalCheck,
@@ -16,6 +17,8 @@ export interface ResultRow {
   search: string;
   record?: HistoryRecord;
   meterId?: string;
+  batchId?: string;
+  meterCount?: number;
 }
 const normalize = (s: string) =>
   s
@@ -53,30 +56,48 @@ export function resultRows(records: HistoryRecord[], series: SeriesData, query =
       ].join(' '),
     };
   });
-  for (const meter of series.meters) {
-    const reading = latest(series.readings, meter.id);
-    const at = reading ? `${reading.date}T${reading.time}` : '';
+  for (const { batch, meters, at } of seriesGroups(series)) {
+    rows.push({
+      id: `series:${batch.id}`,
+      batchId: batch.id,
+      meterCount: meters.length,
+      node: '',
+      at,
+      location: batch.location,
+      placement: '',
+      search: [
+        batch.location,
+        batch.date,
+        at,
+        formatIntervalDateTime(at),
+        'jednotlivý odečet série odečtů',
+        ...meters.flatMap((meter) => [
+          meter.node,
+          meter.serial,
+          meter.location,
+          meter.placement,
+          meter.location.startsWith('R') ? 'VN' : 'NN',
+          meter.active ? 'aktivní sledování' : 'ukončené sledování',
+          ...series.readings
+            .filter((r) => r.meterId === meter.id)
+            .flatMap((r) => [`${r.date}T${r.time}`, formatIntervalDateTime(`${r.date}T${r.time}`)]),
+        ]),
+      ].join(' '),
+    });
+  }
+  // Unlinked legacy records remain individually accessible; never guess membership.
+  for (const meter of series.meters.filter(
+    (m) => !series.batches.some((b) => b.id === m.batchId),
+  )) {
+    const r = latest(series.readings, meter.id);
     rows.push({
       id: meter.id,
       meterId: meter.id,
       node: meter.node,
-      at,
+      at: r ? `${r.date}T${r.time}` : '',
       location: meter.location,
       placement: meter.placement,
-      search: [
-        meter.node,
-        meter.serial,
-        meter.location,
-        meter.placement,
-        at,
-        formatIntervalDateTime(at),
-        ...series.readings
-          .filter((r) => r.meterId === meter.id)
-          .flatMap((r) => [`${r.date}T${r.time}`, formatIntervalDateTime(`${r.date}T${r.time}`)]),
-        'jednotlivý odečet série odečtů',
-        meter.location.startsWith('R') ? 'VN' : 'NN',
-        meter.active ? 'aktivní sledování' : 'ukončené sledování',
-      ].join(' '),
+      search: [meter.node, meter.serial, meter.location, meter.placement].join(' '),
     });
   }
   return rows
