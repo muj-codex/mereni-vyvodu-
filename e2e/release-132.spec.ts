@@ -10,7 +10,7 @@ const roundCard = (p: Page, serial: string) =>
     .filter({ has: p.getByRole('heading', { name: `EM ${serial}`, exact: true }) });
 async function createSeries(page: Page) {
   await page.goto('/');
-  await page.getByRole('button', { name: 'SÉRIE ODEČTŮ', exact: true }).click();
+  await page.getByRole('button', { name: 'Série odečtů', exact: true }).click();
   const s = scope(page);
   for (const [serial, placement, node, value] of [
     ['123', 'pole 21', '21210001', '1000'],

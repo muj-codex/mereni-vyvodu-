@@ -1,3 +1,4 @@
+import { ReadingNavigation } from './ui/ReadingNavigation';
 import { BackButton } from './ui/BackButton';
 import { Series } from './series/Series';
 import { Comparisons, StateCheckSummary } from './ui/Comparisons';
@@ -55,7 +56,9 @@ export default function App() {
       d.intervalEnabled,
       d.interval,
     ]);
-  const [readingMode, setReadingMode] = useState<'single' | 'series' | 'stylus'>('series');
+  const [readingMode, setReadingMode] = useState<'single' | 'series' | 'stylus' | 'history'>(
+    'series',
+  );
   const [mode, setMode] = useState<'power' | 'current'>('power');
   const [draft, setDraft] = useState<FormDraft>(restoreDraft),
     [step, setStep] = useState(0),
@@ -296,20 +299,14 @@ export default function App() {
               VÝPOČET SPOTŘEBY A SAZEB
             </button>
           </div>
-          <div className="segmented" aria-label="Odečty">
-            {(['single', 'series', 'stylus'] as const).map((v, i) => (
-              <button
-                key={v}
-                className={mainSection === 'readings' && readingMode === v ? 'active' : ''}
-                onClick={() => {
-                  setReadingMode(v);
-                  setMainSection('readings');
-                }}
-              >
-                {['JEDNOTLIVÝ ODEČET', 'SÉRIE ODEČTŮ', 'STYLUS'][i]}
-              </button>
-            ))}
-          </div>
+          {mainSection !== 'readings' && (
+            <ReadingNavigation
+              onChange={(mode) => {
+                setReadingMode(mode);
+                setMainSection('readings');
+              }}
+            />
+          )}
         </>
       )}
       {tab !== 'history' && mainSection === 'readings' && (

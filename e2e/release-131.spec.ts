@@ -19,7 +19,7 @@ async function first(page: Page, serial: string, node: string, time = '8:32') {
 test('NN/VN presets, custom MTP, correction, TEĎ and normalized hour', async ({ page }) => {
   await page.clock.install({ time: new Date(2026, 9, 24, 8, 3) });
   await page.goto('/');
-  await page.getByRole('button', { name: 'JEDNOTLIVÝ ODEČET', exact: true }).click();
+  await page.getByRole('button', { name: 'Jednotlivý odečet', exact: true }).click();
   const s = scope(page);
   await expect(s.getByLabel('Čas odečtu (HH:MM)', { exact: true })).toHaveValue('');
   await s
@@ -58,7 +58,7 @@ test('shared sticky date, explicit skip and next visit use the last saved readin
   page,
 }) => {
   await page.goto('/');
-  await page.getByRole('button', { name: 'SÉRIE ODEČTŮ', exact: true }).click();
+  await page.getByRole('button', { name: 'Série odečtů', exact: true }).click();
   const s = scope(page);
   await first(page, '111', '21210034');
   await first(page, '222', '21210035');
@@ -87,11 +87,11 @@ test('shared sticky date, explicit skip and next visit use the last saved readin
 });
 test('global live search, compact rows and results navigation', async ({ page }) => {
   await page.goto('/');
-  await page.getByRole('button', { name: 'JEDNOTLIVÝ ODEČET', exact: true }).click();
+  await page.getByRole('button', { name: 'Jednotlivý odečet', exact: true }).click();
   await first(page, '777666', '21210034');
   await first(page, '222', '999', '8:35');
   await page.getByRole('button', { name: /Výsledky měření/ }).click();
-  await expect(page.getByRole('button', { name: 'SÉRIE ODEČTŮ', exact: true })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Série odečtů', exact: true })).toHaveCount(0);
   await expect(page.locator('.record-open').first()).toContainText('23.10.2026 08:35');
   for (const query of ['3831', '257', '21210034', '766']) {
     await page.getByLabel('Hledat ve všech výsledcích a odečtech').fill(query);

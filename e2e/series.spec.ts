@@ -2,7 +2,7 @@ import { test, expect, type Page } from '@playwright/test';
 const scope = (page: Page) => page.getByRole('region', { name: 'Odečtové série' }).first();
 async function start(page: Page) {
   await page.goto('/');
-  await page.getByRole('button', { name: 'SÉRIE ODEČTŮ', exact: true }).click();
+  await page.getByRole('button', { name: 'Série odečtů', exact: true }).click();
 }
 async function first(page: Page, serial = '12345678', node = '21208142') {
   const s = scope(page);
@@ -137,7 +137,7 @@ test('STYLUS vyžaduje náhled a následné standardní uložení, pokračován�
   page,
 }) => {
   await start(page);
-  await page.getByRole('button', { name: 'STYLUS', exact: true }).first().click();
+  await page.getByRole('button', { name: 'Stylus', exact: true }).first().click();
   const s = scope(page);
   await s
     .getByLabel('Volný zápis STYLUS')
@@ -149,7 +149,7 @@ test('STYLUS vyžaduje náhled a následné standardní uložení, pokračován�
   await s.getByLabel('Čas kola', { exact: true }).fill('08:00');
   await s.getByRole('button', { name: 'ULOŽIT DÍLČÍ ODEČET', exact: true }).click();
   await expect(s.getByRole('status')).toContainText('uložen');
-  await s.getByRole('button', { name: 'STYLUS', exact: true }).click();
+  await s.getByRole('button', { name: 'Stylus', exact: true }).click();
   await s.getByLabel('Volný zápis STYLUS').fill('U21208142 EM12345678 29.10.2026 9:12 stav 24110');
   await s.getByRole('button', { name: 'ROZPOZNAT ÚDAJE', exact: true }).click();
   await expect(s.getByText(/Nalezen existující elektroměr/)).toBeVisible();
@@ -285,9 +285,9 @@ test('XLSX import a export XLSX/TXT zachová UZEL a hodnoty', async ({ page }) =
 test('historie zobrazí odečet přidaný v jiné části aplikace', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('button', { name: /Výsledky měření/ }).click();
-  await expect(page.getByRole('button', { name: 'SÉRIE ODEČTŮ', exact: true })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Série odečtů', exact: true })).toHaveCount(0);
   await page.getByRole('button', { name: 'Nové měření', exact: false }).click();
-  await page.getByRole('button', { name: 'SÉRIE ODEČTŮ', exact: true }).click();
+  await page.getByRole('button', { name: 'Série odečtů', exact: true }).click();
   await first(page);
   await page.getByRole('button', { name: /Výsledky měření/ }).click();
   await expect(page.locator('.record-open')).toContainText('série 1 vývodů');

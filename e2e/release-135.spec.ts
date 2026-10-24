@@ -23,7 +23,7 @@ async function results(p: Page) {
 }
 async function create(p: Page, serials: string[]) {
   await p.goto('/');
-  await p.getByRole('button', { name: 'SÉRIE ODEČTŮ', exact: true }).click();
+  await p.getByRole('button', { name: 'Série odečtů', exact: true }).click();
   for (const serial of serials) await add(p, serial);
 }
 test('two series plus one standalone are separate in both overviews; search and member history stay available', async ({
@@ -31,7 +31,7 @@ test('two series plus one standalone are separate in both overviews; search and 
 }) => {
   await create(page, ['21', '54']);
   for (const serial of ['31', '32', '35', '48']) await add(page, serial, 'TS 3831/257');
-  await page.getByRole('button', { name: 'JEDNOTLIVÝ ODEČET', exact: true }).click();
+  await page.getByRole('button', { name: 'Jednotlivý odečet', exact: true }).click();
   await add(page, '777');
   await results(page);
   const groups = page.getByRole('region', { name: 'ODEČTOVÉ SÉRIE', exact: true });
@@ -106,7 +106,7 @@ test('a standalone can join a series using the same meter and reading IDs; backu
   browser,
 }) => {
   await create(page, ['21']);
-  await page.getByRole('button', { name: 'JEDNOTLIVÝ ODEČET', exact: true }).click();
+  await page.getByRole('button', { name: 'Jednotlivý odečet', exact: true }).click();
   await add(page, '777');
   await results(page);
   const before = await page.evaluate(

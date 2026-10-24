@@ -1409,3 +1409,10 @@ fieldset:disabled {
   margin-block: 4px 0;
   font-size: 0.85rem;
 }
+
+.reading-navigation {
+  flex-wrap: wrap;
+}
+.reading-navigation button {
+  flex: 1 1 120px;
+}

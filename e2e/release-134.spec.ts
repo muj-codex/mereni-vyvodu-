@@ -10,7 +10,7 @@ const saved = (p: Page, serial: string) =>
     .filter({ has: p.getByRole('button', { name: `Historie EM ${serial}`, exact: true }) });
 async function create(page: Page) {
   await page.goto('/');
-  await page.getByRole('button', { name: 'SÉRIE ODEČTŮ', exact: true }).click();
+  await page.getByRole('button', { name: 'Série odečtů', exact: true }).click();
   const s = scope(page);
   await expect(s.getByLabel('Čas kola', { exact: true })).toHaveValue('');
   await s.getByLabel('Datum kola', { exact: true }).fill('2026-10-24');

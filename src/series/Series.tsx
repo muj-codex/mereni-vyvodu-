@@ -1,3 +1,4 @@
+import { ReadingNavigation } from '../ui/ReadingNavigation';
 import { BackButton } from '../ui/BackButton';
 import { EnergisBoundary, type Boundary } from './EnergisBoundary';
 import { SavedEnergis, SavedEnergisImport, usedEnergisBoundary } from './SavedEnergis';
@@ -389,22 +390,15 @@ export function Series({
         </button>
       )}
       {!historyOnly && (
-        <div className="segmented">
-          {(['single', 'series', 'stylus', 'history'] as Mode[]).map((v, i) => (
-            <button
-              key={v}
-              className={mode === v ? 'active' : ''}
-              onClick={() => {
-                setMode(v);
-                if (v !== 'history') onModeChange?.(v);
-                setRoundIds([]);
-                setDetail('');
-              }}
-            >
-              {['Jednotlivý odečet', 'Série odečtů', 'STYLUS', 'Historie odečtů'][i]}
-            </button>
-          ))}
-        </div>
+        <ReadingNavigation
+          active={mode}
+          onChange={(v) => {
+            setMode(v);
+            if (v !== 'history') onModeChange?.(v);
+            setRoundIds([]);
+            setDetail('');
+          }}
+        />
       )}
       <h1>
         {roundIds.length

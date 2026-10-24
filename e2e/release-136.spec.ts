@@ -93,7 +93,7 @@ test('main check has one continuation, local back preserves check and Kyoritsu; 
   ).toHaveCount(0);
   expect(await counts(page)).toEqual({ measurements: 1, series: 0, meters: 0, readings: 0 });
   await page.locator('.record-open').click();
-  await expect(page.getByRole('button', { name: 'SÉRIE ODEČTŮ', exact: true })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Série odečtů', exact: true })).toHaveCount(0);
   await expect(page.getByLabel('Porovnání', { exact: true })).toContainText('EM 10 kWh');
   await back(page).click();
   await expect(page.locator('.record-open')).toHaveCount(1);
@@ -127,9 +127,9 @@ test('allowed reading entry points, member/round/continuation back and SUMA edit
   page,
 }) => {
   await page.goto('/');
-  await page.getByRole('button', { name: 'SÉRIE ODEČTŮ', exact: true }).click();
+  await page.getByRole('button', { name: 'Série odečtů', exact: true }).click();
   await reading(page, '21');
-  await page.getByRole('button', { name: 'JEDNOTLIVÝ ODEČET', exact: true }).click();
+  await page.getByRole('button', { name: 'Jednotlivý odečet', exact: true }).click();
   await reading(page, '777');
   await page.getByRole('button', { name: /Výsledky měření/ }).click();
   await expect(
@@ -181,7 +181,7 @@ test('stylus preview and current result return locally without clearing working 
   page,
 }) => {
   await page.goto('/');
-  await page.getByRole('button', { name: 'STYLUS', exact: true }).first().click();
+  await page.getByRole('button', { name: 'Stylus', exact: true }).first().click();
   const s = scope(page);
   const text = 'TS3831/257 11P U21208142 EM12345678 22.10.2026 8:37 stav 23456';
   await s.getByLabel('Volný zápis STYLUS').fill(text);

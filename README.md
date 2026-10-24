@@ -256,3 +256,9 @@ V detailu série nahrazuje vyhledávací pole kompaktní chronologický seznam u
 - Samostatný blok **OVĚŘIT HODNOTY KYORITSU** byl odstraněn. Samostatná **Kontrola výkonu Kyoritsu** zůstává zachovaná se stejným fyzikálním výsledkem U/I/PF.
 - Řádek **Kyoritsu ↔ Energis** dostává červený rámeček, tučný text, vykřičník a krátké vysvětlení pouze při `abs(percent) > 5`. Přesně +5 % i −5 % zůstává bez tohoto zvýraznění. Rozhoduje původní interní procento; formátování čísla zůstává stávající (nejvýše tři desetinná místa).
 - Změna je společná pro živý i uložený výsledek. Fyzikální shoda Kyoritsu zůstává nezávislá na odchylce proti časově posunutému trendu Energisu. Matematika, diagnostika, tolerance výpočetního jádra a uložená data se nemění.
+
+## Verze 1.3.8 – jednotná navigace odečtů
+
+Duplicitní řady nahrazuje jedna společná navigace: Jednotlivý odečet | Série odečtů | Stylus | Historie odečtů. V odečtech je právě jedna aktivní položka se stejným stylem; menší displeje dovolují zalomení. Hlavní moduly, lokální ← Zpět a globální spodní navigace zůstávají zachované. Ve Výsledcích měření se pracovní navigace nezobrazuje.
+
+Změna se týká pouze navigačního zobrazení. Výpočty, formuláře, rozpracovaná data, odečtová kola, historie, Stylus parser, Energis, +E/-E, IndexedDB a backup/restore zůstávají beze změny.
