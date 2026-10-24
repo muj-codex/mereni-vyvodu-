@@ -1,3 +1,4 @@
+import { withRounds, validateRounds } from './rounds';
 import { compareEnergy } from '../core/energy';
 export interface Batch {
   id: string;
@@ -31,6 +32,8 @@ export interface Reading {
   id: string;
   meterId: string;
   previousId?: string;
+  /** Common visit identity; date/time below remain the physical meter reading. */
+  roundId?: string;
   date: string;
   time: string;
   value: number;
@@ -41,7 +44,16 @@ export interface Reading {
   energisUpdatedAt?: string;
   result?: ReturnType<typeof compareEnergy>;
 }
+export interface SeriesRound {
+  roundId: string;
+  batchId: string;
+  roundDate: string;
+  roundTime: string;
+  legacy?: boolean;
+  entries: { meterId: string; readingId?: string }[];
+}
 export interface SeriesData {
+  rounds?: SeriesRound[];
   batches: Batch[];
   meters: Meter[];
   readings: Reading[];
@@ -192,6 +204,7 @@ export function validateSeries(value: unknown): SeriesData {
   const d = value as SeriesData;
   if (!d || !Array.isArray(d.batches) || !Array.isArray(d.meters) || !Array.isArray(d.readings))
     throw Error('Neplatná záloha sérií.');
+  if (d.rounds !== undefined && !Array.isArray(d.rounds)) throw Error('Neplatná kola série.');
   const ids = (rows: { id: string }[]) =>
     rows.every((r) => r && typeof r.id === 'string' && r.id.length > 0) &&
     new Set(rows.map((r) => r.id)).size === rows.length;
@@ -279,7 +292,9 @@ export function validateSeries(value: unknown): SeriesData {
     )
       throw Error('Historie elektroměru není souvislá.');
   }
-  return structuredClone(d);
+  const normalized = withRounds(structuredClone(d));
+  validateRounds(normalized);
+  return normalized;
 }
 
 // Display/export adapter also exposes corrected meter consumption before Energis is entered.

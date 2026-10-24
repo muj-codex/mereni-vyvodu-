@@ -1,6 +1,6 @@
 import { emptySeries, validateSeries, type SeriesData } from '../series/model';
 import type { HistoryRecord } from '../core/types';
-export const BACKUP_VERSION = 2;
+export const BACKUP_VERSION = 3;
 import { DATABASE_NAME, DATABASE_VERSION } from './schema';
 export { DATABASE_NAME, DATABASE_VERSION } from './schema';
 import { createSeriesStore } from '../series/store';
@@ -188,7 +188,7 @@ export function parseBackup(text: string): BackupRecords {
   } catch {
     throw Error('Soubor není platný JSON. Nic nebylo zapsáno.');
   }
-  if (!object(backup) || ![1, BACKUP_VERSION].includes(backup.backupVersion))
+  if (!object(backup) || ![1, 2, BACKUP_VERSION].includes(backup.backupVersion))
     throw Error('Nekompatibilní backupVersion. Vyberte podporovanou JSON zálohu historie.');
   if (
     typeof backup.appVersion !== 'string' ||

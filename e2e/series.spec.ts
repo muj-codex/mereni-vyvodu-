@@ -12,6 +12,10 @@ async function first(page: Page, serial = '12345678', node = '21208142') {
   await s.getByLabel('UZEL (nepovinný)', { exact: true }).fill(node);
   await s.getByLabel('Datum odečtu', { exact: true }).fill('2026-10-22');
   await s.getByLabel('Čas odečtu (HH:MM)', { exact: true }).fill('08:37');
+  await s
+    .getByLabel('Datum kola', { exact: true })
+    .fill((await s.getByLabel('Datum odečtu', { exact: true }).inputValue()) || '2026-10-22');
+  await s.getByLabel('Čas kola', { exact: true }).fill('08:00');
   await s.getByLabel('Stav elektroměru [kWh]', { exact: true }).fill('23456');
   await s.getByRole('button', { name: 'ULOŽIT DÍLČÍ ODEČET', exact: true }).click();
   await expect(s.getByRole('status')).toContainText('uložen');
@@ -35,6 +39,7 @@ async function fillRound(page: Page) {
   const s = scope(page);
   const card = meterCard(page);
   await s.getByLabel('Datum nového odečtu', { exact: true }).fill('2026-10-29');
+  await s.getByLabel('Čas kola', { exact: true }).fill('08:00');
   await card.getByLabel('Nový čas', { exact: true }).fill('09:12');
   await card.getByLabel('Nový stav [kWh]', { exact: true }).fill('24110');
   await card.getByLabel('SUMA ENERGIS [kWh]', { exact: true }).fill('654');
@@ -135,6 +140,8 @@ test('STYLUS vyžaduje náhled a následné standardní uložení, pokračován�
   await s.getByRole('button', { name: 'ROZPOZNAT ÚDAJE', exact: true }).click();
   await expect(s.getByText(/Nový elektroměr – první/)).toBeVisible();
   await s.getByRole('button', { name: 'PŘEVÉST DO ODEČTU', exact: true }).click();
+  await s.getByLabel('Datum kola', { exact: true }).fill('2026-10-22');
+  await s.getByLabel('Čas kola', { exact: true }).fill('08:00');
   await s.getByRole('button', { name: 'ULOŽIT DÍLČÍ ODEČET', exact: true }).click();
   await expect(s.getByRole('status')).toContainText('uložen');
   await s.getByRole('button', { name: 'STYLUS', exact: true }).click();
@@ -186,7 +193,7 @@ test('70 elektroměrů, výběr 48 a společná stránka pouze pro vybrané', as
   await start(page);
   await page.evaluate(async () => {
     const db = await new Promise<IDBDatabase>((resolve, reject) => {
-      const r = indexedDB.open('mereni-vyvodu-v1', 3);
+      const r = indexedDB.open('mereni-vyvodu-v1');
       r.onsuccess = () => resolve(r.result);
       r.onerror = () => reject(r.error);
     });

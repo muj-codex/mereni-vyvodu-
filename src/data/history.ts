@@ -1,10 +1,11 @@
-import { planSeriesMerge, upgradeSeries } from '../series/store';
+import { planSeriesMerge, upgradeSeries, migrateRounds } from '../series/store';
 import { DATABASE_NAME, DATABASE_VERSION, planImport, validateRecords } from './backup';
 import { openDB, type DBSchema } from 'idb';
 import { emptySeries, validateSeries } from '../series/model';
 import type { BackupRecords } from './backup';
 import type { HistoryRecord } from '../core/types';
 interface HistoryDB extends DBSchema {
+  rounds: { key: string; value: import('../series/model').SeriesRound };
   series: { key: string; value: import('../series/model').Batch };
   meters: { key: string; value: import('../series/model').Meter };
   readings: { key: string; value: import('../series/model').Reading };
@@ -16,8 +17,9 @@ export function createHistory(name = DATABASE_NAME) {
       // Release old tabs when a later app version upgrades the schema.
       void db.then((database) => database.close());
     },
-    upgrade(database) {
+    upgrade(database, oldVersion, _newVersion, tx) {
       upgradeSeries(database);
+      if (oldVersion < 4) void migrateRounds(tx).catch(() => tx.abort());
       // Version 2 widens stored records. Existing v1 objects remain readable unchanged.
       if (!database.objectStoreNames.contains('measurements')) {
         const store = database.createObjectStore('measurements', { keyPath: 'id' });
@@ -36,7 +38,7 @@ export function createHistory(name = DATABASE_NAME) {
       const seriesData = (incoming as BackupRecords).seriesData;
       if (seriesData) validateSeries(seriesData);
       const tx = (await db).transaction(
-        ['measurements', 'series', 'meters', 'readings'],
+        ['measurements', 'series', 'meters', 'readings', 'rounds'],
         'readwrite',
       );
       try {
@@ -46,7 +48,9 @@ export function createHistory(name = DATABASE_NAME) {
           existing.batches = await tx.objectStore('series').getAll();
           existing.meters = await tx.objectStore('meters').getAll();
           existing.readings = await tx.objectStore('readings').getAll();
-          const additions = planSeriesMerge(existing, seriesData);
+          existing.rounds = await tx.objectStore('rounds').getAll();
+          const additions = planSeriesMerge(existing, validateSeries(seriesData));
+          for (const r of additions.rounds ?? []) await tx.objectStore('rounds').put(r);
           for (const b of additions.batches) await tx.objectStore('series').add(b);
           for (const m of additions.meters) await tx.objectStore('meters').put(m);
           for (const r of additions.readings) await tx.objectStore('readings').put(r);

@@ -1,7 +1,8 @@
 import { EnergisBoundary, type Boundary } from './EnergisBoundary';
 import { SavedEnergis, SavedEnergisImport, usedEnergisBoundary } from './SavedEnergis';
 import { seriesGroups } from './grouping';
-import { seriesDates } from './seriesDates';
+import { roundsFor, roundLabel } from './rounds';
+import type { SeriesRound } from './model';
 import { readingTimeOffset } from './energisDisplay';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { locations } from '../core/current';
@@ -109,6 +110,16 @@ export function Series({
   const [roundIds, setRoundIds] = useState<string[]>([]);
   const [round, setRound] = useState<Record<string, Round>>({});
   const [roundDate, setRoundDate] = useState('');
+  const [roundTime, setRoundTime] = useState('');
+  const [initialRoundDate, setInitialRoundDate] = useState('');
+  const [initialRoundTime, setInitialRoundTime] = useState('');
+  const [firstRoundId, setFirstRoundId] = useState('');
+  const [viewRoundId, setViewRoundId] = useState('');
+  const visits = roundsFor(data, batch);
+  const viewRound = visits.find((r) => r.roundId === viewRoundId);
+  const visitReadings = viewRound
+    ? data.readings.filter((r) => viewRound.entries.some((e) => e.readingId === r.id))
+    : data.readings;
   const [dirtyEnergis, setDirtyEnergis] = useState<Record<string, boolean>>({});
   const markEnergisDraft = (id: string, dirty: boolean) =>
     setDirtyEnergis((current) => ({ ...current, [id]: dirty }));
@@ -157,6 +168,7 @@ export function Series({
   };
   const openBatch = (id: string) => {
     setBatch(id);
+    setViewRoundId('');
     setDetail('');
     setSearch('');
     setSelected(data.meters.filter((m) => m.batchId === id && m.active).map((m) => m.id));
@@ -187,6 +199,7 @@ export function Series({
   const begin = (meters: Meter[], preset?: Entry) => {
     const date = preset?.date || roundDate;
     setRoundDate(date);
+    setRoundTime('');
     meters = meters.filter((m) => m.active);
     const batchIds = [...new Set(meters.map((m) => m.batchId))];
     if (batchIds.length === 1) setBatch(batchIds[0]);
@@ -216,6 +229,7 @@ export function Series({
   const editRound = (id: string, patch: Partial<Round>) =>
     setRound((v) => ({ ...v, [id]: { ...v[id], ...patch } }));
   async function saveRound() {
+    timestamp(roundDate, roundTime);
     const valid: { meter: Meter; previous: Reading; reading: Reading }[] = [];
     const failures: string[] = [];
     for (const m of roundMeters) {
@@ -244,25 +258,31 @@ export function Series({
         failures.push(`EM ${m.serial}: ${(e as Error).message}`);
       }
     }
-    if (valid.length) {
-      await repo.append(valid);
-      setData((current) => ({
-        ...current,
-        readings: [...current.readings, ...valid.map((v) => v.reading)],
-        meters: current.meters.map((m) => {
+    if (failures.length) throw Error(failures.join(' · '));
+    const visits: SeriesRound[] = [...new Set(roundMeters.map((m) => m.batchId))].map((batchId) => {
+      const roundId = crypto.randomUUID();
+      const members = data.meters.filter((m) => m.batchId === batchId && m.active);
+      return {
+        roundId,
+        batchId,
+        roundDate,
+        roundTime: normalizeTime(roundTime),
+        entries: members.map((m) => {
           const row = valid.find((v) => v.meter.id === m.id);
-          return row ? { ...m, node: row.meter.node, active: row.reading.active } : m;
+          if (row) row.reading.roundId = roundId;
+          return { meterId: m.id, ...(row ? { readingId: row.reading.id } : {}) };
         }),
-      }));
-      const saved = valid.map((v) => v.meter.id);
-      setRoundIds((ids) => ids.filter((id) => !saved.includes(id) && round[id].take));
-      setMode('history');
-      setNotice(`Uloženo ${valid.length} odečtů. Historie zůstává zachována.`);
-      broadcast();
-    }
-    if (failures.length) setError(failures.join(' · '));
-    else if (!valid.length) throw Error('Vyplňte alespoň jeden nový odečet.');
+      };
+    });
+    await repo.append(valid, visits);
+    await reload();
+    setRoundIds([]);
+    setMode('history');
+    setViewRoundId(visits.find((v) => v.batchId === batch)?.roundId ?? '');
+    setNotice(`Uloženo ${valid.length} odečtů. Historie zůstává zachována.`);
+    broadcast();
   }
+
   const renderResult = (r: Reading) => {
     const previous = data.readings.find((p) => p.id === r.previousId);
     const meter = data.meters.find((m) => m.id === r.meterId);
@@ -330,21 +350,25 @@ export function Series({
         <>
           <section className="card series-round-heading">
             <h2>{[...new Set(roundMeters.map((m) => m.location))].join(' · ')}</h2>
-            <Input
-              label="Datum nového odečtu"
-              type="date"
-              value={roundDate}
-              onChange={(date) => {
-                setRoundDate(date);
-                setRound((v) =>
-                  Object.fromEntries(
-                    Object.entries(v).map(([id, r]) => [id, r.take ? { ...r, date } : r]),
-                  ),
-                );
-              }}
-            />
+            <div className="round-common-fields">
+              <Input
+                label="Datum nového odečtu"
+                type="date"
+                value={roundDate}
+                onChange={(date) => {
+                  setRoundDate(date);
+                  setRound((v) =>
+                    Object.fromEntries(
+                      Object.entries(v).map(([id, r]) => [id, r.take ? { ...r, date } : r]),
+                    ),
+                  );
+                }}
+              />
+              <Input label="Čas kola" value={roundTime} onChange={setRoundTime} />
+            </div>
             <p>{roundMeters.length} vybraných elektroměrů</p>
           </section>
+          <p>Čas kola je společný čas návštěvy. Skutečný čas každého vývodu vyplňte zvlášť.</p>
           {roundMeters.map((m) => {
             const p = latest(data.readings, m.id);
             const r = { ...round[m.id], date: roundDate };
@@ -602,13 +626,33 @@ export function Series({
             </button>
           )}
           {batch ? (
-            <p className="series-dates">{seriesDates(data, batch)}</p>
+            <nav className="series-dates" aria-label="Odečtová kola">
+              <button type="button" aria-pressed={!viewRound} onClick={() => setViewRoundId('')}>
+                Aktuální stavy
+              </button>
+              {visits.map((v) => (
+                <button
+                  type="button"
+                  key={v.roundId}
+                  aria-pressed={viewRoundId === v.roundId}
+                  onClick={() => setViewRoundId(v.roundId)}
+                >
+                  {roundLabel(v)}
+                </button>
+              ))}
+            </nav>
           ) : (
             <Input
               label="Vyhledat UZEL / pole / číslo elektroměru"
               value={search}
               onChange={setSearch}
             />
+          )}
+          {viewRound?.legacy && (
+            <p>
+              Starší data: přehled dne podle skutečných odečtů; původní kola stejného dne nelze
+              spolehlivě rozlišit.
+            </p>
           )}
           <div className="step-actions">
             <button
@@ -627,7 +671,16 @@ export function Series({
             Vybráno {chosen.length} z {data.meters.length}
           </p>
           {visible.map((m) => {
-            const r = latest(data.readings, m.id);
+            const r = latest(visitReadings, m.id);
+            const skipped =
+              !!viewRound && viewRound.entries.some((e) => e.meterId === m.id && !e.readingId);
+            const readings = viewRound
+              ? visitReadings
+                  .filter((r) => r.meterId === m.id)
+                  .sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time))
+              : r
+                ? [r]
+                : [];
             return (
               <article key={m.id} className="card series-meter">
                 <label className="optional-toggle">
@@ -649,21 +702,56 @@ export function Series({
                     }
                   />
                 </label>
-                <p>
-                  {r?.date} {r?.time} · {r?.value} kWh ·{' '}
-                  {m.active ? 'Sledování: AKTIVNÍ' : 'Sledování: UKONČENO'}
-                </p>
-                {batch && r?.previousId && (
-                  <>
-                    {renderResult(r)}
-                    <SavedEnergis
-                      reading={r}
-                      repo={repo}
-                      onSaved={saved}
-                      onDraft={markEnergisDraft}
-                    />
-                  </>
+                {skipped && (
+                  <p>Přeskočeno · {m.active ? 'Sledování: AKTIVNÍ' : 'Sledování: UKONČENO'}</p>
                 )}
+                {viewRound && !viewRound.entries.some((e) => e.meterId === m.id) && (
+                  <p>Vývod nebyl součástí kola.</p>
+                )}
+                {readings.map((r) => (
+                  <section key={r.id}>
+                    <p>
+                      {r?.date} {r?.time} · {r?.value} kWh ·{' '}
+                      {m.active ? 'Sledování: AKTIVNÍ' : 'Sledování: UKONČENO'}
+                    </p>
+                    {batch && r?.previousId && (
+                      <>
+                        {renderResult(r)}
+                        <SavedEnergis
+                          reading={r}
+                          repo={repo}
+                          onSaved={saved}
+                          onDraft={markEnergisDraft}
+                        />
+                      </>
+                    )}
+                  </section>
+                ))}
+                {skipped &&
+                  (() => {
+                    const priorIds = new Set(
+                      visits
+                        .slice(
+                          0,
+                          visits.findIndex((v) => v.roundId === viewRound!.roundId),
+                        )
+                        .flatMap((v) =>
+                          v.entries.flatMap((e) => (e.readingId ? [e.readingId] : [])),
+                        ),
+                    );
+                    const previous = latest(
+                      data.readings.filter((r) => priorIds.has(r.id)),
+                      m.id,
+                    );
+                    return (
+                      previous && (
+                        <p>
+                          Poslední skutečný odečet: {previous.date} {previous.time} ·{' '}
+                          {previous.value} kWh
+                        </p>
+                      )
+                    );
+                  })()}
                 <button className="button secondary" onClick={() => setDetail(m.id)}>
                   Historie EM {m.serial}
                 </button>
@@ -680,7 +768,7 @@ export function Series({
           {batch && (
             <SavedEnergisImport
               meters={data.meters.filter((m) => m.batchId === batch)}
-              readings={data.readings}
+              readings={visitReadings}
               repo={repo}
               onSaved={saved}
               protectedIds={Object.keys(dirtyEnergis).filter((id) => dirtyEnergis[id])}
@@ -750,6 +838,15 @@ export function Series({
           {(mode !== 'stylus' || preview) && (
             <section className="card">
               <h2>{mode === 'stylus' ? 'Náhled – zkontrolujte údaje' : 'První dílčí odečet'}</h2>
+              <div className="field-grid">
+                <Input
+                  label="Datum kola"
+                  type="date"
+                  value={initialRoundDate}
+                  onChange={setInitialRoundDate}
+                />
+                <Input label="Čas kola" value={initialRoundTime} onChange={setInitialRoundTime} />
+              </div>
               <div className="field-grid">
                 <label className="series-field">
                   Napětí
@@ -873,7 +970,13 @@ export function Series({
                         const currentBatch = data.batches.find(
                           (b) => b.id === lastBatch && b.location === entry.location.trim(),
                         );
-                        const created = await repo.first(entry, currentBatch?.id);
+                        timestamp(initialRoundDate, initialRoundTime);
+                        const created = await repo.first(entry, currentBatch?.id, {
+                          roundDate: initialRoundDate,
+                          roundTime: normalizeTime(initialRoundTime),
+                          ...(currentBatch && firstRoundId ? { roundId: firstRoundId } : {}),
+                        });
+                        setFirstRoundId(created.round.roundId);
                         setLastBatch(created.batch.id);
                         setData((current) => ({
                           ...current,
@@ -886,6 +989,12 @@ export function Series({
                               a.serial.localeCompare(b.serial, 'cs', { numeric: true }),
                           ),
                           readings: [...current.readings, created.reading],
+                          rounds: [
+                            ...(current.rounds ?? []).filter(
+                              (r) => r.roundId !== created.round.roundId,
+                            ),
+                            created.round,
+                          ],
                         }));
                         broadcast();
                         setEntry(resetEntry(entry));

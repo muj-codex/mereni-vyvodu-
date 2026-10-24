@@ -224,3 +224,13 @@ ExcelJS se načítá odděleně a PWA jej zahrnuje do offline precache.
 ## Verze 1.3.3 – časový přehled série (24. 10. 2026)
 
 V detailu série nahrazuje vyhledávací pole kompaktní chronologický seznam uložených termínů. Globální hledání zůstává zachováno. Model nemá identifikátor ani timestamp kola: přehled používá nejčasnější skutečný odečet každého dne série. Více kol ve stejný den nelze z uložených dat spolehlivě odlišit a zobrazí se jedním termínem. Výpočty, data a pokračování série zůstávají beze změny.
+
+## Verze 1.3.4 – samostatná odečtová kola (24. 10. 2026)
+
+- Série obsahuje samostatná kola s unikátním `roundId`, společným `roundDate` a `roundTime`. Dvě návštěvy stejného dne zůstávají dvěma událostmi, i při shodném společném čase.
+- Datum i čas kola jsou ručně editovatelné. Čas začíná prázdný; TEĎ vloží lokální HH:MM. Skutečné časy jednotlivých vývodů zůstávají samostatné a mají vlastní TEĎ.
+- Kompaktní tlačítka v detailu přepínají všechna kola a aktuální stavy. Kolo uchovává odkazy na skutečné odečty a explicitně přeskočené vývody; přeskočení nevytvoří odečet ani neukončí sledování. Další interval navazuje na poslední skutečný odečet.
+- Jedna série zůstává jednou kartou výsledků. Řazení používá poslední skutečný čas vývodu v nejnovějším kole; kolo bez odečtů používá společný čas.
+- IndexedDB přechází z verze 3 na 4 přidáním store `rounds`, bez resetu. U starých dat není možné spolehlivě rekonstruovat návštěvy téhož dne: označený kompatibilní denní přehled zachová všechny skutečné odečty, jejich časy, vazby a výsledky. Nová kola se ukládají explicitně.
+- JSON záloha verze 3 zahrnuje kola, jejich časy, vazby a přeskočení. Obnova přijímá také verze 1 a 2; starší záloha nepřepíše známé nové vazby kol ani novější SUMA ENERGIS.
+- Výpočetní jádro, MTP, 1f/3f, ARON, VN, Kyoritsu, U/I/PF, Kontrola stavů, tolerance, diagnostika a matematika/parsery Energisu zůstávají nezměněné. Energis i historie elektroměru nadále používají skutečné individuální datum a čas odečtu.

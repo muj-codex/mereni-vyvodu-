@@ -1328,3 +1328,46 @@ fieldset:disabled {
   line-height: 1.5;
   overflow-wrap: anywhere;
 }
+
+.series-dates {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.series-dates button {
+  font: inherit;
+  padding: 7px 10px;
+  border: 1px solid #657887;
+  border-radius: 8px;
+}
+.series-dates button[aria-pressed='true'] {
+  background: #15486b;
+  color: white;
+}
+
+.series-round-heading {
+  padding: 10px;
+}
+.series-round-heading h2 {
+  margin: 0 0 6px;
+  font-size: 1.1rem;
+}
+.series-round-heading p {
+  margin: 6px 0 0;
+  font-size: 0.85rem;
+}
+.round-common-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 10px;
+}
+.round-common-fields .series-field {
+  min-width: 0;
+  font-size: 0.85rem;
+  gap: 4px;
+}
+.round-common-fields input {
+  min-width: 0;
+  min-height: 44px;
+  padding: 6px;
+}

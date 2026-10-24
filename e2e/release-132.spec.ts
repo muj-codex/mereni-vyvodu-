@@ -22,6 +22,10 @@ async function createSeries(page: Page) {
     await s.getByLabel('Číslo elektroměru', { exact: true }).fill(serial);
     await s.getByLabel('Datum odečtu', { exact: true }).fill('2026-10-23');
     await s.getByLabel('Čas odečtu (HH:MM)', { exact: true }).fill('17:33');
+    await s
+      .getByLabel('Datum kola', { exact: true })
+      .fill((await s.getByLabel('Datum odečtu', { exact: true }).inputValue()) || '2026-10-22');
+    await s.getByLabel('Čas kola', { exact: true }).fill('08:00');
     await s.getByLabel('Stav elektroměru [kWh]', { exact: true }).fill(value);
     await s.getByRole('button', { name: 'ULOŽIT DÍLČÍ ODEČET', exact: true }).click();
     await expect(s.locator('p[role=status]')).toContainText('uložen');
@@ -45,6 +49,7 @@ async function begin(page: Page, date = '2026-10-24') {
   await expect(s.getByLabel('Nové datum', { exact: true })).toHaveCount(0);
   await expect(s.getByText('Hranice exportu', { exact: true })).toHaveCount(0);
   await s.getByLabel('Datum nového odečtu', { exact: true }).fill(date);
+  await s.getByLabel('Čas kola', { exact: true }).fill('08:00');
   await expect(s.locator('.series-round-heading')).toHaveCSS('position', 'sticky');
 }
 async function saveStates(page: Page) {

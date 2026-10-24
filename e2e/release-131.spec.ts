@@ -8,6 +8,10 @@ async function first(page: Page, serial: string, node: string, time = '8:32') {
   await s.getByLabel('Číslo elektroměru', { exact: true }).fill(serial);
   await s.getByLabel('Datum odečtu', { exact: true }).fill('2026-10-23');
   await s.getByLabel('Čas odečtu (HH:MM)', { exact: true }).fill(time);
+  await s
+    .getByLabel('Datum kola', { exact: true })
+    .fill((await s.getByLabel('Datum odečtu', { exact: true }).inputValue()) || '2026-10-22');
+  await s.getByLabel('Čas kola', { exact: true }).fill('08:00');
   await s.getByLabel('Stav elektroměru [kWh]', { exact: true }).fill('100');
   await s.getByRole('button', { name: 'ULOŽIT DÍLČÍ ODEČET', exact: true }).click();
   await expect(s.locator('p[role=status]')).toContainText('uložen');
@@ -18,7 +22,11 @@ test('NN/VN presets, custom MTP, correction, TEĎ and normalized hour', async ({
   await page.getByRole('button', { name: 'JEDNOTLIVÝ ODEČET', exact: true }).click();
   const s = scope(page);
   await expect(s.getByLabel('Čas odečtu (HH:MM)', { exact: true })).toHaveValue('');
-  await s.getByRole('button', { name: 'TEĎ', exact: true }).click();
+  await s
+    .getByLabel('Čas odečtu (HH:MM)', { exact: true })
+    .locator('..')
+    .getByRole('button', { name: 'TEĎ', exact: true })
+    .click();
   await expect(s.getByLabel('Čas odečtu (HH:MM)', { exact: true })).toHaveValue('08:03');
   await s.getByLabel('Napětí', { exact: true }).selectOption('VN');
   await expect(s.getByLabel('TS / rozvodna', { exact: true }).locator('option')).toHaveText([
@@ -61,6 +69,7 @@ test('shared sticky date, explicit skip and next visit use the last saved readin
   await begin();
   const cards = s.locator('.series-meter');
   await s.getByLabel('Datum nového odečtu', { exact: true }).fill('2026-10-24');
+  await s.getByLabel('Čas kola', { exact: true }).fill('08:00');
   await expect(s.getByLabel('Nové datum', { exact: true })).toHaveCount(0);
   await cards.nth(1).getByRole('checkbox', { name: 'ODEČÍST', exact: true }).uncheck();
   await expect(cards.nth(1).getByLabel('Nový čas', { exact: true })).toBeDisabled();

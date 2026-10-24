@@ -4,7 +4,10 @@ import type { SeriesData } from '../src/series/model';
 
 it('uses earliest saved daily time, isolates series, survives skips and does not mutate data', () => {
   const data = {
-    batches: [],
+    batches: [
+      { id: 'one', location: 'TS', date: '2026-10-24' },
+      { id: 'other', location: 'TS', date: '2026-10-23' },
+    ],
     meters: [
       { id: 'a', batchId: 'one' },
       { id: 'b', batchId: 'one' },
@@ -19,7 +22,10 @@ it('uses earliest saved daily time, isolates series, survives skips and does not
     ],
   };
   const complete: SeriesData = {
-    batches: [],
+    batches: [
+      { id: 'one', location: 'TS', date: '2026-10-24' },
+      { id: 'other', location: 'TS', date: '2026-10-23' },
+    ],
     meters: data.meters.map((m) => ({
       ...m,
       location: 'TS',

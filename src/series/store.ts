@@ -1,3 +1,5 @@
+import { withRounds, validateRounds } from './rounds';
+import type { SeriesRound } from './model';
 import { openDB } from 'idb';
 import { DATABASE_NAME, DATABASE_VERSION } from '../data/schema';
 import {
@@ -7,6 +9,8 @@ import {
   nextReading,
   resolveMeter,
   validateSeries,
+  timestamp,
+  normalizeTime,
   type Entry,
   type SeriesData,
   type Reading,
@@ -20,6 +24,8 @@ export function upgradeSeries(db: {
   objectStoreNames: { contains(s: string): boolean };
   createObjectStore(s: string, options: { keyPath: string }): any;
 }) {
+  if (!db.objectStoreNames.contains('rounds'))
+    db.createObjectStore('rounds', { keyPath: 'roundId' });
   for (const name of ['series', 'meters', 'readings'])
     if (!db.objectStoreNames.contains(name)) {
       const s = db.createObjectStore(name, { keyPath: 'id' });
@@ -34,10 +40,11 @@ export function upgradeSeries(db: {
 }
 export function createSeriesStore(name = DATABASE_NAME) {
   const promise = openDB(name, DATABASE_VERSION, {
-    upgrade(db) {
+    upgrade(db, oldVersion, _newVersion, tx) {
       if (!db.objectStoreNames.contains('measurements'))
         db.createObjectStore('measurements', { keyPath: 'id' }).createIndex('by-time', 'savedAt');
       upgradeSeries(db);
+      if (oldVersion < 4) void migrateRounds(tx).catch(() => tx.abort());
     },
     blocking() {
       void promise.then((db) => db.close());
@@ -46,16 +53,20 @@ export function createSeriesStore(name = DATABASE_NAME) {
   return {
     async all(): Promise<SeriesData> {
       const db = await promise;
-      const tx = db.transaction(['series', 'meters', 'readings']);
-      const [batches, meters, readings] = await Promise.all(
-        ['series', 'meters', 'readings'].map((s) => tx.objectStore(s).getAll()),
+      const tx = db.transaction(['series', 'meters', 'readings', 'rounds']);
+      const [batches, meters, readings, rounds] = await Promise.all(
+        ['series', 'meters', 'readings', 'rounds'].map((s) => tx.objectStore(s).getAll()),
       );
       await tx.done;
-      return { batches, meters, readings };
+      return withRounds({ batches, meters, readings, rounds });
     },
-    async first(e: Entry, batchId?: string) {
+    async first(
+      e: Entry,
+      batchId?: string,
+      visit?: { roundDate: string; roundTime: string; roundId?: string },
+    ) {
       const db = await promise;
-      const tx = db.transaction(['series', 'meters', 'readings'], 'readwrite');
+      const tx = db.transaction(['series', 'meters', 'readings', 'rounds'], 'readwrite');
       try {
         const bySerial: Meter[] = await tx
           .objectStore('meters')
@@ -79,11 +90,37 @@ export function createSeriesStore(name = DATABASE_NAME) {
             .get([e.location.trim(), e.date]);
         if (!batch) batch = { id: crypto.randomUUID(), location: e.location.trim(), date: e.date };
         const { meter, reading } = firstReading(e, batch.id);
+        const storedRounds: SeriesRound[] = await tx.objectStore('rounds').getAll();
+        const initialRound = visit?.roundId
+          ? storedRounds.find((r) => r.roundId === visit.roundId && r.batchId === batch!.id)
+          : !visit
+            ? storedRounds
+                .filter((r) => r.batchId === batch!.id && !r.legacy)
+                .sort((a, b) =>
+                  (a.roundDate + a.roundTime).localeCompare(b.roundDate + b.roundTime),
+                )[0]
+            : undefined;
+        const round: SeriesRound = initialRound ?? {
+          roundId: crypto.randomUUID(),
+          batchId: batch.id,
+          roundDate: visit?.roundDate ?? e.date,
+          roundTime: normalizeTime(visit?.roundTime ?? e.time),
+          entries: [],
+        };
+        if (visit?.roundId && !initialRound) throw Error('Kolo série nenalezeno.');
+        if (visit && initialRound) {
+          round.roundDate = visit.roundDate;
+          round.roundTime = normalizeTime(visit.roundTime);
+        }
+        timestamp(round.roundDate, round.roundTime);
+        reading.roundId = round.roundId;
+        round.entries.push({ meterId: meter.id, readingId: reading.id });
+        await tx.objectStore('rounds').put(round);
         await tx.objectStore('series').put(batch);
         await tx.objectStore('meters').add(meter);
         await tx.objectStore('readings').add(reading);
         await tx.done;
-        return { meter, reading, batch };
+        return { meter, reading, batch, round };
       } catch (e) {
         try {
           tx.abort();
@@ -100,10 +137,31 @@ export function createSeriesStore(name = DATABASE_NAME) {
       await tx.store.put({ ...meter, active: true, trackingUpdatedAt: trackingStamp(meter) });
       await tx.done;
     },
-    async append(rows: { meter: Meter; previous: Reading; reading: Reading }[]) {
+    async append(
+      rows: { meter: Meter; previous: Reading; reading: Reading }[],
+      visits: SeriesRound[] = [],
+    ) {
       const db = await promise;
-      const tx = db.transaction(['meters', 'readings'], 'readwrite');
+      const tx = db.transaction(['series', 'meters', 'readings', 'rounds'], 'readwrite');
       try {
+        if (visits.length) {
+          const data = {
+            batches: await tx.objectStore('series').getAll(),
+            meters: await tx.objectStore('meters').getAll(),
+            readings: rows.map((r) => r.reading),
+            rounds: visits,
+          };
+          validateRounds(data);
+          const requested = visits.flatMap((v) =>
+            v.entries.flatMap((e) => (e.readingId ? [e.readingId] : [])),
+          );
+          if (
+            requested.length !== rows.length ||
+            rows.some((r) => !requested.includes(r.reading.id))
+          )
+            throw Error('Neúplné kolo.');
+          for (const v of visits) await tx.objectStore('rounds').add(v);
+        }
         for (const row of rows) {
           const stored: Meter = await tx.objectStore('meters').get(row.meter.id);
           const history: Reading[] = await tx
@@ -203,13 +261,14 @@ export function createSeriesStore(name = DATABASE_NAME) {
     async merge(data: SeriesData) {
       const incoming = validateSeries(data);
       const db = await promise;
-      const tx = db.transaction(['series', 'meters', 'readings'], 'readwrite');
+      const tx = db.transaction(['series', 'meters', 'readings', 'rounds'], 'readwrite');
       try {
         const existing = emptySeries();
         for (const [key, store] of [
           ['batches', 'series'],
           ['meters', 'meters'],
           ['readings', 'readings'],
+          ['rounds', 'rounds'],
         ] as const)
           (existing[key] as unknown[]) = await tx.objectStore(store).getAll();
         const additions = planSeriesMerge(existing, incoming);
@@ -217,8 +276,9 @@ export function createSeriesStore(name = DATABASE_NAME) {
           ['batches', 'series'],
           ['meters', 'meters'],
           ['readings', 'readings'],
+          ['rounds', 'rounds'],
         ] as const)
-          for (const r of additions[key]) await tx.objectStore(store).put(r);
+          for (const r of additions[key] ?? []) await tx.objectStore(store).put(r);
         await tx.done;
         return additions.batches.length + additions.meters.length + additions.readings.length;
       } catch (e) {
@@ -236,8 +296,34 @@ export function createSeriesStore(name = DATABASE_NAME) {
 }
 
 export function planSeriesMerge(existing: SeriesData, incoming: SeriesData): SeriesData {
-  const merged = structuredClone(existing),
-    additions = emptySeries();
+  const merged = withRounds(structuredClone(existing));
+  incoming = withRounds(structuredClone(incoming));
+  const additions = emptySeries();
+  additions.rounds = [];
+  // An older backup has no visit identity. Keep known explicit membership, and
+  // upgrade a legacy membership when a newer backup supplies the real round ID.
+  for (const reading of merged.readings) {
+    const next = incoming.readings.find((r) => r.id === reading.id);
+    if (!next) continue;
+    const oldRound = merged.rounds.find((r) => r.entries.some((e) => e.readingId === reading.id));
+    const newRound = incoming.rounds?.find((r) =>
+      r.entries.some((e) => e.readingId === reading.id),
+    );
+    if (!oldRound || !newRound || oldRound.roundId === newRound.roundId) continue;
+    if (!oldRound.legacy && !newRound.legacy) throw Error('Konflikt kola odečtu.');
+    if (!oldRound.legacy) {
+      newRound.entries = newRound.entries.filter((e) => e.readingId !== reading.id);
+      next.roundId = reading.roundId;
+    } else if (!newRound.legacy) {
+      oldRound.entries = oldRound.entries.filter((e) => e.readingId !== reading.id);
+      reading.roundId = next.roundId;
+      if (!additions.rounds.some((r) => r.roundId === oldRound.roundId))
+        additions.rounds.push(oldRound);
+      additions.readings.push(reading);
+    }
+  }
+  incoming.rounds = incoming.rounds?.filter((r) => !r.legacy || r.entries.length);
+
   const canonical = (v: unknown): string => {
     if (Array.isArray(v)) return '[' + v.map(canonical).join(',') + ']';
     if (v && typeof v === 'object')
@@ -261,6 +347,7 @@ export function planSeriesMerge(existing: SeriesData, incoming: SeriesData): Ser
           : key === 'readings'
             ? {
                 ...(v as Reading),
+                roundId: undefined,
                 energis: undefined,
                 import: undefined,
                 result: undefined,
@@ -276,6 +363,14 @@ export function planSeriesMerge(existing: SeriesData, incoming: SeriesData): Ser
         !(row as Meter).trackingUpdatedAt
       )
         throw Error('Konflikt UZLU stejného elektroměru. Nic nebylo přepsáno.');
+      if (
+        key === 'readings' &&
+        prev &&
+        (prev as Reading).roundId &&
+        (row as Reading).roundId &&
+        (prev as Reading).roundId !== (row as Reading).roundId
+      )
+        throw Error('Konflikt kola odečtu.');
       if (prev && canonical(comparable(prev)) !== canonical(comparable(row)))
         throw Error('Konflikt stejného ID série. Nic nebylo přepsáno.');
       if (key === 'readings' && prev) {
@@ -311,6 +406,36 @@ export function planSeriesMerge(existing: SeriesData, incoming: SeriesData): Ser
         (additions[key] as unknown[]).push(row);
       }
     }
+  for (const row of incoming.rounds ?? []) {
+    const prev = merged.rounds.find((r) => r.roundId === row.roundId);
+    if (prev && canonical(prev) !== canonical(row)) {
+      if (
+        prev.batchId !== row.batchId ||
+        prev.roundDate !== row.roundDate ||
+        prev.legacy !== row.legacy ||
+        (!prev.legacy && prev.roundTime !== row.roundTime)
+      )
+        throw Error('Konflikt stejného ID kola.');
+      const entries = [...prev.entries];
+      for (const entry of row.entries) {
+        const same = entries.find((e) =>
+          prev.legacy ? e.readingId === entry.readingId : e.meterId === entry.meterId,
+        );
+        if (same && canonical(same) !== canonical(entry)) throw Error('Konflikt vývodu kola.');
+        if (!same) entries.push(entry);
+      }
+      const updated = {
+        ...prev,
+        roundTime: prev.legacy ? [prev.roundTime, row.roundTime].sort()[0] : prev.roundTime,
+        entries,
+      };
+      Object.assign(prev, updated);
+      additions.rounds.push(updated);
+    } else if (!prev) {
+      merged.rounds.push(row);
+      additions.rounds.push(row);
+    }
+  }
   for (const m of merged.meters) {
     const last = latest(merged.readings, m.id);
     const incomingMeter = incoming.meters.find((x) => x.id === m.id);
@@ -330,4 +455,19 @@ export function planSeriesMerge(existing: SeriesData, incoming: SeriesData): Ser
   }
   validateSeries(merged);
   return additions;
+}
+
+// Runs inside the versionchange transaction: legacy readings retain their exact timestamps.
+export async function migrateRounds(tx: any) {
+  const [batches, meters, readings] = await Promise.all(
+    ['series', 'meters', 'readings'].map((s) => tx.objectStore(s).getAll()),
+  );
+  const data = withRounds({ batches, meters, readings });
+  for (const round of data.rounds) {
+    await tx.objectStore('rounds').put(round);
+    for (const entry of round.entries) {
+      const reading = readings.find((r: Reading) => r.id === entry.readingId);
+      if (reading) await tx.objectStore('readings').put({ ...reading, roundId: round.roundId });
+    }
+  }
 }
