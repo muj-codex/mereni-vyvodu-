@@ -1,11 +1,10 @@
+import { BackButton } from './BackButton';
 import { useMemo, useState } from 'react';
 import { createIntervalCheck, type IntervalCheckRecord } from '../core/intervalCheck';
 import { intervalLabel, intervalEndpoint, formatIntervalDateTime } from '../core/historyView';
 import { formatNumber } from '../core/numbers';
 import type { FormDraft } from '../core/types';
 import { toTSV, intervalSubject } from '../data/export';
-import { resetInterval } from '../core/measurement';
-import { Info } from './Info';
 import { Field } from './Fields';
 export function IntervalResult({
   record,
@@ -73,16 +72,14 @@ export function IntervalResult({
 export function Interval({
   draft,
   onChange,
-  onSave,
+  onBack,
   notify,
 }: {
   draft: FormDraft;
   onChange: (value: FormDraft['interval']) => void;
-  onSave: (record: IntervalCheckRecord) => Promise<void>;
+  onBack?: () => void;
   notify: (text: string) => void;
 }) {
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState('');
   const [fallback, setFallback] = useState('');
 
   const values = draft.interval;
@@ -99,21 +96,6 @@ export function Interval({
       return { result: undefined, validation: (e as Error).message };
     }
   }, [draft]);
-  async function save() {
-    if (!result || busy) return;
-    setBusy(true);
-    setError('');
-    try {
-      await onSave(result);
-      onChange(resetInterval(values));
-      setFallback('');
-      notify('Kontrola stavů uložena.');
-    } catch {
-      setError('Kontrola nebyla uložena. Formulář zůstává zachován. Zkuste uložení znovu.');
-    } finally {
-      setBusy(false);
-    }
-  }
   async function send() {
     if (!result) return;
     const text = toTSV([result]);
@@ -133,13 +115,14 @@ export function Interval({
     }
   }
   return (
-    <section className="card">
+    <section className="card" aria-label="Kontrola stavů">
+      {onBack && <BackButton onBack={onBack} />}
       <h3>Kontrola stavů · volitelné</h3>
       <p className="hint">
         Použijte přesně shodný interval v Energis. Stavy zadávejte v kWh. Registr musí být škálovaný
         na primární stranu podle MTP elektroměru.
       </p>
-      <fieldset className="field-grid interval-fields" disabled={busy}>
+      <fieldset className="field-grid interval-fields">
         {(['from', 'to'] as const).map((key) => (
           <div key={key} className="two-fields">
             {(['date', 'time'] as const).map((part) => (
@@ -159,7 +142,6 @@ export function Interval({
                       [key]:
                         part === 'date' ? `${e.target.value}T${time}` : `${date}T${e.target.value}`,
                     });
-                    setError('');
                     setFallback('');
                   }}
                 />
@@ -186,22 +168,16 @@ export function Interval({
           onChange={(energis) => onChange({ ...values, energis })}
         />
       </fieldset>
-      {(error || validation) && (
+      {validation && (
         <p className="notice warning" role="alert">
-          {error || validation}
+          {validation}
         </p>
       )}
-      <Info label="Uložit kontrolu stavů">
-        Uloží aktuální kontrolu do historie. Po úspěšném uložení zůstane identifikace a datumy,
-        pracovní hodnoty, výsledky a časy se vyčistí pro další měření.
-      </Info>
+      <p className="hint">Kontrola je součástí měření. Uloží se až s dokončeným měřením.</p>
       {result && (
         <>
           <IntervalResult record={result} />
           <div className="step-actions">
-            <button className="button primary" disabled={busy} onClick={() => void save()}>
-              ULOŽIT KONTROLU STAVŮ
-            </button>
             <button className="button secondary" onClick={() => void send()}>
               ODESLAT TUTO KONTROLU
             </button>
@@ -218,9 +194,7 @@ export function Interval({
             value={fallback}
             onFocus={(e) => e.target.select()}
           />
-          <button className="button secondary" onClick={() => setFallback('')}>
-            Zavřít TSV
-          </button>
+          <BackButton onBack={() => setFallback('')} />
         </section>
       )}
     </section>

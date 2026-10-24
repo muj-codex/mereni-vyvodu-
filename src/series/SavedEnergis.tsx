@@ -1,3 +1,4 @@
+import { BackButton } from '../ui/BackButton';
 import { useEffect, useRef, useState } from 'react';
 import { EnergisBoundary, EnergisHelp, type Boundary } from './EnergisBoundary';
 import { readingTimeOffset } from './energisDisplay';
@@ -17,26 +18,31 @@ export function usedEnergisBoundary(reading: Reading) {
 }
 export function SavedEnergis({
   reading,
+  draft,
   repo,
   onSaved,
   onDraft,
 }: {
   reading: Reading;
-  onDraft?: (id: string, dirty: boolean) => void;
+  draft?: { value: string; boundary: Boundary };
+  onDraft?: (id: string, dirty: boolean, draft?: { value: string; boundary: Boundary }) => void;
   repo: SeriesRepo;
   onSaved: () => Promise<void>;
 }) {
-  const [value, setValue] = useState(reading.energis === undefined ? '' : String(reading.energis));
+  const [value, setValue] = useState(
+    draft?.value ?? (reading.energis === undefined ? '' : String(reading.energis)),
+  );
   const [boundary, setBoundary] = useState<Boundary>(
-    reading.boundary ?? reading.import?.boundary ?? 'previous',
+    draft?.boundary ?? reading.boundary ?? reading.import?.boundary ?? 'previous',
   );
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('');
+  const [editing, setEditing] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
   useEffect(() => {
-    setValue(reading.energis === undefined ? '' : String(reading.energis));
-    setBoundary(reading.boundary ?? reading.import?.boundary ?? 'previous');
+    setValue(draft?.value ?? (reading.energis === undefined ? '' : String(reading.energis)));
+    setBoundary(draft?.boundary ?? reading.boundary ?? reading.import?.boundary ?? 'previous');
   }, [reading.id, reading.energis, reading.boundary, reading.energisUpdatedAt]);
-  useEffect(() => () => onDraft?.(reading.id, false), [reading.id]);
   if (!reading.previousId) return null;
   const preview = { ...reading, boundary, import: reading.import };
   return (
@@ -44,59 +50,70 @@ export function SavedEnergis({
       className="saved-energis"
       aria-label={`Energis intervalu ${reading.date} ${reading.time}`}
     >
-      <label className="series-field">
-        <span>SUMA ENERGIS [kWh]</span>
-        <input
-          aria-label="SUMA ENERGIS [kWh]"
-          inputMode="decimal"
-          value={value}
-          onChange={(e) => {
-            setValue(e.target.value);
-            onDraft?.(reading.id, true);
+      {editing && !collapsed && <BackButton onBack={() => setCollapsed(true)} disabled={busy} />}
+      {collapsed && (
+        <button className="button secondary" onClick={() => setCollapsed(false)}>
+          Upravit SUMA ENERGIS
+        </button>
+      )}
+      <div hidden={collapsed}>
+        <label className="series-field">
+          <span>SUMA ENERGIS [kWh]</span>
+          <input
+            aria-label="SUMA ENERGIS [kWh]"
+            inputMode="decimal"
+            value={value}
+            onChange={(e) => {
+              setValue(e.target.value);
+              setEditing(true);
+              onDraft?.(reading.id, true, { value: e.target.value, boundary });
+            }}
+          />
+        </label>
+        <EnergisBoundary
+          value={boundary}
+          onChange={(next) => {
+            setBoundary(next);
+            setEditing(true);
+            onDraft?.(reading.id, true, { value, boundary: next });
           }}
         />
-      </label>
-      <EnergisBoundary
-        value={boundary}
-        onChange={(next) => {
-          setBoundary(next);
-          onDraft?.(reading.id, true);
-        }}
-      />
-      <p>
-        {readingTimeOffset(preview.import, reading.date, reading.time, boundary)} · Použit Energis
-        do {usedEnergisBoundary(preview)}.
-      </p>
-      <button
-        className="button secondary"
-        disabled={busy}
-        onClick={async () => {
-          setBusy(true);
-          setMessage('');
-          try {
-            await repo.updateEnergis([
-              {
-                reading,
-                energis: value,
-                boundary,
-                import:
-                  value === String(reading.energis) && reading.import
-                    ? { ...reading.import, boundary }
-                    : undefined,
-              },
-            ]);
-            await onSaved();
-            onDraft?.(reading.id, false);
-            setMessage('Energis uložen.');
-          } catch (e) {
-            setMessage((e as Error).message);
-          } finally {
-            setBusy(false);
-          }
-        }}
-      >
-        ULOŽIT SUMA ENERGIS
-      </button>
+        <p>
+          {readingTimeOffset(preview.import, reading.date, reading.time, boundary)} · Použit Energis
+          do {usedEnergisBoundary(preview)}.
+        </p>
+        <button
+          className="button secondary"
+          disabled={busy}
+          onClick={async () => {
+            setBusy(true);
+            setMessage('');
+            try {
+              await repo.updateEnergis([
+                {
+                  reading,
+                  energis: value,
+                  boundary,
+                  import:
+                    value === String(reading.energis) && reading.import
+                      ? { ...reading.import, boundary }
+                      : undefined,
+                },
+              ]);
+              await onSaved();
+              onDraft?.(reading.id, false);
+              setEditing(false);
+              setMessage('Energis uložen.');
+            } catch (e) {
+              setMessage((e as Error).message);
+            } finally {
+              setBusy(false);
+            }
+          }}
+        >
+          ULOŽIT SUMA ENERGIS
+        </button>
+      </div>
       {message && <p role="status">{message}</p>}
     </section>
   );
@@ -161,7 +178,12 @@ export function SavedEnergisImport({
           }
         }}
       />
-      {message && <p role="status">{message}</p>}
+      {message && (
+        <>
+          <p role="status">{message}</p>
+          <BackButton onBack={() => setMessage('')} disabled={busy} />
+        </>
+      )}
     </section>
   );
 }

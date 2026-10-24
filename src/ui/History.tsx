@@ -1,3 +1,4 @@
+import { BackButton } from './BackButton';
 import { readingSummary } from '../series/grouping';
 import { resultRows } from './resultsView';
 import { Series } from '../series/Series';
@@ -48,6 +49,15 @@ export function History({
   const [batchDetail, setBatchDetail] = useState('');
   const [meterDetail, setMeterDetail] = useState('');
   const [browseSeries, setBrowseSeries] = useState(false);
+  const retainedReading = useRef<{ key: string; detail: string; batch: string } | null>(null);
+  const readingActive = !!(meterDetail || batchDetail || browseSeries);
+  if (readingActive)
+    retainedReading.current = {
+      key: meterDetail || batchDetail || 'history',
+      detail: meterDetail,
+      batch: batchDetail,
+    };
+
   const [series, setSeries] = useState(emptySeries);
   const seriesRepo = useMemo(() => createSeriesStore(), []);
   useEffect(() => {
@@ -124,30 +134,24 @@ export function History({
   }
   return (
     <>
-      {meterDetail || batchDetail || browseSeries ? (
-        <>
-          <button
-            className="text-button"
-            onClick={() => {
+      {retainedReading.current && (
+        <div hidden={!readingActive}>
+          <Series
+            key={retainedReading.current.key}
+            historyOnly
+            initialDetail={retainedReading.current.detail}
+            initialBatch={retainedReading.current.batch}
+            onBack={() => {
               setMeterDetail('');
               setBatchDetail('');
               setBrowseSeries(false);
             }}
-          >
-            Zpět na výsledky měření
-          </button>
-          <Series
-            key={meterDetail || batchDetail || 'history'}
-            historyOnly
-            initialDetail={meterDetail}
-            initialBatch={batchDetail}
           />
-        </>
-      ) : opened ? (
+        </div>
+      )}
+      {readingActive ? null : opened ? (
         <>
-          <button className="text-button" onClick={() => setOpened(null)}>
-            <Icon name="back" /> Zpět na výsledky měření
-          </button>
+          <BackButton onBack={() => setOpened(null)} />
           <div className="page-heading">
             <span className="eyebrow">ULOŽENÉ MĚŘENÍ</span>
             <h1>
@@ -532,9 +536,7 @@ export function History({
                 Otevřít e-mailovou aplikaci
               </a>
             )}
-            <button className="button secondary" onClick={() => setFallback(null)}>
-              Zavřít
-            </button>
+            <BackButton onBack={() => setFallback(null)} />
           </section>
         </div>
       )}

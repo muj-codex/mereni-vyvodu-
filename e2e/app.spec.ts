@@ -6,6 +6,8 @@ async function noOverflow(page: Page) {
 }
 async function enterMeasurement(page: Page, serial = '0012345678', energis = '9,17') {
   await page.getByLabel('VÝROBNÍ ČÍSLO ELEKTROMĚRU', { exact: true }).fill(serial);
+  const check = page.getByRole('checkbox', { name: 'Porovnat stavy s Energis', exact: false });
+  if (await check.isChecked()) await check.uncheck();
   await page.getByRole('button', { name: 'MĚŘENÍ KYORITSU' }).click();
   if (await page.getByLabel('Typ zadaného napětí U1–U3').count())
     await page.getByLabel('Typ zadaného napětí U1–U3').selectOption('line-line');
@@ -93,7 +95,7 @@ test('sériové měření, historie, výběr, export a bezpečné mazání', asy
   await noOverflow(page);
   await page.getByRole('button', { name: 'Data / detail' }).click();
   await expect(page.getByText('9,17 kW', { exact: true })).toBeVisible();
-  await page.getByRole('button', { name: 'Zpět na výsledky měření' }).click();
+  await page.getByRole('button', { name: '← Zpět' }).click();
   await page.getByRole('button', { name: 'SDÍLET', exact: true }).click();
   await page.getByLabel('Vybrat všechna', { exact: true }).check();
   await expect(page.getByText('Vybráno: 2')).toBeVisible();
@@ -103,7 +105,7 @@ test('sériové měření, historie, výběr, export a bezpečné mazání', asy
   expect(text.split('\n')).toHaveLength(2);
   expect(text).toContain('\t');
   expect(text).not.toMatch(/shoda|varianta|prověřit|scénář/i);
-  await page.getByRole('button', { name: 'Zavřít', exact: true }).click();
+  await page.getByRole('button', { name: '← Zpět', exact: true }).click();
   await page.getByRole('button', { name: 'KOPÍROVAT PRO EXCEL' }).click();
   // Clipboard can be restricted by the host; either successful toast or selectable fallback is valid.
   await expect(
@@ -111,8 +113,8 @@ test('sériové měření, historie, výběr, export a bezpečné mazání', asy
       .getByText('TSV zkopírováno pro Excel.')
       .or(page.getByRole('heading', { name: 'Data pro Excel' })),
   ).toBeVisible();
-  if (await page.getByRole('button', { name: 'Zavřít', exact: true }).isVisible())
-    await page.getByRole('button', { name: 'Zavřít', exact: true }).click();
+  if (await page.getByRole('button', { name: '← Zpět', exact: true }).isVisible())
+    await page.getByRole('button', { name: '← Zpět', exact: true }).click();
   await page.getByRole('button', { name: 'Smazat celou historii', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Trvale smazat' })).toBeDisabled();
   await page.getByLabel('Pro potvrzení napište SMAZAT').fill('SMAZAT');
@@ -165,9 +167,9 @@ test('volitelný interval bez pulzů, MTP a nezávislá historie při rozpracova
   ).toBeVisible();
   await expect(page.getByText(/Odhad váhy|Nejbližší smysluplná/)).toHaveCount(0);
   await noOverflow(page);
-  await page.getByRole('button', { name: 'Použít kontrolu stavů a pokračovat' }).click();
+  await page.getByRole('button', { name: 'POUŽÍT KONTROLU STAVŮ A POKRAČOVAT' }).click();
   await expect(page.getByRole('heading', { name: 'Napětí a proudy' })).toBeVisible();
-  await page.getByRole('button', { name: 'Zpět', exact: true }).click();
+  await page.getByRole('button', { name: '← Zpět', exact: true }).click();
   // Existing helper explicitly skips the interval; skipping must clear it from the saved record.
   await enterMeasurement(page, '00042');
   await page.getByRole('button', { name: 'ULOŽIT MĚŘENÍ', exact: true }).click();

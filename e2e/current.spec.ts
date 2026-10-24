@@ -64,7 +64,7 @@ test('NN 400 V: identifikace bez pulzů, vlastní MTP, uložení, tabs, share a 
   const detail = await page.locator('main').innerText();
   expect(detail).toContain('Skutečný sekundár');
   expect(detail).not.toBe(inspection);
-  await page.getByRole('button', { name: 'Zpět na výsledky měření' }).click();
+  await page.getByRole('button', { name: '← Zpět' }).click();
   const download = page.waitForEvent('download');
   await page.getByRole('button', { name: 'ZÁLOHOVAT DATA' }).click();
   expect((await download).suggestedFilename()).toBe('mereni-zaloha.json');
@@ -97,7 +97,7 @@ test('NN 400 V: identifikace bez pulzů, vlastní MTP, uložení, tabs, share a 
   const url = new URL(href!);
   expect(url.searchParams.get('body')).toBe(body);
   expect([...url.searchParams.keys()]).toEqual(['subject', 'body']);
-  await page.getByRole('button', { name: 'Zavřít', exact: true }).click();
+  await page.getByRole('button', { name: '← Zpět', exact: true }).click();
   // Observe the actual button's navigation URL before the browser delegates mailto to an OS handler.
   await page.evaluate(() => {
     (window as any).mailNavigation = '';

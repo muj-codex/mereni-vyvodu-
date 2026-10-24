@@ -1,3 +1,4 @@
+import { BackButton } from './BackButton';
 import { SaveInfo } from './Info';
 import { resetCurrentDraft, locations } from '../core/current';
 import { useEffect, useState } from 'react';
@@ -134,7 +135,9 @@ export function CurrentMeasurement({
   onSave,
   notify,
   shared,
+  onBack,
 }: {
+  onBack?: () => void;
   shared?: { serial: string; identification: Identification; actualMtp?: number };
   onSave: (r: CurrentRecord) => Promise<void>;
   notify: (s: string) => void;
@@ -234,6 +237,7 @@ export function CurrentMeasurement({
   }
   return (
     <>
+      {(result || onBack) && <BackButton onBack={() => (result ? setResult(null) : onBack?.())} />}
       <h1>Proudová diagnostika NN / VN</h1>
       {shared ? (
         <>

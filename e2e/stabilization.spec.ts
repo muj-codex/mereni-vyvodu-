@@ -1,3 +1,4 @@
+import { seedLegacyIntervalFromDraft } from './legacyInterval';
 import { test, expect, type Page } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
 import { createServer } from 'node:http';
@@ -72,7 +73,7 @@ test('kontrola → Kyoritsu → výsledek → historie → reload zachová spole
   await page.goto('/');
   await base(page);
   await page
-    .getByRole('button', { name: 'Použít kontrolu stavů a pokračovat', exact: true })
+    .getByRole('button', { name: 'POUŽÍT KONTROLU STAVŮ A POKRAČOVAT', exact: true })
     .click();
   await expect(page.getByLabel('Přenesená kontrola stavů')).toContainText('22.10.2026 14:45');
   await expect(page.getByLabel('Přenesená kontrola stavů')).toContainText('16:45');
@@ -90,9 +91,11 @@ test('kontrola → Kyoritsu → výsledek → historie → reload zachová spole
   await comparisons(page);
   expect(await snapshot(page)).toEqual(before);
 });
-test('MĚŘENÍ KYORITSU nepřipojí vyplněnou kontrolu stavů', async ({ page }) => {
+test('výslovné vypnutí kontroly ji nepřipojí k měření Kyoritsu', async ({ page }) => {
   await page.goto('/');
   await base(page);
+  await expect(page.getByRole('button', { name: 'MĚŘENÍ KYORITSU', exact: true })).toHaveCount(0);
+  await page.getByRole('checkbox', { name: 'Porovnat stavy s Energis' }).uncheck();
   await page.getByRole('button', { name: 'MĚŘENÍ KYORITSU', exact: true }).click();
   await expect(page.getByLabel('Přenesená kontrola stavů')).toHaveCount(0);
   await power(page);
@@ -106,11 +109,11 @@ test('JSON záloha → čistá DB → kompletní historie → opakovaný import 
 }) => {
   await page.goto('/');
   await base(page, '000CHECK');
-  await page.getByRole('button', { name: 'ULOŽIT KONTROLU STAVŮ', exact: true }).click();
+  await seedLegacyIntervalFromDraft(page);
   await expect(page.getByLabel('Čas OD', { exact: true })).toHaveValue('');
   await base(page, '000LINKED');
   await page
-    .getByRole('button', { name: 'Použít kontrolu stavů a pokračovat', exact: true })
+    .getByRole('button', { name: 'POUŽÍT KONTROLU STAVŮ A POKRAČOVAT', exact: true })
     .click();
   await power(page);
   await page.getByRole('button', { name: 'ULOŽIT MĚŘENÍ', exact: true }).click();
@@ -177,7 +180,7 @@ test('iOS souborová záloha používá systémové sdílení a neplatný import
 }) => {
   await page.goto('/');
   await base(page);
-  await page.getByRole('button', { name: 'ULOŽIT KONTROLU STAVŮ', exact: true }).click();
+  await seedLegacyIntervalFromDraft(page);
   await history(page);
   const before = await snapshot(page);
   await page.evaluate(() => {
@@ -322,7 +325,7 @@ test('skutečný update service worker/cache zachová stejnou instalaci a Indexe
     await expect(comparison).toContainText('Elektroměr ↔ Energis');
     await expect(comparison).toContainText('Kyoritsu ↔ Energis');
     await expect(comparison).not.toContainText('Elektroměr ↔ Kyoritsu');
-    await page.getByRole('button', { name: 'Zpět na výsledky měření' }).click();
+    await page.getByRole('button', { name: '← Zpět' }).click();
     const manifest = await page.evaluate(async () =>
       (await fetch('./manifest.webmanifest')).json(),
     );

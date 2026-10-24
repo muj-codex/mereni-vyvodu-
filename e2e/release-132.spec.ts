@@ -85,7 +85,8 @@ test('one series, all active outlets, sticky common date, optional Energis and s
   await expect(card(page, '234').getByText(/Použit Energis do 2026-10-24 08:45/)).toBeVisible();
   await expect(card(page, '123').locator('.saved-energis')).toContainText('-7 min E');
   await expect(card(page, '234').locator('.saved-energis')).toContainText('+8 min E');
-  await page.getByRole('button', { name: 'Zpět na výsledky měření', exact: true }).click();
+  await page.getByRole('button', { name: '← Zpět', exact: true }).first().click();
+  await page.getByRole('button', { name: '← Zpět', exact: true }).first().click();
   await expect(page.locator('.record-open')).toHaveCount(1);
   await expect(page.locator('.record-open')).toContainText('24.10.2026 08:37');
   await page.locator('.record-open').click();
@@ -113,7 +114,7 @@ test('one series, all active outlets, sticky common date, optional Energis and s
   await expect(
     roundCard(page, '234').getByRole('checkbox', { name: 'ODEČÍST', exact: true }),
   ).toBeChecked();
-  await scope(page).getByRole('button', { name: 'Zpět do historie', exact: true }).click();
+  await scope(page).getByRole('button', { name: '← Zpět', exact: true }).click();
   await scope(page).getByRole('button', { name: 'Historie EM 234', exact: true }).click();
   await expect(scope(page).getByText('2026-10-23 17:33 – 1800 kWh', { exact: true })).toBeVisible();
   await expect(scope(page).getByText('2026-10-24 08:37 – 1820 kWh', { exact: true })).toBeVisible();

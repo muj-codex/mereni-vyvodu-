@@ -1,3 +1,4 @@
+import { finishPower } from './measurement';
 import { test, expect, type Page } from '@playwright/test';
 const carryLabel = 'Použít tuto identifikaci i pro následující měření';
 async function setup(page: Page, vn = false) {
@@ -36,42 +37,29 @@ async function failWrites(page: Page) {
 async function history(page: Page) {
   await page.getByRole('button', { name: 'Výsledky měření', exact: false }).last().click();
 }
-test('uložení kontroly zachová hlavičku/datumy, vyčistí časy a pokračuje s čistou 3f hlavičkou', async ({
+test('kontrola zůstane rozepsaná do dokončení měření, uloží se pouze společný výsledek', async ({
   page,
 }) => {
   await setup(page);
-  await expect(page.getByRole('checkbox', { name: carryLabel, exact: true })).toBeChecked();
-  await page.getByRole('button', { name: 'Informace: přenos identifikace', exact: true }).click();
-  await expect(page.getByRole('note')).toContainText('Nepřenáší naměřené hodnoty');
-  await page.getByRole('button', { name: 'Informace: přenos identifikace', exact: true }).click();
-  await page.getByRole('button', { name: 'ULOŽIT KONTROLU STAVŮ', exact: true }).click();
-  for (const label of [
-    'Čas OD',
-    'Čas DO',
-    'Stav elektroměru OD',
-    'Stav elektroměru DO',
-    'Spotřeba Energis za interval',
-  ])
-    await expect(page.getByLabel(label, { exact: true })).toHaveValue('');
-  await expect(page.getByLabel('Datum OD', { exact: true })).toHaveValue('2026-10-22');
-  await expect(page.getByLabel('Datum DO', { exact: true })).toHaveValue('2026-10-25');
-  await expect(page.getByLabel('DATUM', { exact: true })).toHaveValue('2026-10-22');
-  await expect(page.locator('.interval-result')).toHaveCount(0);
-  await expect(page.getByLabel('MTP elektroměr', { exact: true })).toHaveValue('600');
+  await expect(
+    page.getByRole('button', { name: 'ULOŽIT KONTROLU STAVŮ', exact: true }),
+  ).toHaveCount(0);
+  await page
+    .getByRole('button', { name: 'POUŽÍT KONTROLU STAVŮ A POKRAČOVAT', exact: true })
+    .click();
+  await expect(page.getByLabel('Přenesená kontrola stavů')).toContainText('09:45');
+  await finishPower(page);
+  await page.getByRole('button', { name: 'ULOŽIT MĚŘENÍ', exact: true }).click();
   await expect(page.getByLabel('VÝROBNÍ ČÍSLO ELEKTROMĚRU', { exact: true })).toHaveValue(
     '66666777',
   );
-  await page.reload();
+  await page.getByRole('checkbox', { name: 'Porovnat stavy s Energis' }).check();
   await expect(page.getByLabel('Čas OD', { exact: true })).toHaveValue('');
+  await expect(page.getByLabel('Datum OD', { exact: true })).toHaveValue('2026-10-22');
   await expect(page.getByLabel('Datum DO', { exact: true })).toHaveValue('2026-10-25');
-  await page.getByRole('button', { name: 'MĚŘENÍ KYORITSU' }).click();
-  await expect(page.locator('.identification-summary')).toContainText('66666777');
-  await expect(page.locator('.identification-summary')).toContainText('TS 3308/250');
-  await expect(page.locator('.identification-summary')).toContainText('NN 500 V – ARON');
-  await expect(page.getByLabel('U1', { exact: true })).toHaveValue('');
-  await expect(page.getByLabel('IL1', { exact: true })).toHaveValue('');
   await history(page);
   await expect(page.locator('.history-item')).toHaveCount(1);
+  await expect(page.locator('.record-open')).toHaveAttribute('data-type', '3f měření');
   await page.locator('.record-open').click();
   await page.getByRole('button', { name: 'Data / detail', exact: true }).click();
   await expect(page.locator('main')).toContainText('22.10.2026 09:45');
@@ -114,6 +102,7 @@ test('OFF nepřenese hlavičku ani konfiguraci do 1f a umožní vlastní identif
 test('OFF nepřenese hlavičku ani MTP do 3f', async ({ page }) => {
   await setup(page);
   await page.getByRole('checkbox', { name: carryLabel, exact: true }).uncheck();
+  await page.getByRole('checkbox', { name: 'Porovnat stavy s Energis' }).uncheck();
   await page.getByRole('button', { name: 'MĚŘENÍ KYORITSU' }).click();
   await expect(page.getByLabel('VÝROBNÍ ČÍSLO ELEKTROMĚRU', { exact: true })).toHaveValue('');
   await expect(page.getByLabel('POLE / UMÍSTĚNÍ', { exact: true })).toHaveValue('');
@@ -134,22 +123,26 @@ test('obrácený interval odmítne uložení, datum i čas jsou nezávisle edito
   await page.getByLabel('Datum DO', { exact: true }).fill('2026-10-25');
   await expect(
     page.getByRole('button', { name: 'ULOŽIT KONTROLU STAVŮ', exact: true }),
-  ).toBeVisible();
+  ).toHaveCount(0);
+  await page
+    .getByRole('button', { name: 'POUŽÍT KONTROLU STAVŮ A POKRAČOVAT', exact: true })
+    .click();
+  await expect(page.getByRole('heading', { name: 'Napětí a proudy', exact: true })).toBeVisible();
 });
-test('chyba zápisu kontroly nesmaže vstupy; opakování uloží a vyčistí až po úspěchu', async ({
+test('chyba uložení společného měření zachová kontrolu i Kyoritsu pro úspěšné opakování', async ({
   page,
 }) => {
   await setup(page);
+  await page
+    .getByRole('button', { name: 'POUŽÍT KONTROLU STAVŮ A POKRAČOVAT', exact: true })
+    .click();
+  await finishPower(page);
   await failWrites(page);
-  await page.getByRole('button', { name: 'ULOŽIT KONTROLU STAVŮ', exact: true }).click();
+  await page.getByRole('button', { name: 'ULOŽIT MĚŘENÍ', exact: true }).click();
   await expect(page.getByRole('alert')).toContainText('Formulář zůstává zachován');
-  await expect(page.getByLabel('Čas OD', { exact: true })).toHaveValue('09:45');
-  await expect(page.getByLabel('Čas DO', { exact: true })).toHaveValue('11:15');
-  await expect(page.getByLabel('Stav elektroměru OD', { exact: true })).toHaveValue('100');
-  await expect(page.getByLabel('Spotřeba Energis za interval', { exact: true })).toHaveValue('10');
+  await expect(page.getByLabel('Porovnání', { exact: true })).toContainText('Elektroměr');
   await page.evaluate(() => (window as any).restoreTransactions());
-  await page.getByRole('button', { name: 'ULOŽIT KONTROLU STAVŮ', exact: true }).click();
-  await expect(page.getByLabel('Čas OD', { exact: true })).toHaveValue('');
+  await page.getByRole('button', { name: 'ULOŽIT MĚŘENÍ', exact: true }).click();
   await history(page);
   await expect(page.locator('.history-item')).toHaveCount(1);
 });

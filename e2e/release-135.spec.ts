@@ -60,8 +60,8 @@ test('two series plus one standalone are separate in both overviews; search and 
     await s.getByRole('button', { name: new RegExp(`Odečtová série · ${location}`) }).click();
     await s.getByRole('button', { name: `Historie EM ${serial}`, exact: true }).click();
     await expect(s.getByRole('heading', { name: `UZEL 2120${serial}`, exact: true })).toBeVisible();
-    await s.getByRole('button', { name: 'Zpět na sérii', exact: true }).click();
-    await s.getByRole('button', { name: 'Všechny série', exact: true }).click();
+    await s.getByRole('button', { name: '← Zpět', exact: true }).click();
+    await s.getByRole('button', { name: '← Zpět', exact: true }).click();
   }
 });
 test('reading just one of three keeps the series, shared history and all active outlets for the next round', async ({
@@ -87,7 +87,7 @@ test('reading just one of three keeps the series, shared history and all active 
     await expect(
       s.getByRole('heading', { name: '2026-10-24 11:19 – 100 kWh', exact: true }),
     ).toBeVisible();
-    await s.getByRole('button', { name: 'Zpět na sérii', exact: true }).click();
+    await s.getByRole('button', { name: '← Zpět', exact: true }).click();
   }
   await s.getByRole('button', { name: 'POKRAČOVAT DALŠÍM ODEČTEM', exact: true }).click();
   for (const serial of ['1', '2', '3'])
@@ -137,7 +137,8 @@ test('a standalone can join a series using the same meter and reading IDs; backu
   await expect(s.locator('p[role=status]').first()).toContainText('přidán');
   await s.getByRole('button', { name: 'Historie EM 777', exact: true }).click();
   await expect(s.getByRole('heading', { level: 3 })).toHaveCount(1);
-  await page.getByRole('button', { name: 'Zpět na výsledky měření', exact: true }).click();
+  await page.getByRole('button', { name: '← Zpět', exact: true }).first().click();
+  await page.getByRole('button', { name: '← Zpět', exact: true }).first().click();
   await expect(page.locator('.record-open')).toHaveCount(1);
   await expect(
     page.getByRole('region', { name: 'SAMOSTATNÉ ODEČTY', exact: true }).locator('.record-open'),

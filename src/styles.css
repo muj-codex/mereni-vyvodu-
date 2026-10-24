@@ -1381,3 +1381,9 @@ fieldset:disabled {
   font-size: 1.05rem;
   letter-spacing: 0.03em;
 }
+
+.local-back {
+  display: block;
+  margin-block: 0.5rem 1rem;
+  min-height: 44px;
+}

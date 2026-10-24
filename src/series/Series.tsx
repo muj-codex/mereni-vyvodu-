@@ -1,3 +1,4 @@
+import { BackButton } from '../ui/BackButton';
 import { EnergisBoundary, type Boundary } from './EnergisBoundary';
 import { SavedEnergis, SavedEnergisImport, usedEnergisBoundary } from './SavedEnergis';
 import { seriesGroups, standaloneMeters, readingSummary } from './grouping';
@@ -86,7 +87,9 @@ export function Series({
   initialDetail = '',
   initialBatch = '',
   onModeChange,
+  onBack,
 }: {
+  onBack?: () => void;
   initial?: Mode;
   historyOnly?: boolean;
   initialDetail?: string;
@@ -109,6 +112,13 @@ export function Series({
   const [attachId, setAttachId] = useState('');
   const [selected, setSelected] = useState<string[]>([]);
   const [roundIds, setRoundIds] = useState<string[]>([]);
+  const [pausedRoundIds, setPausedRoundIds] = useState<string[]>([]);
+  const roundReturn = useRef<{
+    mode: Mode;
+    detail: string;
+    batch: string;
+    viewRoundId: string;
+  } | null>(null);
   const [round, setRound] = useState<Record<string, Round>>({});
   const [roundDate, setRoundDate] = useState('');
   const [roundTime, setRoundTime] = useState('');
@@ -122,8 +132,16 @@ export function Series({
     ? data.readings.filter((r) => viewRound.entries.some((e) => e.readingId === r.id))
     : data.readings;
   const [dirtyEnergis, setDirtyEnergis] = useState<Record<string, boolean>>({});
-  const markEnergisDraft = (id: string, dirty: boolean) =>
+  const energisDrafts = useRef<Record<string, { value: string; boundary: Boundary }>>({});
+  const markEnergisDraft = (
+    id: string,
+    dirty: boolean,
+    draft?: { value: string; boundary: Boundary },
+  ) => {
+    if (dirty && draft) energisDrafts.current[id] = draft;
+    if (!dirty) delete energisDrafts.current[id];
     setDirtyEnergis((current) => ({ ...current, [id]: dirty }));
+  };
   const [detail, setDetail] = useState(initialDetail);
   const file = useRef<HTMLInputElement>(null);
   const instanceId = useRef(crypto.randomUUID());
@@ -199,6 +217,19 @@ export function Series({
   const chosen = data.meters.filter((m) => selected.includes(m.id));
   const roundMeters = data.meters.filter((m) => roundIds.includes(m.id));
   const begin = (meters: Meter[], preset?: Entry) => {
+    if (
+      !preset &&
+      pausedRoundIds.length &&
+      meters.length === pausedRoundIds.length &&
+      meters.every((m) => pausedRoundIds.includes(m.id))
+    ) {
+      setRoundIds(pausedRoundIds);
+      setPausedRoundIds([]);
+      setDetail('');
+      return;
+    }
+    roundReturn.current = { mode, detail, batch, viewRoundId };
+    setPausedRoundIds([]);
     const date = preset?.date || roundDate;
     setRoundDate(date);
     setRoundTime('');
@@ -278,6 +309,8 @@ export function Series({
     });
     await repo.append(valid, visits);
     await reload();
+    setPausedRoundIds([]);
+    roundReturn.current = null;
     setRoundIds([]);
     setMode('history');
     setViewRoundId(visits.find((v) => v.batchId === batch)?.roundId ?? '');
@@ -307,8 +340,54 @@ export function Series({
       </p>
     );
   };
+  const goBack = () => {
+    if (roundIds.length) {
+      setPausedRoundIds(roundIds);
+      setRoundIds([]);
+      const previous = roundReturn.current;
+      if (previous) {
+        setMode(previous.mode);
+        setDetail(previous.detail);
+        setBatch(previous.batch);
+        setViewRoundId(previous.viewRoundId);
+      } else setMode('history');
+    } else if (detail) {
+      if (initialDetail && !batch && onBack) onBack();
+      else setDetail('');
+    } else if (viewRoundId) setViewRoundId('');
+    else if (mode === 'stylus' && preview) setPreview(false);
+    else if (batch) {
+      if (initialBatch && onBack) onBack();
+      else {
+        setBatch('');
+        setSelected([]);
+      }
+    } else if (onBack) onBack();
+    else {
+      const next = initial === 'history' ? 'series' : initial;
+      setMode(next);
+      onModeChange?.(next);
+    }
+  };
   return (
     <section className="series-workflow" aria-label="Odečtové série">
+      {(roundIds.length > 0 ||
+        detail ||
+        viewRoundId ||
+        mode === 'history' ||
+        (mode === 'stylus' && preview)) && <BackButton onBack={goBack} disabled={busy} />}
+      {!roundIds.length && pausedRoundIds.length > 0 && (
+        <button
+          className="button secondary"
+          onClick={() => {
+            setRoundIds(pausedRoundIds);
+            setPausedRoundIds([]);
+            setDetail('');
+          }}
+        >
+          Pokračovat v rozepsaném kole
+        </button>
+      )}
       {!historyOnly && (
         <div className="segmented">
           {(['single', 'series', 'stylus', 'history'] as Mode[]).map((v, i) => (
@@ -530,15 +609,6 @@ export function Series({
               }}
             />
           </section>
-          <button
-            className="button secondary"
-            onClick={() => {
-              setRoundIds([]);
-              setMode('history');
-            }}
-          >
-            Zpět do historie
-          </button>
         </>
       ) : detail ? (
         <>
@@ -564,6 +634,7 @@ export function Series({
                       {renderResult(r)}
                       <SavedEnergis
                         reading={r}
+                        draft={energisDrafts.current[r.id]}
                         repo={repo}
                         onSaved={saved}
                         onDraft={markEnergisDraft}
@@ -593,11 +664,6 @@ export function Series({
                     ZNOVU AKTIVOVAT SLEDOVÁNÍ
                   </button>
                 )}
-                <button className="button secondary" onClick={() => setDetail('')}>
-                  {data.batches.some((b) => b.id === m.batchId && b.kind !== 'standalone')
-                    ? 'Zpět na sérii'
-                    : 'Zpět na odečty'}
-                </button>
               </article>
             );
           })()}
@@ -631,17 +697,7 @@ export function Series({
                   </button>
                 ))}
             </section>
-          ) : (
-            <button
-              className="text-button"
-              onClick={() => {
-                setBatch('');
-                setSelected([]);
-              }}
-            >
-              Všechny série
-            </button>
-          )}
+          ) : null}
           {batch ? (
             <nav className="series-dates" aria-label="Odečtová kola">
               <button type="button" aria-pressed={!viewRound} onClick={() => setViewRoundId('')}>
@@ -739,6 +795,7 @@ export function Series({
                           {renderResult(r)}
                           <SavedEnergis
                             reading={r}
+                            draft={energisDrafts.current[r.id]}
                             repo={repo}
                             onSaved={saved}
                             onDraft={markEnergisDraft}

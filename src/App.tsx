@@ -1,3 +1,4 @@
+import { BackButton } from './ui/BackButton';
 import { Series } from './series/Series';
 import { Comparisons, StateCheckSummary } from './ui/Comparisons';
 import { Info, SaveInfo } from './ui/Info';
@@ -42,6 +43,18 @@ function restoreDraft(): FormDraft {
 }
 export default function App() {
   const [mainSection, setMainSection] = useState('measurement');
+  const [stateCheckOpen, setStateCheckOpen] = useState(true);
+  const powerWorking = useRef<FormDraft | null>(null);
+  const powerWorkingBase = useRef('');
+  const baseIdentity = (d: FormDraft) =>
+    JSON.stringify([
+      d.serial,
+      d.identification,
+      d.config,
+      d.carryIdentification,
+      d.intervalEnabled,
+      d.interval,
+    ]);
   const [readingMode, setReadingMode] = useState<'single' | 'series' | 'stylus'>('series');
   const [mode, setMode] = useState<'power' | 'current'>('power');
   const [draft, setDraft] = useState<FormDraft>(restoreDraft),
@@ -172,9 +185,29 @@ export default function App() {
     }
     if (step === 0 && next === 1) {
       baseDraft.current = structuredClone(draft);
-      change(startKyoritsu(draft, useStateCheck));
+      const nextDraft = startKyoritsu(draft, useStateCheck);
+      const previous = powerWorking.current;
+      change(
+        previous &&
+          powerWorkingBase.current === baseIdentity(draft) &&
+          !!previous.stateCheck === useStateCheck
+          ? structuredClone(previous)
+          : previous &&
+              previous.serial === nextDraft.serial &&
+              JSON.stringify(previous.config) === JSON.stringify(nextDraft.config)
+            ? {
+                ...nextDraft,
+                phases: previous.phases,
+                kyoritsu: previous.kyoritsu,
+                energis: previous.energis,
+              }
+            : nextDraft,
+      );
     }
     if (next === 0 && baseDraft.current) {
+      powerWorking.current = structuredClone(draft);
+      powerWorkingBase.current = baseIdentity(baseDraft.current);
+      setStateCheckOpen(true);
       change({
         ...baseDraft.current,
         phases: draft.phases,
@@ -196,6 +229,8 @@ export default function App() {
         : nextDraft;
       setDraft(ready);
       baseDraft.current = null;
+      powerWorking.current = null;
+      powerWorkingBase.current = '';
       setStep(0);
       setError('');
       notify(`Měření ${record.input.serial} uloženo. Připraveno pro další měření.`);
@@ -325,6 +360,7 @@ export default function App() {
             </div>
             {mode === 'current' ? (
               <CurrentMeasurement
+                onBack={() => setMode('power')}
                 notify={notify}
                 shared={
                   draft.carryIdentification === false
@@ -474,23 +510,27 @@ export default function App() {
                         <input
                           type="checkbox"
                           checked={draft.intervalEnabled}
-                          onChange={(e) => change({ ...draft, intervalEnabled: e.target.checked })}
+                          onChange={(e) => {
+                            setStateCheckOpen(true);
+                            change({ ...draft, intervalEnabled: e.target.checked });
+                          }}
                         />
                       </label>
-                      {draft.intervalEnabled && (
+                      {draft.intervalEnabled && stateCheckOpen && (
                         <Interval
                           draft={draft}
                           onChange={(interval) => change({ ...draft, interval })}
-                          onSave={async (record) => {
-                            await repo.add(record);
-                            setRecords((r) => [record, ...r]);
-                            void navigator.storage
-                              ?.persist?.()
-                              .then(setStoragePersistent)
-                              .catch(() => setStoragePersistent(false));
-                          }}
+                          onBack={() => setStateCheckOpen(false)}
                           notify={notify}
                         />
+                      )}
+                      {draft.intervalEnabled && !stateCheckOpen && (
+                        <button
+                          className="button secondary"
+                          onClick={() => setStateCheckOpen(true)}
+                        >
+                          Otevřít kontrolu stavů
+                        </button>
                       )}
                       {draft.config.voltage > 500 ? (
                         <p className="notice">
@@ -498,9 +538,11 @@ export default function App() {
                         </p>
                       ) : (
                         <div className="step-actions">
-                          <button className="button primary" onClick={() => navigate(1)}>
-                            MĚŘENÍ KYORITSU <Icon name="arrow" />
-                          </button>
+                          {!draft.intervalEnabled && (
+                            <button className="button primary" onClick={() => navigate(1)}>
+                              MĚŘENÍ KYORITSU <Icon name="arrow" />
+                            </button>
+                          )}
                           {draft.intervalEnabled && (
                             <button
                               className="button secondary"
@@ -520,7 +562,7 @@ export default function App() {
                                 }
                               }}
                             >
-                              Použít kontrolu stavů a pokračovat
+                              POUŽÍT KONTROLU STAVŮ A POKRAČOVAT
                             </button>
                           )}
                         </div>
@@ -636,9 +678,7 @@ export default function App() {
                       <button className="button primary" onClick={() => navigate(2)}>
                         POKRAČOVAT NA PF A VÝKONY <Icon name="arrow" />
                       </button>
-                      <button className="button secondary" onClick={() => navigate(0)}>
-                        Zpět
-                      </button>
+                      <BackButton onBack={() => navigate(0)} />
                     </div>
                   </>
                 )}
@@ -708,9 +748,7 @@ export default function App() {
                       <button className="button primary" onClick={() => navigate(3)}>
                         VYHODNOTIT MĚŘENÍ <Icon name="arrow" />
                       </button>
-                      <button className="button secondary" onClick={() => navigate(1)}>
-                        Zpět
-                      </button>
+                      <BackButton onBack={() => navigate(1)} />
                     </div>
                   </>
                 )}
@@ -750,12 +788,7 @@ export default function App() {
                         {busy ? 'UKLÁDÁM…' : 'ULOŽIT MĚŘENÍ'}
                       </button>
                       <SaveInfo />
-                      <button
-                        className="text-button centered"
-                        onClick={() => navigate(step === 3 ? 2 : step - 1)}
-                      >
-                        Zpět {step === 3 ? 'k hodnotám' : ''}
-                      </button>
+                      <BackButton onBack={() => navigate(step === 3 ? 2 : step - 1)} />
                     </div>
                   </>
                 )}
@@ -843,9 +876,7 @@ export default function App() {
             >
               Požádat o trvalé úložiště
             </button>
-            <button className="button primary" onClick={() => setHelp(false)}>
-              Rozumím
-            </button>
+            <BackButton onBack={() => setHelp(false)} />
           </section>
         </div>
       )}

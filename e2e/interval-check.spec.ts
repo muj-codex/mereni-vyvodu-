@@ -1,3 +1,4 @@
+import { seedLegacyIntervalFromDraft } from './legacyInterval';
 import { test, expect, type Page } from '@playwright/test';
 async function check(
   page: Page,
@@ -25,7 +26,7 @@ async function check(
   await page.getByLabel('Spotřeba Energis za interval', { exact: true }).fill(energy);
 }
 async function save(page: Page) {
-  await page.getByRole('button', { name: 'ULOŽIT KONTROLU STAVŮ', exact: true }).click();
+  await seedLegacyIntervalFromDraft(page);
   await expect(page.getByLabel('Čas OD', { exact: true })).toHaveValue('');
   await expect(page.locator('.interval-result')).toHaveCount(0);
 }
@@ -44,9 +45,7 @@ async function threeRecords(page: Page) {
   }
   await history(page);
 }
-test('samostatná kontrola: korekce, uložení bez Kyoritsu a tři různé záložky snapshotu', async ({
-  page,
-}) => {
+test('kontrola: korekce a archivovaný samostatný snapshot ve třech záložkách', async ({ page }) => {
   await page.goto('/');
   await check(page);
   await expect(page.getByLabel('Korekční koeficient', { exact: true })).toHaveText('× 0,500');
