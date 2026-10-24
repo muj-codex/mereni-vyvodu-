@@ -80,3 +80,13 @@ Mobilní profily jsou emulace v Chromiu, nikoli fyzické iPadOS/Safari. Apple Pe
 - Pozdější ruční doplnění SUMA nevytváří odečet, nemění stav, datum/čas, sledování ani vazby A → B → C. Historie EM nadále obsahuje kompletní řetězec.
 - Testy času 08:37 ověřují -E → 08:30 → -7 min E a +E → 08:45 → +8 min E, uložení volby k intervalu a její zachování v JSON záloze.
 - Backup/restore ověřuje obnovu starší i nové zálohy do prázdné i existující DB, opakovaný import bez duplicit a zachování novější úpravy Energisu při následném importu staré zálohy. Pokus o editaci zastaralého snapshotu je odmítnut.
+
+## Ověření 1.3.3 – kompaktní termíny série (24. 10. 2026)
+
+- `npm test`: všech 279 testů v 16 souborech prošlo.
+- `npm run test:e2e`: všech 108 scénářů prošlo na profilech iPhone 13 / iPad (gen 7), proti aktuálnímu produkčnímu buildu.
+- `npm run build`: TypeScript, produkční Vite build i PWA/service worker prošly. Všech 8 souborů offline precache existuje; výsledný UI bundle obsahuje verzi 1.3.3. Offline scénáře prošly na obou profilech.
+- Nový E2E scénář vytvoří sérii dvou elektroměrů, uloží dvě kola s rozdílnými individuálními časy, obnoví stránku a otevře detail. Ověřuje nepřítomnost vyhledávání a přesný text `23.10.2026 17:33; 26.10.2026 08:36`.
+- Unit test přehledu ověřuje chronologii, nejčasnější skutečný čas dne, izolaci série, přeskočené vývody, nezávislost na pořadí záznamů a zachování vstupních dat.
+- Všech 27 existujících souborů v `src/core`, `src/data` a podpůrné logice `src/series` (mimo UI komponentu `Series.tsx`) je bajtově shodných s produkční 1.3.2, commit `7e700bb3419c54987b79aff2de2a540d2554ac40`. UI komponenta mění pouze zobrazení vyhledávání/termínů. Matematické a datové regresní testy zůstaly zachovány; očekávaná verze v testu zálohy je aktualizována na 1.3.3.
+- Model nemá identifikátor ani timestamp kola. Přehled proto deterministicky používá nejčasnější uložený odečet za každý den série; více kol ve stejný den nelze spolehlivě rozlišit. Nevzniká nový timestamp, schéma ani zápis dat při otevření detailu.

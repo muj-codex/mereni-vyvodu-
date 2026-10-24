@@ -220,3 +220,7 @@ ExcelJS se načítá odděleně a PWA jej zahrnuje do offline precache.
 - Starší série se zobrazují podle existujícího `batchId`. Samotná shoda TS/R neslučuje odlišná ID; záznamy bez doložené vazby se neseskupují odhadem.
 - IndexedDB zůstává ve verzi 3, bez resetu nebo změny object stores. JSON záloha zachovává série, historie, SUMA, import, volbu hranice, sledování a revizi pozdější úpravy Energisu. Starší záloha nevrací nově doplněný Energis zpět.
 - Matematické jádro, MTP korekce a parsery Energisu/STYLUS jsou proti 1.3.1 nezměněné.
+
+## Verze 1.3.3 – časový přehled série (24. 10. 2026)
+
+V detailu série nahrazuje vyhledávací pole kompaktní chronologický seznam uložených termínů. Globální hledání zůstává zachováno. Model nemá identifikátor ani timestamp kola: přehled používá nejčasnější skutečný odečet každého dne série. Více kol ve stejný den nelze z uložených dat spolehlivě odlišit a zobrazí se jedním termínem. Výpočty, data a pokračování série zůstávají beze změny.

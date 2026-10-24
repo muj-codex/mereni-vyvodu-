@@ -1322,3 +1322,9 @@ fieldset:disabled {
 .saved-energis-import {
   margin-block: 16px;
 }
+
+.series-dates {
+  font-size: 14px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}

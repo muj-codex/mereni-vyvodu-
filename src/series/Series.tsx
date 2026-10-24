@@ -1,6 +1,7 @@
 import { EnergisBoundary, type Boundary } from './EnergisBoundary';
 import { SavedEnergis, SavedEnergisImport, usedEnergisBoundary } from './SavedEnergis';
 import { seriesGroups } from './grouping';
+import { seriesDates } from './seriesDates';
 import { readingTimeOffset } from './energisDisplay';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { locations } from '../core/current';
@@ -600,11 +601,15 @@ export function Series({
               Všechny série
             </button>
           )}
-          <Input
-            label="Vyhledat UZEL / pole / číslo elektroměru"
-            value={search}
-            onChange={setSearch}
-          />
+          {batch ? (
+            <p className="series-dates">{seriesDates(data, batch)}</p>
+          ) : (
+            <Input
+              label="Vyhledat UZEL / pole / číslo elektroměru"
+              value={search}
+              onChange={setSearch}
+            />
+          )}
           <div className="step-actions">
             <button
               className="button secondary"
