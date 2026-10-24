@@ -1371,3 +1371,13 @@ fieldset:disabled {
   min-height: 44px;
   padding: 6px;
 }
+
+.reading-history-section {
+  margin-block: 1rem 2rem;
+  padding-block-start: 0.75rem;
+  border-top: 2px solid var(--border);
+}
+.reading-history-section h2 {
+  font-size: 1.05rem;
+  letter-spacing: 0.03em;
+}

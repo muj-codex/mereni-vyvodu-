@@ -234,3 +234,11 @@ V detailu série nahrazuje vyhledávací pole kompaktní chronologický seznam u
 - IndexedDB přechází z verze 3 na 4 přidáním store `rounds`, bez resetu. U starých dat není možné spolehlivě rekonstruovat návštěvy téhož dne: označený kompatibilní denní přehled zachová všechny skutečné odečty, jejich časy, vazby a výsledky. Nová kola se ukládají explicitně.
 - JSON záloha verze 3 zahrnuje kola, jejich časy, vazby a přeskočení. Obnova přijímá také verze 1 a 2; starší záloha nepřepíše známé nové vazby kol ani novější SUMA ENERGIS.
 - Výpočetní jádro, MTP, 1f/3f, ARON, VN, Kyoritsu, U/I/PF, Kontrola stavů, tolerance, diagnostika a matematika/parsery Energisu zůstávají nezměněné. Energis i historie elektroměru nadále používají skutečné individuální datum a čas odečtu.
+
+## Verze 1.3.5 – série a samostatné odečty (24. 10. 2026)
+
+- Výsledky i Historie odečtů mají oddělené sekce **ODEČTOVÉ SÉRIE** a **SAMOSTATNÉ ODEČTY**. Členové série se zobrazují v její kartě a detailu, bez dalších hlavních karet. Samostatný elektroměr má vlastní položku; oba přehledy používají stejné pravidlo členství a přesný souhrn počtů.
+- Nový JEDNOTLIVÝ ODEČET ukládá výslovný druh `standalone` do svého existujícího datového kontextu. Neslučuje se se sérií ani jiným samostatným elektroměrem podle shodného TS/R a data. Existující vazby `batchId` z 1.3.4 nadále znamenají členství v sérii; původní způsob založení u nich neodhadujeme. Záznamy bez platné vazby na sérii zůstávají jednotlivě dostupné.
+- Vyhledávání nadále prochází TS/R, pole, EM, UZEL i historii. Výsledek člena série otevře sérii; jeho kompletní A → B → C je dostupné přes Historie EM. Ruční SUMA, import, +E/-E, volba ODEČÍST a dlouhodobé sledování zůstávají zachované.
+- V detailu série lze přidat existující samostatný elektroměr. Mění se pouze členství stejného `meterId`; skutečné odečty se nekopírují ani nepřepisují. Historická kola zachovávají původní kontext. Revize členství při obnově zálohy brání vrácení elektroměru do původního samostatného přehledu starší zálohou. Odebrání ze série tato verze nepřidává.
+- IndexedDB zůstává ve verzi 4 a JSON backup ve verzi 3, bez další migrace nebo resetu. Matematické jádro, Energis a +E/-E, skutečné časy odečtů i datum/čas kol zůstávají nezměněné.

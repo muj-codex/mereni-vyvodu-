@@ -20,8 +20,13 @@ async function first(page: Page, serial = '12345678', node = '21208142') {
   await s.getByRole('button', { name: 'ULOŽIT DÍLČÍ ODEČET', exact: true }).click();
   await expect(s.getByRole('status')).toContainText('uložen');
 }
-async function history(page: Page) {
+async function history(page: Page, open = true) {
   await scope(page).getByRole('button', { name: 'Historie odečtů', exact: true }).click();
+  if (open)
+    await scope(page)
+      .getByRole('button', { name: /Odečtová série · TS/ })
+      .first()
+      .click();
 }
 async function select(page: Page, serial = '12345678') {
   await scope(page)
@@ -61,7 +66,7 @@ test('první kolo: zachová TS a datum, vyčistí pracovní pole a seskupí hist
   ])
     await expect(s.getByLabel(name, { exact: true })).toHaveValue('');
   await first(page, '222', '21208020');
-  await history(page);
+  await history(page, false);
   await expect(s.getByRole('button', { name: /Odečtová série · TS/ })).toHaveCount(1);
   await expect(s.getByRole('button', { name: /Odečtová série · TS/ })).toContainText(
     '2 elektroměrů',
@@ -185,6 +190,7 @@ test('JSON záloha obnoví série v čisté DB a podruhé nevytvoří duplicity'
   await clean.getByRole('button', { name: /Historie odečtů · výběr/ }).click();
   const s = scope(clean);
   await expect(s.getByRole('button', { name: /Odečtová série · TS/ })).toHaveCount(1);
+  await s.getByRole('button', { name: /Odečtová série · TS/ }).click();
   await s.getByRole('button', { name: 'Historie EM 12345678', exact: true }).click();
   await expect(s.getByText('2026-10-29 09:12 – 24110 kWh', { exact: true })).toBeVisible();
   await context.close();
@@ -231,6 +237,7 @@ test('70 elektroměrů, výběr 48 a společná stránka pouze pro vybrané', as
   await history(page);
   const s = scope(page);
   await expect(s.getByRole('checkbox')).toHaveCount(70);
+  await s.getByRole('button', { name: 'Zrušit výběr', exact: true }).click();
   for (let i = 0; i < 48; i++)
     await s.getByRole('checkbox', { name: `Vybrat EM EM${i}`, exact: true }).check();
   await expect(s.getByText('Vybráno 48 z 70', { exact: true })).toBeVisible();

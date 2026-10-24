@@ -1,3 +1,4 @@
+import { readingSummary } from '../series/grouping';
 import { resultRows } from './resultsView';
 import { Series } from '../series/Series';
 import { createSeriesStore } from '../series/store';
@@ -64,6 +65,11 @@ export function History({
     };
   }, [seriesRepo]);
   const visible = resultRows(records, series, search);
+  const groups = [
+    { label: 'ODEČTOVÉ SÉRIE', rows: visible.filter((r) => r.batchId) },
+    { label: 'SAMOSTATNÉ ODEČTY', rows: visible.filter((r) => r.meterId) },
+    { label: 'MĚŘENÍ', rows: visible.filter((r) => r.record) },
+  ];
   const chosen = records.filter((r) => selected.includes(r.id));
   async function copy(text: string, kind: 'tsv' | 'email') {
     try {
@@ -208,6 +214,7 @@ export function History({
             <span className="eyebrow">LOKÁLNÍ HISTORIE</span>
             <h1>Výsledky měření</h1>
             <p>{records.length} uložených měření · pouze v tomto zařízení</p>
+            <p>{readingSummary(series)}</p>
           </div>
           <label className="field">
             <span>Hledat ve všech výsledcích a odečtech</span>
@@ -312,63 +319,74 @@ export function History({
           ) : (
             <div className="history-list">
               {visible.length === 0 && <p>Žádné záznamy neodpovídají filtrům.</p>}
-              {visible.map((row) => (
-                <article
-                  key={row.id}
-                  className={`history-item compact-result ${selected.includes(row.id) ? 'selected' : ''}`}
-                >
-                  {selecting && row.record && (
-                    <label className="record-checkbox">
-                      <input
-                        aria-label={`Vybrat měření ${row.record.input.serial}`}
-                        type="checkbox"
-                        checked={selected.includes(row.id)}
-                        onChange={(e) =>
-                          setSelected((ids) =>
-                            e.target.checked ? [...ids, row.id] : ids.filter((id) => id !== row.id),
-                          )
+              {groups.map(({ label, rows }) => (
+                <section key={label} aria-label={label} className="reading-history-section">
+                  <h2>{label}</h2>
+                  {rows.length === 0 && <p>Žádné položky.</p>}
+                  {rows.map((row) => (
+                    <article
+                      key={row.id}
+                      className={`history-item compact-result ${selected.includes(row.id) ? 'selected' : ''}`}
+                    >
+                      {selecting && row.record && (
+                        <label className="record-checkbox">
+                          <input
+                            aria-label={`Vybrat měření ${row.record.input.serial}`}
+                            type="checkbox"
+                            checked={selected.includes(row.id)}
+                            onChange={(e) =>
+                              setSelected((ids) =>
+                                e.target.checked
+                                  ? [...ids, row.id]
+                                  : ids.filter((id) => id !== row.id),
+                              )
+                            }
+                          />
+                        </label>
+                      )}
+                      <button
+                        className="record-open"
+                        data-serial={row.record?.input.serial}
+                        data-type={
+                          row.record
+                            ? isIntervalCheck(row.record)
+                              ? 'Kontrola stavů'
+                              : isCurrent(row.record)
+                                ? '1f měření'
+                                : '3f měření'
+                            : 'odečet'
                         }
-                      />
-                    </label>
-                  )}
-                  <button
-                    className="record-open"
-                    data-serial={row.record?.input.serial}
-                    data-type={
-                      row.record
-                        ? isIntervalCheck(row.record)
-                          ? 'Kontrola stavů'
-                          : isCurrent(row.record)
-                            ? '1f měření'
-                            : '3f měření'
-                        : 'odečet'
-                    }
-                    aria-label={`${row.search}`}
-                    onClick={() => {
-                      if (row.record) {
-                        setOpened(row.record);
-                        setSection('result');
-                      } else if (row.batchId) setBatchDetail(row.batchId);
-                      else setMeterDetail(row.meterId!);
-                    }}
-                  >
-                    {row.batchId ? (
-                      <>
-                        <span>{formatIntervalDateTime(row.at)}</span>
-                        <span>{row.location}</span>
-                        <span>série {row.meterCount} vývodů</span>
-                      </>
-                    ) : (
-                      <>
-                        <span>{row.node || 'UZEL neuveden'}</span>
-                        <span>{formatIntervalDateTime(row.at)}</span>
-                        <span>
-                          {row.location} · {row.placement}
-                        </span>
-                      </>
-                    )}
-                  </button>
-                </article>
+                        aria-label={`${row.search}`}
+                        onClick={() => {
+                          if (row.record) {
+                            setOpened(row.record);
+                            setSection('result');
+                          } else if (row.batchId) setBatchDetail(row.batchId);
+                          else setMeterDetail(row.meterId!);
+                        }}
+                      >
+                        {row.batchId ? (
+                          <>
+                            <span>{formatIntervalDateTime(row.at)}</span>
+                            <span>{row.location}</span>
+                            <span>série {row.meterCount} vývodů</span>
+                          </>
+                        ) : (
+                          <>
+                            <span>{row.node || 'UZEL neuveden'}</span>
+                            <span>{formatIntervalDateTime(row.at)}</span>
+                            <span>
+                              {row.location} · {row.placement}
+                              {row.meterId && (
+                                <> · EM {series.meters.find((m) => m.id === row.meterId)?.serial}</>
+                              )}
+                            </span>
+                          </>
+                        )}
+                      </button>
+                    </article>
+                  ))}
+                </section>
               ))}
             </div>
           )}

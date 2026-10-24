@@ -1,3 +1,4 @@
+import { standaloneMeters } from './grouping';
 import { withRounds, validateRounds } from './rounds';
 import type { SeriesRound } from './model';
 import { openDB } from 'idb';
@@ -64,6 +65,7 @@ export function createSeriesStore(name = DATABASE_NAME) {
       e: Entry,
       batchId?: string,
       visit?: { roundDate: string; roundTime: string; roundId?: string },
+      kind: 'series' | 'standalone' = 'series',
     ) {
       const db = await promise;
       const tx = db.transaction(['series', 'meters', 'readings', 'rounds'], 'readwrite');
@@ -81,14 +83,24 @@ export function createSeriesStore(name = DATABASE_NAME) {
         let batch: SeriesData['batches'][number] | undefined = batchId
           ? await tx.objectStore('series').get(batchId)
           : undefined;
+        if (kind === 'standalone') batch = undefined;
+        if (batch && batch.kind === 'standalone') throw Error('Vyberte odečtovou sérii.');
         if (batch && batch.location !== e.location.trim())
           throw Error('Série patří k jinému TS/R.');
-        if (!batch)
-          batch = await tx
+        if (!batch && kind === 'series') {
+          const matches: SeriesData['batches'] = await tx
             .objectStore('series')
             .index('by-location-date')
-            .get([e.location.trim(), e.date]);
-        if (!batch) batch = { id: crypto.randomUUID(), location: e.location.trim(), date: e.date };
+            .getAll([e.location.trim(), e.date]);
+          batch = matches.find((b) => b.kind !== 'standalone');
+        }
+        if (!batch)
+          batch = {
+            id: crypto.randomUUID(),
+            location: e.location.trim(),
+            date: e.date,
+            ...(kind === 'standalone' ? { kind } : {}),
+          };
         const { meter, reading } = firstReading(e, batch.id);
         const storedRounds: SeriesRound[] = await tx.objectStore('rounds').getAll();
         const initialRound = visit?.roundId
@@ -129,6 +141,45 @@ export function createSeriesStore(name = DATABASE_NAME) {
         throw e;
       }
     },
+    async attachToSeries(meterId: string, batchId: string) {
+      const db = await promise;
+      const tx = db.transaction(['series', 'meters', 'readings', 'rounds'], 'readwrite');
+      try {
+        const batches = await tx.objectStore('series').getAll();
+        const meters = await tx.objectStore('meters').getAll();
+        const meter: Meter | undefined = meters.find((m: Meter) => m.id === meterId);
+        if (
+          !meter ||
+          !standaloneMeters({ batches, meters, readings: [] }).some((m) => m.id === meterId)
+        )
+          throw Error('Elektroměr už patří do série.');
+        if (!batches.some((b) => b.id === batchId && b.kind !== 'standalone'))
+          throw Error('Série nenalezena.');
+        const snapshot = withRounds({
+          batches,
+          meters,
+          readings: await tx.objectStore('readings').getAll(),
+          rounds: await tx.objectStore('rounds').getAll(),
+        });
+        for (const round of snapshot.rounds) await tx.objectStore('rounds').put(round);
+        await tx
+          .objectStore('meters')
+          .put({
+            ...meter,
+            batchId,
+            membershipUpdatedAt: new Date(
+              Math.max(Date.now(), (Date.parse(meter.membershipUpdatedAt || '') || 0) + 1),
+            ).toISOString(),
+          });
+        await tx.done;
+      } catch (e) {
+        try {
+          tx.abort();
+        } catch {}
+        await tx.done.catch(() => {});
+        throw e;
+      }
+    },
     async reactivate(id: string) {
       const db = await promise;
       const tx = db.transaction('meters', 'readwrite');
@@ -152,6 +203,14 @@ export function createSeriesStore(name = DATABASE_NAME) {
             rounds: visits,
           };
           validateRounds(data);
+          if (
+            visits.some((v) =>
+              v.entries.some(
+                (e) => !data.meters.some((m) => m.id === e.meterId && m.batchId === v.batchId),
+              ),
+            )
+          )
+            throw Error('Vývod nepatří do této série.');
           const requested = visits.flatMap((v) =>
             v.entries.flatMap((e) => (e.readingId ? [e.readingId] : [])),
           );
@@ -343,7 +402,14 @@ export function planSeriesMerge(existing: SeriesData, incoming: SeriesData): Ser
       const prev = merged[key].find((r) => r.id === row.id);
       const comparable = (v: unknown) =>
         key === 'meters'
-          ? { ...(v as Meter), active: undefined, trackingUpdatedAt: undefined, node: undefined }
+          ? {
+              ...(v as Meter),
+              active: undefined,
+              trackingUpdatedAt: undefined,
+              node: undefined,
+              batchId: undefined,
+              membershipUpdatedAt: undefined,
+            }
           : key === 'readings'
             ? {
                 ...(v as Reading),
@@ -371,6 +437,14 @@ export function planSeriesMerge(existing: SeriesData, incoming: SeriesData): Ser
         (prev as Reading).roundId !== (row as Reading).roundId
       )
         throw Error('Konflikt kola odečtu.');
+      if (
+        key === 'meters' &&
+        prev &&
+        (prev as Meter).batchId !== (row as Meter).batchId &&
+        !(prev as Meter).membershipUpdatedAt &&
+        !(row as Meter).membershipUpdatedAt
+      )
+        throw Error('Konflikt členství elektroměru.');
       if (prev && canonical(comparable(prev)) !== canonical(comparable(row)))
         throw Error('Konflikt stejného ID série. Nic nebylo přepsáno.');
       if (key === 'readings' && prev) {
@@ -443,8 +517,22 @@ export function planSeriesMerge(existing: SeriesData, incoming: SeriesData): Ser
       incomingMeter?.trackingUpdatedAt &&
       (!m.trackingUpdatedAt || incomingMeter.trackingUpdatedAt > m.trackingUpdatedAt)
     ) {
-      Object.assign(m, incomingMeter);
+      m.active = incomingMeter.active;
+      m.node = incomingMeter.node;
+      m.trackingUpdatedAt = incomingMeter.trackingUpdatedAt;
       additions.meters.push(m);
+    }
+    if (incomingMeter?.membershipUpdatedAt) {
+      if (
+        m.membershipUpdatedAt === incomingMeter.membershipUpdatedAt &&
+        m.batchId !== incomingMeter.batchId
+      )
+        throw Error('Konflikt revize členství.');
+      if (!m.membershipUpdatedAt || incomingMeter.membershipUpdatedAt > m.membershipUpdatedAt) {
+        m.batchId = incomingMeter.batchId;
+        m.membershipUpdatedAt = incomingMeter.membershipUpdatedAt;
+        additions.meters.push(m);
+      }
     }
     if (last && !m.trackingUpdatedAt && m.active !== last.active) {
       m.active = last.active;

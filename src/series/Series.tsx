@@ -1,6 +1,6 @@
 import { EnergisBoundary, type Boundary } from './EnergisBoundary';
 import { SavedEnergis, SavedEnergisImport, usedEnergisBoundary } from './SavedEnergis';
-import { seriesGroups } from './grouping';
+import { seriesGroups, standaloneMeters, readingSummary } from './grouping';
 import { roundsFor, roundLabel } from './rounds';
 import type { SeriesRound } from './model';
 import { readingTimeOffset } from './energisDisplay';
@@ -106,6 +106,7 @@ export function Series({
   const [preview, setPreview] = useState(false);
   const [batch, setBatch] = useState(initialBatch);
   const [search, setSearch] = useState('');
+  const [attachId, setAttachId] = useState('');
   const [selected, setSelected] = useState<string[]>([]);
   const [roundIds, setRoundIds] = useState<string[]>([]);
   const [round, setRound] = useState<Record<string, Round>>({});
@@ -187,7 +188,8 @@ export function Series({
       setBusy(false);
     }
   };
-  const visible = data.meters.filter(
+  const singles = standaloneMeters(data);
+  const visible = (batch ? data.meters : singles).filter(
     (m) =>
       (!batch || m.batchId === batch) &&
       [m.serial, m.node, m.placement, m.location].some((v) =>
@@ -329,7 +331,11 @@ export function Series({
         {roundIds.length
           ? 'Pokračovat dalším odečtem'
           : mode === 'history'
-            ? 'Odečtové série'
+            ? detail
+              ? 'Historie elektroměru'
+              : data.batches.some((b) => b.id === batch && b.kind === 'standalone')
+                ? 'Samostatný odečet'
+                : 'Odečtové série'
             : mode === 'stylus'
               ? 'STYLUS'
               : mode === 'single'
@@ -588,7 +594,9 @@ export function Series({
                   </button>
                 )}
                 <button className="button secondary" onClick={() => setDetail('')}>
-                  Zpět na sérii
+                  {data.batches.some((b) => b.id === m.batchId && b.kind !== 'standalone')
+                    ? 'Zpět na sérii'
+                    : 'Zpět na odečty'}
                 </button>
               </article>
             );
@@ -597,23 +605,32 @@ export function Series({
       ) : mode === 'history' ? (
         <>
           {!batch ? (
-            <div>
-              {seriesGroups(data).map(({ batch: b, at }) => (
-                <button
-                  className="card series-batch"
-                  key={b.id}
-                  onClick={() => {
-                    openBatch(b.id);
-                  }}
-                >
-                  <strong>Odečtová série · {b.location}</strong>
-                  <span>
-                    {at.replace('T', ' ')} · {data.meters.filter((m) => m.batchId === b.id).length}{' '}
-                    elektroměrů
-                  </span>
-                </button>
-              ))}
-            </div>
+            <section aria-label="ODEČTOVÉ SÉRIE">
+              <h2>ODEČTOVÉ SÉRIE</h2>
+              <p>{readingSummary(data)}</p>
+              {seriesGroups(data)
+                .filter(({ batch: b, meters }) =>
+                  [
+                    b.location,
+                    ...meters.flatMap((m) => [m.serial, m.node, m.placement, m.location]),
+                  ].some((v) => v.toLowerCase().includes(search.toLowerCase())),
+                )
+                .map(({ batch: b, at }) => (
+                  <button
+                    className="card series-batch"
+                    key={b.id}
+                    onClick={() => {
+                      openBatch(b.id);
+                    }}
+                  >
+                    <strong>Odečtová série · {b.location}</strong>
+                    <span>
+                      {at.replace('T', ' ')} ·{' '}
+                      {data.meters.filter((m) => m.batchId === b.id).length} elektroměrů
+                    </span>
+                  </button>
+                ))}
+            </section>
           ) : (
             <button
               className="text-button"
@@ -654,142 +671,183 @@ export function Series({
               spolehlivě rozlišit.
             </p>
           )}
-          <div className="step-actions">
-            <button
-              className="button secondary"
-              onClick={() =>
-                setSelected((ids) => [...new Set([...ids, ...visible.map((m) => m.id)])])
-              }
-            >
-              Vybrat vše
-            </button>
-            <button className="button secondary" onClick={() => setSelected([])}>
-              Zrušit výběr
-            </button>
-          </div>
-          <p>
-            Vybráno {chosen.length} z {data.meters.length}
-          </p>
-          {visible.map((m) => {
-            const r = latest(visitReadings, m.id);
-            const skipped =
-              !!viewRound && viewRound.entries.some((e) => e.meterId === m.id && !e.readingId);
-            const readings = viewRound
-              ? visitReadings
-                  .filter((r) => r.meterId === m.id)
-                  .sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time))
-              : r
-                ? [r]
-                : [];
-            return (
-              <article key={m.id} className="card series-meter">
-                <label className="optional-toggle">
-                  <span>
-                    <strong>
-                      {m.placement} · EM {m.serial}
-                    </strong>
-                    <br />
-                    {m.location} · UZEL {m.node || '—'}
-                  </span>
-                  <input
-                    aria-label={`Vybrat EM ${m.serial}`}
-                    type="checkbox"
-                    checked={selected.includes(m.id)}
-                    onChange={(e) =>
-                      setSelected((ids) =>
-                        e.target.checked ? [...ids, m.id] : ids.filter((id) => id !== m.id),
-                      )
-                    }
-                  />
-                </label>
-                {skipped && (
-                  <p>Přeskočeno · {m.active ? 'Sledování: AKTIVNÍ' : 'Sledování: UKONČENO'}</p>
-                )}
-                {viewRound && !viewRound.entries.some((e) => e.meterId === m.id) && (
-                  <p>Vývod nebyl součástí kola.</p>
-                )}
-                {readings.map((r) => (
-                  <section key={r.id}>
-                    <p>
-                      {r?.date} {r?.time} · {r?.value} kWh ·{' '}
-                      {m.active ? 'Sledování: AKTIVNÍ' : 'Sledování: UKONČENO'}
-                    </p>
-                    {batch && r?.previousId && (
-                      <>
-                        {renderResult(r)}
-                        <SavedEnergis
-                          reading={r}
-                          repo={repo}
-                          onSaved={saved}
-                          onDraft={markEnergisDraft}
-                        />
-                      </>
-                    )}
-                  </section>
-                ))}
-                {skipped &&
-                  (() => {
-                    const priorIds = new Set(
-                      visits
-                        .slice(
-                          0,
-                          visits.findIndex((v) => v.roundId === viewRound!.roundId),
-                        )
-                        .flatMap((v) =>
-                          v.entries.flatMap((e) => (e.readingId ? [e.readingId] : [])),
-                        ),
-                    );
-                    const previous = latest(
-                      data.readings.filter((r) => priorIds.has(r.id)),
-                      m.id,
-                    );
-                    return (
-                      previous && (
-                        <p>
-                          Poslední skutečný odečet: {previous.date} {previous.time} ·{' '}
-                          {previous.value} kWh
-                        </p>
-                      )
-                    );
-                  })()}
-                <button className="button secondary" onClick={() => setDetail(m.id)}>
-                  Historie EM {m.serial}
-                </button>
-              </article>
-            );
-          })}
-          <button
-            className="button primary"
-            disabled={!chosen.some((m) => m.active)}
-            onClick={() => begin(chosen.filter((m) => m.active))}
-          >
-            POKRAČOVAT DALŠÍM ODEČTEM
-          </button>
-          {batch && (
-            <SavedEnergisImport
-              meters={data.meters.filter((m) => m.batchId === batch)}
-              readings={visitReadings}
-              repo={repo}
-              onSaved={saved}
-              protectedIds={Object.keys(dirtyEnergis).filter((id) => dirtyEnergis[id])}
-            />
-          )}
-          <Info label="POKRAČOVAT DALŠÍM ODEČTEM">
-            Otevře všechny vybrané elektroměry na jedné stránce. Předchozí hodnoty zůstávají
-            zamčené.
-          </Info>
-          <div className="step-actions">
-            {(['xlsx', 'txt'] as const).map((f) => (
+          <section aria-label={batch ? 'Vývody série' : 'SAMOSTATNÉ ODEČTY'}>
+            {!batch && <h2>SAMOSTATNÉ ODEČTY</h2>}
+            <div className="step-actions">
               <button
-                key={f}
                 className="button secondary"
-                disabled={busy || !chosen.length}
-                onClick={() => void act(() => exportSelected(chosen, data, f))}
+                onClick={() =>
+                  setSelected((ids) => [...new Set([...ids, ...visible.map((m) => m.id)])])
+                }
               >
-                EXPORTOVAT VYBRANÉ {f.toUpperCase()}
+                Vybrat vše
               </button>
-            ))}
-          </div>
+              <button className="button secondary" onClick={() => setSelected([])}>
+                Zrušit výběr
+              </button>
+            </div>
+            <p>
+              Vybráno {chosen.length} z{' '}
+              {batch ? data.meters.filter((m) => m.batchId === batch).length : singles.length}
+            </p>
+            {visible.map((m) => {
+              const r = latest(visitReadings, m.id);
+              const skipped =
+                !!viewRound && viewRound.entries.some((e) => e.meterId === m.id && !e.readingId);
+              const readings = viewRound
+                ? visitReadings
+                    .filter((r) => r.meterId === m.id)
+                    .sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time))
+                : r
+                  ? [r]
+                  : [];
+              return (
+                <article key={m.id} className="card series-meter">
+                  <label className="optional-toggle">
+                    <span>
+                      <strong>
+                        {m.placement} · EM {m.serial}
+                      </strong>
+                      <br />
+                      {m.location} · UZEL {m.node || '—'}
+                    </span>
+                    <input
+                      aria-label={`Vybrat EM ${m.serial}`}
+                      type="checkbox"
+                      checked={selected.includes(m.id)}
+                      onChange={(e) =>
+                        setSelected((ids) =>
+                          e.target.checked ? [...ids, m.id] : ids.filter((id) => id !== m.id),
+                        )
+                      }
+                    />
+                  </label>
+                  {skipped && (
+                    <p>Přeskočeno · {m.active ? 'Sledování: AKTIVNÍ' : 'Sledování: UKONČENO'}</p>
+                  )}
+                  {viewRound && !viewRound.entries.some((e) => e.meterId === m.id) && (
+                    <p>Vývod nebyl součástí kola.</p>
+                  )}
+                  {readings.map((r) => (
+                    <section key={r.id}>
+                      <p>
+                        {r?.date} {r?.time} · {r?.value} kWh ·{' '}
+                        {m.active ? 'Sledování: AKTIVNÍ' : 'Sledování: UKONČENO'}
+                      </p>
+                      {batch && r?.previousId && (
+                        <>
+                          {renderResult(r)}
+                          <SavedEnergis
+                            reading={r}
+                            repo={repo}
+                            onSaved={saved}
+                            onDraft={markEnergisDraft}
+                          />
+                        </>
+                      )}
+                    </section>
+                  ))}
+                  {skipped &&
+                    (() => {
+                      const priorIds = new Set(
+                        visits
+                          .slice(
+                            0,
+                            visits.findIndex((v) => v.roundId === viewRound!.roundId),
+                          )
+                          .flatMap((v) =>
+                            v.entries.flatMap((e) => (e.readingId ? [e.readingId] : [])),
+                          ),
+                      );
+                      const previous = latest(
+                        data.readings.filter((r) => priorIds.has(r.id)),
+                        m.id,
+                      );
+                      return (
+                        previous && (
+                          <p>
+                            Poslední skutečný odečet: {previous.date} {previous.time} ·{' '}
+                            {previous.value} kWh
+                          </p>
+                        )
+                      );
+                    })()}
+                  <button className="button secondary" onClick={() => setDetail(m.id)}>
+                    Historie EM {m.serial}
+                  </button>
+                </article>
+              );
+            })}
+            <button
+              className="button primary"
+              disabled={!chosen.some((m) => m.active)}
+              onClick={() => begin(chosen.filter((m) => m.active))}
+            >
+              POKRAČOVAT DALŠÍM ODEČTEM
+            </button>
+            {batch && (
+              <SavedEnergisImport
+                meters={data.meters.filter((m) => m.batchId === batch)}
+                readings={visitReadings}
+                repo={repo}
+                onSaved={saved}
+                protectedIds={Object.keys(dirtyEnergis).filter((id) => dirtyEnergis[id])}
+              />
+            )}
+            <Info label="POKRAČOVAT DALŠÍM ODEČTEM">
+              Otevře všechny vybrané elektroměry na jedné stránce. Předchozí hodnoty zůstávají
+              zamčené.
+            </Info>
+            <div className="step-actions">
+              {(['xlsx', 'txt'] as const).map((f) => (
+                <button
+                  key={f}
+                  className="button secondary"
+                  disabled={busy || !chosen.length}
+                  onClick={() => void act(() => exportSelected(chosen, data, f))}
+                >
+                  EXPORTOVAT VYBRANÉ {f.toUpperCase()}
+                </button>
+              ))}
+            </div>
+            {batch &&
+              data.batches.some((b) => b.id === batch && b.kind !== 'standalone') &&
+              singles.length > 0 && (
+                <section className="card" aria-label="Přidat samostatný elektroměr">
+                  <label className="series-field">
+                    Samostatný elektroměr
+                    <select
+                      aria-label="Samostatný elektroměr"
+                      value={attachId}
+                      onChange={(e) => setAttachId(e.target.value)}
+                    >
+                      <option value="">Vyberte elektroměr</option>
+                      {singles.map((m) => (
+                        <option key={m.id} value={m.id}>
+                          {m.location} · {m.placement} · EM {m.serial}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <button
+                    className="button secondary"
+                    disabled={!attachId || busy}
+                    onClick={() =>
+                      void act(async () => {
+                        await repo.attachToSeries(attachId, batch);
+                        setAttachId('');
+                        await saved();
+                        setNotice(
+                          'Elektroměr přidán do série. Kompletní historie zůstává zachována.',
+                        );
+                      })
+                    }
+                  >
+                    PŘIDAT DO SÉRIE
+                  </button>
+                </section>
+              )}
+          </section>
           <Info label="export vybraných">
             Exportuje úplnou historii vybraných elektroměrů včetně intervalů a Energis.
           </Info>
@@ -968,14 +1026,23 @@ export function Series({
                     onClick={() =>
                       void act(async () => {
                         const currentBatch = data.batches.find(
-                          (b) => b.id === lastBatch && b.location === entry.location.trim(),
+                          (b) =>
+                            mode !== 'single' &&
+                            b.kind !== 'standalone' &&
+                            b.id === lastBatch &&
+                            b.location === entry.location.trim(),
                         );
                         timestamp(initialRoundDate, initialRoundTime);
-                        const created = await repo.first(entry, currentBatch?.id, {
-                          roundDate: initialRoundDate,
-                          roundTime: normalizeTime(initialRoundTime),
-                          ...(currentBatch && firstRoundId ? { roundId: firstRoundId } : {}),
-                        });
+                        const created = await repo.first(
+                          entry,
+                          currentBatch?.id,
+                          {
+                            roundDate: initialRoundDate,
+                            roundTime: normalizeTime(initialRoundTime),
+                            ...(currentBatch && firstRoundId ? { roundId: firstRoundId } : {}),
+                          },
+                          mode === 'single' ? 'standalone' : 'series',
+                        );
                         setFirstRoundId(created.round.roundId);
                         setLastBatch(created.batch.id);
                         setData((current) => ({

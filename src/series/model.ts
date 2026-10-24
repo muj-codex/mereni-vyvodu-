@@ -1,6 +1,8 @@
 import { withRounds, validateRounds } from './rounds';
 import { compareEnergy } from '../core/energy';
 export interface Batch {
+  /** Missing on older data: a real reading series. */
+  kind?: 'series' | 'standalone';
   id: string;
   location: string;
   date: string;
@@ -8,6 +10,7 @@ export interface Batch {
 export interface Meter {
   id: string;
   batchId: string;
+  membershipUpdatedAt?: string;
   location: string;
   placement: string;
   serial: string;
@@ -214,10 +217,18 @@ export function validateSeries(value: unknown): SeriesData {
     if (typeof b.location !== 'string' || !b.location.trim())
       throw Error('Neplatná lokalita série.');
     timestamp(b.date, '00:00');
+    if (b.kind !== undefined && !['series', 'standalone'].includes(b.kind))
+      throw Error('Neplatný druh odečtu.');
   }
   for (const m of d.meters) {
-    if (!d.batches.some((b) => b.id === m.batchId) || typeof m.active !== 'boolean')
+    if (typeof m.batchId !== 'string' || typeof m.active !== 'boolean')
       throw Error('Chybí vazba elektroměru.');
+    if (
+      m.membershipUpdatedAt !== undefined &&
+      (typeof m.membershipUpdatedAt !== 'string' ||
+        !Number.isFinite(Date.parse(m.membershipUpdatedAt)))
+    )
+      throw Error('Neplatná metadata členství.');
     if (
       m.trackingUpdatedAt !== undefined &&
       (typeof m.trackingUpdatedAt !== 'string' || !Number.isFinite(Date.parse(m.trackingUpdatedAt)))

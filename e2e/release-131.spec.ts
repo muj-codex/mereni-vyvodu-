@@ -95,11 +95,10 @@ test('global live search, compact rows and results navigation', async ({ page })
   await expect(page.locator('.record-open').first()).toContainText('23.10.2026 08:35');
   for (const query of ['3831', '257', '21210034', '766']) {
     await page.getByLabel('Hledat ve všech výsledcích a odečtech').fill(query);
-    await expect(page.locator('.record-open')).toHaveCount(1);
+    await expect(page.locator('.record-open')).toHaveCount(['3831', '257'].includes(query) ? 2 : 1);
   }
-  await expect(page.locator('.record-open')).toContainText('série 2 vývodů');
+  await expect(page.locator('.record-open')).toContainText('EM 777666');
   await page.locator('.record-open').click();
-  await scope(page).getByRole('button', { name: 'Historie EM 777666', exact: true }).click();
   await expect(
     scope(page).getByRole('heading', { name: 'UZEL 21210034', exact: true }),
   ).toBeVisible();

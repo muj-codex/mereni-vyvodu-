@@ -1,4 +1,4 @@
-import { seriesGroups } from '../series/grouping';
+import { seriesGroups, standaloneMeters } from '../series/grouping';
 import type { HistoryRecord } from '../core/types';
 import {
   isIntervalCheck,
@@ -70,7 +70,7 @@ export function resultRows(records: HistoryRecord[], series: SeriesData, query =
         batch.date,
         at,
         formatIntervalDateTime(at),
-        'jednotlivý odečet série odečtů',
+        'série odečtů',
         ...meters.flatMap((meter) => [
           meter.node,
           meter.serial,
@@ -86,9 +86,7 @@ export function resultRows(records: HistoryRecord[], series: SeriesData, query =
     });
   }
   // Unlinked legacy records remain individually accessible; never guess membership.
-  for (const meter of series.meters.filter(
-    (m) => !series.batches.some((b) => b.id === m.batchId),
-  )) {
+  for (const meter of standaloneMeters(series)) {
     const r = latest(series.readings, meter.id);
     rows.push({
       id: meter.id,
@@ -97,7 +95,18 @@ export function resultRows(records: HistoryRecord[], series: SeriesData, query =
       at: r ? `${r.date}T${r.time}` : '',
       location: meter.location,
       placement: meter.placement,
-      search: [meter.node, meter.serial, meter.location, meter.placement].join(' '),
+      search: [
+        meter.node,
+        meter.serial,
+        meter.location,
+        meter.placement,
+        'samostatný jednotlivý odečet',
+        meter.location.startsWith('R') ? 'VN' : 'NN',
+        meter.active ? 'aktivní sledování' : 'ukončené sledování',
+        ...series.readings
+          .filter((r) => r.meterId === meter.id)
+          .flatMap((r) => [`${r.date}T${r.time}`, formatIntervalDateTime(`${r.date}T${r.time}`)]),
+      ].join(' '),
     });
   }
   return rows

@@ -51,7 +51,9 @@ export function validateRounds(data: SeriesData & { rounds: SeriesRound[] }) {
     const meters = new Set<string>();
     for (const e of r.entries) {
       if (
-        !data.meters.some((m) => m.id === e.meterId && m.batchId === r.batchId) ||
+        !data.meters.some(
+          (m) => m.id === e.meterId && (m.batchId === r.batchId || !!m.membershipUpdatedAt),
+        ) ||
         (!r.legacy && meters.has(e.meterId))
       )
         throw Error('Neplatný vývod kola.');
