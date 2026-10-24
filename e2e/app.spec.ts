@@ -205,7 +205,8 @@ test('500 V automaticky ARON, informační MTP, fyzické barvy a historie offlin
     .getByRole('combobox', { name: 'Režim sítě / napětí', exact: true })
     .selectOption('500');
   await enterMeasurement(page, '000500', '5');
-  await expect(page.getByRole('heading', { name: 'OVĚŘIT HODNOTY KYORITSU' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'OVĚŘIT HODNOTY KYORITSU' })).toHaveCount(0);
+  await expect(page.getByRole('region', { name: 'Kontrola výkonu Kyoritsu' })).toBeVisible();
   const cards = page.locator('.aron-mapping');
   expect(await cards.count()).toBeGreaterThan(0);
   expect(await cards.count()).toBeLessThanOrEqual(2);

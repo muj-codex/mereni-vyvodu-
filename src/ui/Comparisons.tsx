@@ -33,17 +33,33 @@ export function Comparisons({ record }: { record: MeasurementRecord }) {
       </p>
       {measurementComparisons(record)
         .filter((c) => c.key !== 'meter-kyoritsu')
-        .map((c) => (
-          <div key={c.key}>
-            <strong>
-              {c.label}:{' '}
-              {c.percent === null
-                ? 'Porovnání není dostupné'
-                : `${c.percent > 0 ? '+' : ''}${formatNumber(c.percent)} %`}
-            </strong>
-            <p className="hint">{c.note}</p>
-          </div>
-        ))}
+        .map((c) => {
+          // Presentation only: compare the existing unrounded percentage, never its display text.
+          const warning =
+            c.key === 'kyoritsu-energis' && c.percent !== null && Math.abs(c.percent) > 5;
+          return (
+            <div
+              key={c.key}
+              data-comparison={c.key}
+              className={warning ? 'comparison-warning' : undefined}
+            >
+              <strong>
+                {warning && (
+                  <span className="comparison-warning-icon" role="img" aria-label="Upozornění">
+                    !
+                  </span>
+                )}
+                {c.label}:{' '}
+                {c.percent === null
+                  ? 'Porovnání není dostupné'
+                  : `${c.percent > 0 ? '+' : ''}${formatNumber(c.percent)} %`}
+              </strong>
+              <p className="hint">
+                {warning ? 'Rozdíl překročil 5 %. Trend Energis může být časově posunutý.' : c.note}
+              </p>
+            </div>
+          );
+        })}
     </section>
   );
 }

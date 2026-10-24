@@ -189,22 +189,20 @@ export function Result({ diagnosis, serial }: { diagnosis: Diagnosis; serial: st
   const powerIssue = powerNeedsVerification(diagnosis);
   return (
     <>
-      <div
-        className={`result-banner ${powerIssue ? (diagnosis.powerConsistency?.status === 'unavailable' ? 'unknown' : diagnosis.powerConsistency?.status === 'verify' ? 'intermediate' : 'warning') : workingBand(diagnosis.differencePercent)}`}
-      >
-        <Icon name={ok ? 'check' : 'alert'} size={28} />
-        <h2>
-          {powerIssue
-            ? 'OVĚŘIT HODNOTY KYORITSU'
-            : ok
+      {!powerIssue && (
+        <div className={`result-banner ${workingBand(diagnosis.differencePercent)}`}>
+          <Icon name={ok ? 'check' : 'alert'} size={28} />
+          <h2>
+            {ok
               ? 'MĚŘENÍ V POŘÁDKU'
               : diagnosis.differencePercent !== null && Math.abs(diagnosis.differencePercent) <= 25
                 ? 'OVĚŘIT SOUBĚŽNOST MĚŘENÍ'
                 : diagnosis.status === 'near-zero'
                   ? 'VÝKON TÉMĚŘ NULOVÝ'
                   : 'MIMO TOLERANCI – PROVĚŘIT ZAPOJENÍ'}
-        </h2>
-      </div>
+          </h2>
+        </div>
+      )}
       <PowerConsistencyResult diagnosis={diagnosis} />
       <p className="main-percent">{signedPercent(diagnosis.differencePercent)}</p>
       <p className="hint">

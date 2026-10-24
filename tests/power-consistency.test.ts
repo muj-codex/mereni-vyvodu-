@@ -50,7 +50,8 @@ describe('independent U/I/|PF| power consistency', () => {
     expect(d.powerConsistency?.total?.percent).toBeCloseTo(-83.4299917);
     expect(measurementIsOk(d)).toBe(false);
     const html = renderToStaticMarkup(createElement(Result, { diagnosis: d, serial: '001' }));
-    expect(html).toContain('OVĚŘIT HODNOTY KYORITSU');
+    expect(html).not.toContain('OVĚŘIT HODNOTY KYORITSU');
+    expect(html).not.toContain('result-banner');
     expect(html).not.toContain('MĚŘENÍ V POŘÁDKU');
     expect(html).toContain('24,14');
     expect(html).toContain('-83,43');

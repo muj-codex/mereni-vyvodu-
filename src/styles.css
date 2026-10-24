@@ -1387,3 +1387,25 @@ fieldset:disabled {
   margin-block: 0.5rem 1rem;
   min-height: 44px;
 }
+
+.comparisons .comparison-warning {
+  border: 3px solid #b42318;
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin-block: 8px;
+  color: #8f1d14;
+  background: #fff4f2;
+}
+.comparison-warning > strong {
+  font-weight: 800;
+}
+.comparison-warning-icon {
+  display: inline-block;
+  margin-inline-end: 6px;
+  font-weight: 900;
+}
+.comparisons .comparison-warning .hint {
+  color: #8f1d14;
+  margin-block: 4px 0;
+  font-size: 0.85rem;
+}

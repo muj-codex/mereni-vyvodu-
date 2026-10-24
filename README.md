@@ -250,3 +250,9 @@ V detailu série nahrazuje vyhledávací pole kompaktní chronologický seznam u
 - Jednotné **← Zpět** vrací lokálně z uloženého výsledku, Kontroly stavů, Kyoritsu kroku/výsledku, historie EM, série, konkrétního kola, pokračování, editace SUMA, inline výsledku importu, STYLUS náhledu, nápovědy a exportního náhledu. Spodní navigace zůstává globální a pracovní navigace se ve Výsledcích nezobrazuje.
 - Návrat z pokračování zachová vyplněné kolo a nabízí jeho obnovení. Rozepsané SUMA a +E/-E zůstávají při lokálních návratech zachované. Poslední otevřený odečtový kontext ve Výsledcích zůstává při návratu do přehledu připojený. Kyoritsu krok se po návratu obnoví se stejnými rozpracovanými hodnotami, pokud se základ měření nezměnil, včetně vypnutého přenosu identifikace.
 - Výpočetní jádro, datové modely, matematika Energisu a +E/-E, odečtová kola, IndexedDB 4 a backup verze 3 se nemění. Nevzniká migrace ani reset databáze.
+
+## Verze 1.3.7 – varování přímo u Kyoritsu ↔ Energis (24. 10. 2026)
+
+- Samostatný blok **OVĚŘIT HODNOTY KYORITSU** byl odstraněn. Samostatná **Kontrola výkonu Kyoritsu** zůstává zachovaná se stejným fyzikálním výsledkem U/I/PF.
+- Řádek **Kyoritsu ↔ Energis** dostává červený rámeček, tučný text, vykřičník a krátké vysvětlení pouze při `abs(percent) > 5`. Přesně +5 % i −5 % zůstává bez tohoto zvýraznění. Rozhoduje původní interní procento; formátování čísla zůstává stávající (nejvýše tři desetinná místa).
+- Změna je společná pro živý i uložený výsledek. Fyzikální shoda Kyoritsu zůstává nezávislá na odchylce proti časově posunutému trendu Energisu. Matematika, diagnostika, tolerance výpočetního jádra a uložená data se nemění.

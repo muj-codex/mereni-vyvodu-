@@ -21,8 +21,8 @@ test('ARON 24.14 kW vs entered 4 kW never green; persisted detail', async ({ pag
   await aron(page, true);
   await expect(
     page.getByRole('heading', { name: 'OVĚŘIT HODNOTY KYORITSU', exact: true }),
-  ).toBeVisible();
-  await expect(page.locator('.result-banner')).not.toHaveClass(/success/);
+  ).toHaveCount(0);
+  await expect(page.locator('.result-banner')).toHaveCount(0);
   const check = page.getByRole('region', { name: 'Kontrola výkonu Kyoritsu' });
   await expect(check).toContainText('24,14 kW');
   await expect(check).toContainText('-83,43 %');
@@ -35,7 +35,7 @@ test('ARON 24.14 kW vs entered 4 kW never green; persisted detail', async ({ pag
   await page.locator('.record-open').click();
   await expect(
     page.getByRole('heading', { name: 'OVĚŘIT HODNOTY KYORITSU', exact: true }),
-  ).toBeVisible();
+  ).toHaveCount(0);
   await page.getByRole('button', { name: 'Data / detail', exact: true }).click();
   await expect(page.getByRole('region', { name: 'Kontrola výkonu Kyoritsu' })).toContainText(
     '24,14 kW',
