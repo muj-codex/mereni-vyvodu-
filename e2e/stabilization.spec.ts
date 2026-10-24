@@ -164,8 +164,8 @@ test('JSON záloha → čistá DB → kompletní historie → opakovaný import 
     expect(await snapshot(clean)).toEqual(before);
     await clean
       .locator('.record-open')
-      .filter({ hasText: '000LINKED' })
-      .filter({ hasText: '3f měření' })
+      .locator('xpath=self::*[@data-serial="000LINKED"]')
+      .locator('xpath=self::*[@data-type="3f měření"]')
       .click();
     await comparisons(clean);
   } finally {
@@ -199,13 +199,11 @@ test('iOS souborová záloha používá systémové sdílení a neplatný import
   const shared = await page.evaluate(() => JSON.parse((window as any).backupShare.text));
   expect(shared.records).toEqual(before);
   for (const text of ['broken JSON', '{"backupVersion":99}']) {
-    await page
-      .getByLabel('IMPORTOVAT / OBNOVIT DATA', { exact: true })
-      .setInputFiles({
-        name: 'broken.json',
-        mimeType: 'application/json',
-        buffer: Buffer.from(text),
-      });
+    await page.getByLabel('IMPORTOVAT / OBNOVIT DATA', { exact: true }).setInputFiles({
+      name: 'broken.json',
+      mimeType: 'application/json',
+      buffer: Buffer.from(text),
+    });
     await expect(page.getByRole('alert')).toBeVisible();
     await expect(page.getByRole('dialog')).toHaveCount(0);
     expect(await snapshot(page)).toEqual(before);
@@ -335,7 +333,6 @@ test('skutečný update service worker/cache zachová stejnou instalaci a Indexe
     await page.locator('.record-open').click();
     await expect(page.locator('main')).toContainText('000LEGACY');
     expect(await snapshot(page)).toEqual([old]);
-
   } finally {
     await context.setOffline(false);
     server.closeAllConnections();

@@ -1,21 +1,17 @@
+import { resultRows } from './resultsView';
+import { Series } from '../series/Series';
+import { createSeriesStore } from '../series/store';
+import { emptySeries } from '../series/model';
+import { formatIntervalDateTime } from '../core/historyView';
 import { Comparisons } from './Comparisons';
 import { Info } from './Info';
 import { downloadJSONBackup, parseBackup, planImport } from '../data/backup';
-import {
-  isIntervalCheck,
-  intervalLabel,
-  filterHistory,
-  recordTypeLabel,
-  recordVoltage,
-  voltageLabel,
-} from '../core/historyView';
+import { isIntervalCheck, intervalLabel } from '../core/historyView';
 import { IntervalResult } from './Interval';
 import { CurrentResult } from './CurrentMeasurement';
 import { IdentificationSummary } from './Identification';
-import { percentDifference, signedPercent } from '../core/current';
-import { useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { HistoryRecord } from '../core/types';
-import { formatNumber } from '../core/numbers';
 import { shareSubject, emailBody, mailtoLink, toTSV, isCurrent, backupTSV } from '../data/export';
 import { Detail, Icon, Inspection, Result } from './components';
 export function History({
@@ -47,9 +43,26 @@ export function History({
   const [confirm, setConfirm] = useState<'all' | string | null>(null),
     [confirmText, setConfirmText] = useState(''),
     [busy, setBusy] = useState(false);
-  const [location, setLocation] = useState(''),
-    [voltage, setVoltage] = useState('');
-  const visible = filterHistory(records, location, voltage);
+  const [search, setSearch] = useState('');
+  const [meterDetail, setMeterDetail] = useState('');
+  const [browseSeries, setBrowseSeries] = useState(false);
+  const [series, setSeries] = useState(emptySeries);
+  const seriesRepo = useMemo(() => createSeriesStore(), []);
+  useEffect(() => {
+    const refresh = () => {
+      void seriesRepo
+        .all()
+        .then(setSeries)
+        .catch((e) => setImportError(String(e)));
+    };
+    refresh();
+    window.addEventListener('series-updated', refresh);
+    return () => {
+      window.removeEventListener('series-updated', refresh);
+      void seriesRepo.close();
+    };
+  }, [seriesRepo]);
+  const visible = resultRows(records, series, search);
   const chosen = records.filter((r) => selected.includes(r.id));
   async function copy(text: string, kind: 'tsv' | 'email') {
     try {
@@ -104,14 +117,30 @@ export function History({
   }
   return (
     <>
-      {opened ? (
+      {meterDetail || browseSeries ? (
+        <>
+          <button
+            className="text-button"
+            onClick={() => {
+              setMeterDetail('');
+              setBrowseSeries(false);
+            }}
+          >
+            Zpět na výsledky měření
+          </button>
+          <Series key={meterDetail || 'history'} historyOnly initialDetail={meterDetail} />
+        </>
+      ) : opened ? (
         <>
           <button className="text-button" onClick={() => setOpened(null)}>
             <Icon name="back" /> Zpět na výsledky měření
           </button>
           <div className="page-heading">
             <span className="eyebrow">ULOŽENÉ MĚŘENÍ</span>
-            <h1>{opened.input.serial}</h1>
+            <h1>
+              UZEL{' '}
+              {(opened.input.identification as { node?: string } | undefined)?.node || 'neuveden'}
+            </h1>
             <p>{isIntervalCheck(opened) ? intervalLabel(opened) : opened.localTimestamp}</p>
           </div>
           <div className="segmented" aria-label="Detail uloženého měření">
@@ -173,53 +202,13 @@ export function History({
             <h1>Výsledky měření</h1>
             <p>{records.length} uložených měření · pouze v tomto zařízení</p>
           </div>
-          <div className="field-grid card history-filters">
-            <label className="field">
-              <span>Umístění</span>
-              <select
-                aria-label="Filtr umístění"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-              >
-                <option value="">Všechna místa</option>
-                {[
-                  ...new Set(
-                    records
-                      .map((r) => r.input.identification?.location)
-                      .filter((v): v is string => !!v),
-                  ),
-                ]
-                  .sort()
-                  .map((v) => (
-                    <option key={v}>{v}</option>
-                  ))}
-              </select>
-            </label>
-            <label className="field">
-              <span>Režim / napětí</span>
-              <select
-                aria-label="Filtr režim / napětí"
-                value={voltage}
-                onChange={(e) => setVoltage(e.target.value)}
-              >
-                <option value="">Všechny režimy</option>
-                {[400, 500, 6000, 6300, 10000, 10300].map((v) => (
-                  <option key={v} value={v}>
-                    {voltageLabel(v)}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <button
-              className="button secondary"
-              onClick={() => {
-                setLocation('');
-                setVoltage('');
-              }}
-            >
-              Zrušit filtry
-            </button>
-          </div>
+          <label className="field">
+            <span>Hledat ve všech výsledcích a odečtech</span>
+            <input value={search} onChange={(e) => setSearch(e.target.value)} />
+          </label>
+          <button className="button secondary" onClick={() => setBrowseSeries(true)}>
+            Historie odečtů · výběr pro další odečet / export
+          </button>
           <div className="history-toolbar">
             <button
               className="button secondary"
@@ -303,7 +292,7 @@ export function History({
           )}
           {loading ? (
             <p role="status">Načítám historii…</p>
-          ) : records.length === 0 ? (
+          ) : records.length === 0 && series.meters.length === 0 ? (
             <div className="empty-state">
               <Icon name="list" size={38} />
               <h2>Zatím žádná měření</h2>
@@ -316,20 +305,20 @@ export function History({
           ) : (
             <div className="history-list">
               {visible.length === 0 && <p>Žádné záznamy neodpovídají filtrům.</p>}
-              {visible.map((r) => (
+              {visible.map((row) => (
                 <article
-                  key={r.id}
-                  className={`history-item ${selected.includes(r.id) ? 'selected' : ''}`}
+                  key={row.id}
+                  className={`history-item compact-result ${selected.includes(row.id) ? 'selected' : ''}`}
                 >
-                  {selecting && (
+                  {selecting && row.record && (
                     <label className="record-checkbox">
                       <input
-                        aria-label={`Vybrat měření ${r.input.serial}`}
+                        aria-label={`Vybrat měření ${row.record.input.serial}`}
                         type="checkbox"
-                        checked={selected.includes(r.id)}
+                        checked={selected.includes(row.id)}
                         onChange={(e) =>
                           setSelected((ids) =>
-                            e.target.checked ? [...ids, r.id] : ids.filter((id) => id !== r.id),
+                            e.target.checked ? [...ids, row.id] : ids.filter((id) => id !== row.id),
                           )
                         }
                       />
@@ -337,57 +326,29 @@ export function History({
                   )}
                   <button
                     className="record-open"
+                    data-serial={row.record?.input.serial}
+                    data-type={
+                      row.record
+                        ? isIntervalCheck(row.record)
+                          ? 'Kontrola stavů'
+                          : isCurrent(row.record)
+                            ? '1f měření'
+                            : '3f měření'
+                        : 'odečet'
+                    }
+                    aria-label={`${row.search}`}
                     onClick={() => {
-                      setOpened(r);
-                      setSection('result');
+                      if (row.record) {
+                        setOpened(row.record);
+                        setSection('result');
+                      } else setMeterDetail(row.meterId!);
                     }}
                   >
-                    <div className="record-top">
-                      <strong>{r.input.serial}</strong>
-                      <Icon name="arrow" size={18} />
-                    </div>
-                    <p>
-                      <b>{recordTypeLabel(r)}</b> · {voltageLabel(recordVoltage(r))}
-                    </p>
-                    <p>
-                      {isIntervalCheck(r)
-                        ? `Interval: ${intervalLabel(r)}`
-                        : `Datum měření: ${r.input.identification?.date ?? r.localTimestamp.split(' ')[0]}`}
-                    </p>
-                    {!isIntervalCheck(r) && <time dateTime={r.savedAt}>{r.localTimestamp}</time>}
-                    <p>
-                      {r.input.identification?.location} · {r.input.identification?.placement}
-                    </p>
-                    <strong className="main-percent">
-                      {isIntervalCheck(r)
-                        ? signedPercent(r.result.percent)
-                        : isCurrent(r)
-                          ? r.phases
-                              .flatMap((p, i) =>
-                                p.unused
-                                  ? []
-                                  : [`IL${i + 1}: ${signedPercent(p.differencePercent)}`],
-                              )
-                              .join(' · ')
-                          : signedPercent(percentDifference(r.input.energis, r.input.kyoritsu))}
-                    </strong>
-                    {isIntervalCheck(r) ? (
-                      <p>{r.assessment.summary}</p>
-                    ) : isCurrent(r) ? (
-                      <p>
-                        {r.input.vn ? 'VN · SCADA' : 'NN'} · MTP {formatNumber(r.input.ctPrimary)}/
-                        {r.input.ctSecondary} A
-                      </p>
-                    ) : (
-                      <div className="record-values">
-                        <span>
-                          Kyoritsu <b>{formatNumber(r.input.kyoritsu)} kW</b>
-                        </span>
-                        <span>
-                          Energis <b>{formatNumber(r.input.energis)} kW</b>
-                        </span>
-                      </div>
-                    )}
+                    <span>{row.node || 'UZEL neuveden'}</span>
+                    <span>{formatIntervalDateTime(row.at)}</span>
+                    <span>
+                      {row.location} · {row.placement}
+                    </span>
                   </button>
                 </article>
               ))}

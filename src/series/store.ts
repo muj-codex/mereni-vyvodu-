@@ -12,6 +12,10 @@ import {
   type Reading,
   type Meter,
 } from './model';
+const trackingStamp = (meter: Meter) =>
+  new Date(
+    Math.max(Date.now(), (Date.parse(meter.trackingUpdatedAt || '') || 0) + 1),
+  ).toISOString();
 export function upgradeSeries(db: {
   objectStoreNames: { contains(s: string): boolean };
   createObjectStore(s: string, options: { keyPath: string }): any;
@@ -82,6 +86,14 @@ export function createSeriesStore(name = DATABASE_NAME) {
         throw e;
       }
     },
+    async reactivate(id: string) {
+      const db = await promise;
+      const tx = db.transaction('meters', 'readwrite');
+      const meter: Meter | undefined = await tx.store.get(id);
+      if (!meter) throw Error('Elektroměr nenalezen.');
+      await tx.store.put({ ...meter, active: true, trackingUpdatedAt: trackingStamp(meter) });
+      await tx.done;
+    },
     async append(rows: { meter: Meter; previous: Reading; reading: Reading }[]) {
       const db = await promise;
       const tx = db.transaction(['meters', 'readings'], 'readwrite');
@@ -110,7 +122,13 @@ export function createSeriesStore(name = DATABASE_NAME) {
           )
             throw Error('Neplatný interval.');
           await tx.objectStore('readings').add(r);
-          await tx.objectStore('meters').put({ ...stored, active: r.active });
+          if (!/^\d*$/.test(row.meter.node)) throw Error('UZEL smí obsahovat pouze číslice.');
+          await tx.objectStore('meters').put({
+            ...stored,
+            node: row.meter.node,
+            active: r.active,
+            trackingUpdatedAt: trackingStamp(stored),
+          });
         }
         await tx.done;
       } catch (e) {
@@ -177,7 +195,17 @@ export function planSeriesMerge(existing: SeriesData, incoming: SeriesData): Ser
     for (const row of incoming[key]) {
       const prev = merged[key].find((r) => r.id === row.id);
       const comparable = (v: unknown) =>
-        key === 'meters' ? { ...(v as Meter), active: undefined } : v;
+        key === 'meters'
+          ? { ...(v as Meter), active: undefined, trackingUpdatedAt: undefined, node: undefined }
+          : v;
+      if (
+        key === 'meters' &&
+        prev &&
+        (prev as Meter).node !== (row as Meter).node &&
+        !(prev as Meter).trackingUpdatedAt &&
+        !(row as Meter).trackingUpdatedAt
+      )
+        throw Error('Konflikt UZLU stejného elektroměru. Nic nebylo přepsáno.');
       if (prev && canonical(comparable(prev)) !== canonical(comparable(row)))
         throw Error('Konflikt stejného ID série. Nic nebylo přepsáno.');
       if (!prev) {
@@ -187,7 +215,15 @@ export function planSeriesMerge(existing: SeriesData, incoming: SeriesData): Ser
     }
   for (const m of merged.meters) {
     const last = latest(merged.readings, m.id);
-    if (last && m.active !== last.active) {
+    const incomingMeter = incoming.meters.find((x) => x.id === m.id);
+    if (
+      incomingMeter?.trackingUpdatedAt &&
+      (!m.trackingUpdatedAt || incomingMeter.trackingUpdatedAt > m.trackingUpdatedAt)
+    ) {
+      Object.assign(m, incomingMeter);
+      additions.meters.push(m);
+    }
+    if (last && !m.trackingUpdatedAt && m.active !== last.active) {
       m.active = last.active;
       const i = additions.meters.findIndex((x) => x.id === m.id);
       if (i >= 0) additions.meters[i] = m;

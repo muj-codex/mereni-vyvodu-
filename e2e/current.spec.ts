@@ -194,7 +194,9 @@ test('hlavní navigace i přepínání karet zachovají rozepsané hodnoty', asy
   await expect(
     page.getByRole('button', { name: 'VYHODNOTIT PROUDY', exact: true }),
   ).not.toBeVisible();
-  await page.getByRole('button', { name: 'MĚŘENÍ', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'MĚŘENÍ + ODEČET ELEKTROMĚRU / ENERGIS', exact: true })
+    .click();
   await expect(page.getByLabel('Klešťový ampérmetr L1 (mV / V)', { exact: true })).toHaveValue(
     '50',
   );
@@ -240,7 +242,7 @@ test('persistentní context D1 → další den D2 zachová oba záznamy', async 
     await save(page);
     await history(page);
     await expect(page.locator('.history-item')).toHaveCount(2);
-    await expect(page.locator('.record-open').first()).toContainText('000D2');
+    await expect(page.locator('.record-open').first()).toHaveAttribute('data-serial', '000D2');
   } finally {
     await ctx.close();
     await rm(dir, { recursive: true, force: true });
@@ -303,7 +305,7 @@ test('starý v1 záznam přežije DB upgrade i offline reload', async ({ page, c
   await expect(page.getByText('Offline připraveno', { exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Výsledky měření', exact: false }).last().click();
   await expect(page.locator('.history-item')).toHaveCount(1);
-  await expect(page.locator('.main-percent')).toHaveText('+1,4 %');
+  await expect(page.locator('.history-list .main-percent')).toHaveCount(0);
   await context.setOffline(true);
   await page.reload();
   await page.getByRole('button', { name: 'Výsledky měření', exact: false }).last().click();

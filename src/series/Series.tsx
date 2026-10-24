@@ -1,4 +1,9 @@
+import { readingTimeOffset } from './energisDisplay';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { locations } from '../core/current';
+import { MtpSelect } from '../ui/MtpSelect';
+import { MtpCoefficient } from '../ui/MtpCoefficient';
+import { localTime, normalizeTime } from './model';
 import { Info } from '../ui/Info';
 import {
   intervalValues,
@@ -17,7 +22,7 @@ import {
 } from './model';
 import { createSeriesStore } from './store';
 import { parseStylus } from './stylus';
-import { importMetadata, parseEnergis, timeOffset } from './energis';
+import { importMetadata, parseEnergis } from './energis';
 import { exportSelected } from './export';
 type Mode = 'single' | 'series' | 'stylus' | 'history';
 type Round = {
@@ -26,6 +31,8 @@ type Round = {
   value: string;
   energis: string;
   active: boolean;
+  take: boolean;
+  node: string;
   import?: EnergisMeta;
   issue?: string;
 };
@@ -47,24 +54,42 @@ function Input({
       <span>{label}</span>
       <input
         type={type}
+        aria-label={label}
         value={value}
         readOnly={readOnly}
-        onChange={(e) => onChange?.(e.target.value)}
+        inputMode={label.startsWith('UZEL') ? 'numeric' : undefined}
+        onBlur={() => {
+          if (label.includes('čas') || label.includes('Čas')) onChange?.(normalizeTime(value));
+        }}
+        onChange={(e) =>
+          onChange?.(label.startsWith('UZEL') ? e.target.value.replace(/\D/g, '') : e.target.value)
+        }
         autoComplete="off"
       />
+      {!readOnly && (label.includes('čas') || label.includes('Čas')) && (
+        <button type="button" onClick={() => onChange?.(localTime())}>
+          TEĎ
+        </button>
+      )}
     </label>
   );
 }
 export function Series({
   initial = 'series',
   historyOnly = false,
+  initialDetail = '',
+  onModeChange,
 }: {
   initial?: Mode;
   historyOnly?: boolean;
+  initialDetail?: string;
+  onModeChange?: (mode: Exclude<Mode, 'history'>) => void;
 }) {
   const repo = useMemo(() => createSeriesStore(), []);
   const [data, setData] = useState<SeriesData>(emptySeries);
   const [mode, setMode] = useState<Mode>(historyOnly ? 'history' : initial);
+  const [vn, setVn] = useState(false);
+  const [lastBatch, setLastBatch] = useState('');
   const [entry, setEntry] = useState<Entry>(blankEntry);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
@@ -77,7 +102,7 @@ export function Series({
   const [roundIds, setRoundIds] = useState<string[]>([]);
   const [round, setRound] = useState<Record<string, Round>>({});
   const [roundDate, setRoundDate] = useState('');
-  const [detail, setDetail] = useState('');
+  const [detail, setDetail] = useState(initialDetail);
   const [boundary, setBoundary] = useState<'previous' | 'next'>('previous');
   const file = useRef<HTMLInputElement>(null);
   const instanceId = useRef(crypto.randomUUID());
@@ -127,7 +152,7 @@ export function Series({
   };
   const visible = data.meters.filter(
     (m) =>
-      (!batch || m.batchId === batch) &&
+      (!batch || m.location === data.batches.find((b) => b.id === batch)?.location) &&
       [m.serial, m.node, m.placement, m.location].some((v) =>
         v.toLowerCase().includes(search.toLowerCase()),
       ),
@@ -137,13 +162,22 @@ export function Series({
   const begin = (meters: Meter[], preset?: Entry) => {
     const date = preset?.date || roundDate;
     setRoundDate(date);
+    meters = meters.filter((m) => m.active);
     setRoundIds(meters.map((m) => m.id));
     setDetail('');
     setRound(
       Object.fromEntries(
         meters.map((m) => [
           m.id,
-          { date, time: preset?.time ?? '', value: preset?.value ?? '', energis: '', active: true },
+          {
+            date,
+            time: preset?.time ?? '',
+            value: preset?.value ?? '',
+            energis: '',
+            active: true,
+            take: true,
+            node: m.node,
+          },
         ]),
       ),
     );
@@ -158,7 +192,7 @@ export function Series({
     const failures: string[] = [];
     for (const m of roundMeters) {
       const r = round[m.id];
-      if (!r.time && !r.value && !r.energis) continue;
+      if (!r.take) continue;
       try {
         const previous = latest(data.readings, m.id);
         if (!previous) throw Error('Chybí předchozí odečet.');
@@ -174,9 +208,9 @@ export function Series({
             }
           : undefined;
         valid.push({
-          meter: m,
+          meter: { ...m, node: r.node },
           previous,
-          reading: nextReading(m, previous, { ...r, import: meta }),
+          reading: nextReading(m, previous, { ...r, boundary, import: meta }),
         });
       } catch (e) {
         failures.push(`EM ${m.serial}: ${(e as Error).message}`);
@@ -189,11 +223,12 @@ export function Series({
         readings: [...current.readings, ...valid.map((v) => v.reading)],
         meters: current.meters.map((m) => {
           const row = valid.find((v) => v.meter.id === m.id);
-          return row ? { ...m, active: row.reading.active } : m;
+          return row ? { ...m, node: row.meter.node, active: row.reading.active } : m;
         }),
       }));
       const saved = valid.map((v) => v.meter.id);
-      setRoundIds((ids) => ids.filter((id) => !saved.includes(id)));
+      setRoundIds((ids) => ids.filter((id) => !saved.includes(id) && round[id].take));
+      setMode('history');
       setNotice(`Uloženo ${valid.length} odečtů. Historie zůstává zachována.`);
       broadcast();
     }
@@ -215,9 +250,7 @@ export function Series({
             {' '}
             · SUMA ENERGIS: {r.energis} kWh · rozdíl {values.difference} kWh ·{' '}
             {values.percent === null ? '—' : values.percent.toFixed(2) + ' %'} ·{' '}
-            {timeOffset(r.import, r.date, r.time)}
-            <br />
-            <small>K prověření s ohledem na časové hranice Energisu.</small>
+            {readingTimeOffset(r.import, r.date, r.time, r.boundary)}
           </>
         )}
       </p>
@@ -233,6 +266,7 @@ export function Series({
               className={mode === v ? 'active' : ''}
               onClick={() => {
                 setMode(v);
+                if (v !== 'history') onModeChange?.(v);
                 setRoundIds([]);
                 setDetail('');
               }}
@@ -268,13 +302,15 @@ export function Series({
           <section className="card series-round-heading">
             <h2>{[...new Set(roundMeters.map((m) => m.location))].join(' · ')}</h2>
             <Input
-              label="Datum pracovního kola"
+              label="Datum nového odečtu"
               type="date"
               value={roundDate}
               onChange={(date) => {
                 setRoundDate(date);
                 setRound((v) =>
-                  Object.fromEntries(Object.entries(v).map(([id, r]) => [id, { ...r, date }])),
+                  Object.fromEntries(
+                    Object.entries(v).map(([id, r]) => [id, r.take ? { ...r, date } : r]),
+                  ),
                 );
               }}
             />
@@ -298,10 +334,13 @@ export function Series({
                 value={boundary}
                 onChange={(e) => setBoundary(e.target.value as typeof boundary)}
               >
-                <option value="previous">Předchozí hranice</option>
-                <option value="next">Následující hranice</option>
+                <option value="previous">Energis do předchozího intervalu</option>
+                <option value="next">Energis do následujícího intervalu</option>
               </select>
             </label>
+            <Info label="hranice Energisu">
+              Ruční odečet 08:37: Energis do 08:30 → -7 min E; Energis do 08:45 → +8 min E.
+            </Info>
             <input
               hidden
               ref={file}
@@ -312,10 +351,13 @@ export function Series({
                 e.target.value = '';
                 if (f)
                   void act(async () => {
-                    const results = await parseEnergis(f, roundMeters);
+                    const importMeters = roundMeters
+                      .filter((m) => round[m.id].take)
+                      .map((m) => ({ ...m, node: round[m.id].node }));
+                    const results = await parseEnergis(f, importMeters);
                     setRound((current) => {
                       const next = { ...current };
-                      for (const m of roundMeters) {
+                      for (const m of importMeters) {
                         const found = results.find((r) => r.node === m.node);
                         const prev = current[m.id];
                         if (!m.node)
@@ -352,10 +394,19 @@ export function Series({
             const r = round[m.id];
             let calculated: Reading | undefined;
             try {
-              if (r.value && r.time && r.date) calculated = nextReading(m, p, r);
+              if (r.value && r.time && r.date) calculated = nextReading(m, p, { ...r, boundary });
             } catch {}
             return (
-              <article className="card series-meter" key={m.id}>
+              <article className={`card series-meter ${r.take ? '' : 'round-skipped'}`} key={m.id}>
+                <Input label="UZEL" value={r.node} onChange={(node) => editRound(m.id, { node })} />
+                <label className="optional-toggle">
+                  <span>ODEČÍST</span>
+                  <input
+                    type="checkbox"
+                    checked={r.take}
+                    onChange={(e) => editRound(m.id, { take: e.target.checked })}
+                  />
+                </label>
                 <h2>EM {m.serial}</h2>
                 <p>
                   {m.location} · {m.placement} · UZEL {m.node || '—'}
@@ -368,31 +419,34 @@ export function Series({
                     <Input label="Předchozí stav [kWh]" value={String(p.value)} readOnly />
                   </div>
                 </fieldset>
-                <div className="field-grid">
-                  <Input
-                    label="Nové datum"
-                    type="date"
-                    value={r.date}
-                    onChange={(date) => editRound(m.id, { date })}
-                  />
-                  <Input
-                    label="Nový čas"
-                    value={r.time}
-                    onChange={(time) => editRound(m.id, { time })}
-                  />
-                  <Input
-                    label="Nový stav [kWh]"
-                    value={r.value}
-                    onChange={(value) => editRound(m.id, { value })}
-                  />
-                  <Input
-                    label="SUMA ENERGIS [kWh]"
-                    value={r.energis}
-                    onChange={(energis) =>
-                      editRound(m.id, { energis, import: undefined, issue: undefined })
-                    }
-                  />
-                </div>
+                <fieldset disabled={!r.take}>
+                  <legend>Nový odečet</legend>
+                  <div className="field-grid">
+                    <Input
+                      label="Nové datum"
+                      type="date"
+                      value={r.date}
+                      onChange={(date) => editRound(m.id, { date })}
+                    />
+                    <Input
+                      label="Nový čas"
+                      value={r.time}
+                      onChange={(time) => editRound(m.id, { time })}
+                    />
+                    <Input
+                      label="Nový stav [kWh]"
+                      value={r.value}
+                      onChange={(value) => editRound(m.id, { value })}
+                    />
+                    <Input
+                      label="SUMA ENERGIS [kWh]"
+                      value={r.energis}
+                      onChange={(energis) =>
+                        editRound(m.id, { energis, import: undefined, issue: undefined })
+                      }
+                    />
+                  </div>
+                </fieldset>
                 <Info label="SUMA ENERGIS">
                   Součet za srovnávaný interval. Lze zadat ručně i bez UZLU. Ruční změna nahradí
                   importovanou hodnotu.
@@ -401,7 +455,7 @@ export function Series({
                   <p>
                     Energis: {r.import.from.replace('T', ' ')} → {r.import.to.replace('T', ' ')} ·
                     UZEL {r.import.node} · {r.import.sum} {r.import.unit} ·{' '}
-                    {timeOffset(r.import, r.date, r.time)} ·{' '}
+                    {readingTimeOffset(r.import, r.date, r.time, boundary)} ·{' '}
                     {r.import.boundary === 'previous' ? 'předchozí' : 'následující'} hranice
                   </p>
                 )}
@@ -437,14 +491,16 @@ export function Series({
       ) : detail ? (
         <>
           {(() => {
-            const m = data.meters.find((m) => m.id === detail)!;
+            const m = data.meters.find((m) => m.id === detail);
+            if (!m) return <p role="status">Načítám historii elektroměru…</p>;
             return (
               <article className="card">
-                <h2>EM {m.serial}</h2>
+                <h2>UZEL {m.node || 'neuveden'}</h2>
+                <p>Elektroměr {m.serial}</p>
                 <p>
-                  UZEL {m.node || '—'} · {m.location} · {m.placement}
+                  {m.location} · {m.placement}
                 </p>
-                <p>{m.active ? 'Sledování aktivní' : 'Ukončený – historie zachována'}</p>
+                <p>{m.active ? 'Sledování: AKTIVNÍ' : 'Sledování: UKONČENO'}</p>
                 {data.readings
                   .filter((r) => r.meterId === m.id)
                   .sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time))
@@ -461,9 +517,24 @@ export function Series({
                       )}
                     </section>
                   ))}
-                <button className="button primary" onClick={() => begin([m])}>
-                  POKRAČOVAT DALŠÍM ODEČTEM
-                </button>
+                {m.active ? (
+                  <button className="button primary" onClick={() => begin([m])}>
+                    POKRAČOVAT DALŠÍM ODEČTEM
+                  </button>
+                ) : (
+                  <button
+                    className="button primary"
+                    onClick={() =>
+                      void act(async () => {
+                        await repo.reactivate(m.id);
+                        await reload();
+                        broadcast();
+                      })
+                    }
+                  >
+                    ZNOVU AKTIVOVAT SLEDOVÁNÍ
+                  </button>
+                )}
                 <button className="button secondary" onClick={() => setDetail('')}>
                   Zpět na sérii
                 </button>
@@ -548,7 +619,7 @@ export function Series({
                 </label>
                 <p>
                   {r?.date} {r?.time} · {r?.value} kWh ·{' '}
-                  {m.active ? 'Pokračovat ve sledování' : 'Ukončený'}
+                  {m.active ? 'Sledování: AKTIVNÍ' : 'Sledování: UKONČENO'}
                 </p>
                 <button className="button secondary" onClick={() => setDetail(m.id)}>
                   Historie EM {m.serial}
@@ -558,8 +629,8 @@ export function Series({
           })}
           <button
             className="button primary"
-            disabled={!chosen.length}
-            onClick={() => begin(chosen)}
+            disabled={!chosen.some((m) => m.active)}
+            onClick={() => begin(chosen.filter((m) => m.active))}
           >
             POKRAČOVAT DALŠÍM ODEČTEM
           </button>
@@ -606,7 +677,17 @@ export function Series({
               <button
                 className="button secondary"
                 onClick={() => {
-                  setEntry(parseStylus(text));
+                  const parsed = parseStylus(text);
+                  const matched = [...locations(false), ...locations(true)].find(
+                    (v) =>
+                      v.replace(/\s/g, '').toLowerCase() ===
+                      parsed.location
+                        .replace(/\s/g, '')
+                        .replace(/^(?=\d)/, 'TS')
+                        .toLowerCase(),
+                  );
+                  setVn((matched || parsed.location).startsWith('R'));
+                  setEntry({ ...parsed, location: matched || parsed.location });
                   setPreview(true);
                 }}
               >
@@ -618,31 +699,83 @@ export function Series({
             <section className="card">
               <h2>{mode === 'stylus' ? 'Náhled – zkontrolujte údaje' : 'První dílčí odečet'}</h2>
               <div className="field-grid">
+                <label className="series-field">
+                  Napětí
+                  <select
+                    aria-label="Napětí"
+                    value={vn ? 'VN' : 'NN'}
+                    onChange={(e) => {
+                      const next = e.target.value === 'VN';
+                      setVn(next);
+                      update('location', locations(next)[0]);
+                    }}
+                  >
+                    <option>NN</option>
+                    <option>VN</option>
+                  </select>
+                </label>
                 {(
                   [
+                    ['node', 'UZEL (nepovinný)'],
                     ['location', 'TS / rozvodna'],
                     ['placement', 'Pole / kobka / umístění'],
                     ['serial', 'Číslo elektroměru'],
-                    ['node', 'UZEL (nepovinný)'],
                     ['date', 'Datum odečtu'],
                     ['time', 'Čas odečtu (HH:MM)'],
                     ['value', 'Stav elektroměru [kWh]'],
-                    ['actualMtp', 'MTP primár (1 = bez korekce)'],
-                    ['meterMtp', 'MTP elektroměr (1 = bez korekce)'],
                   ] as [keyof Entry, string][]
-                ).map(([key, label]) => (
-                  <Input
-                    key={key}
-                    label={label}
-                    value={entry[key]}
-                    type={key === 'date' ? 'date' : 'text'}
-                    onChange={(v) => update(key, v)}
+                ).map(([key, label]) =>
+                  key === 'location' ? (
+                    <label className="series-field" key={key}>
+                      {label}
+                      <select
+                        aria-label={label}
+                        value={entry.location}
+                        onChange={(e) => update(key, e.target.value)}
+                      >
+                        <option value="">Vyberte TS / rozvodnu</option>
+                        {!locations(vn).includes(entry.location) && entry.location && (
+                          <option>{entry.location}</option>
+                        )}
+                        {locations(vn).map((v) => (
+                          <option key={v}>{v}</option>
+                        ))}
+                      </select>
+                    </label>
+                  ) : (
+                    <Input
+                      key={key}
+                      label={label}
+                      value={entry[key]}
+                      type={key === 'date' ? 'date' : 'text'}
+                      onChange={(v) => update(key, v)}
+                    />
+                  ),
+                )}
+              </div>
+              <div className="field-grid">
+                <MtpSelect
+                  label="MTP primár"
+                  secondary={vn ? 1 : 5}
+                  value={Number(entry.actualMtp)}
+                  onChange={(v) => update('actualMtp', String(v))}
+                />
+                <MtpSelect
+                  label="MTP elektroměr"
+                  secondary={vn ? 1 : 5}
+                  value={Number(entry.meterMtp)}
+                  onChange={(v) => update('meterMtp', String(v))}
+                />
+                {entry.actualMtp !== entry.meterMtp && (
+                  <MtpCoefficient
+                    primary={Number(entry.actualMtp)}
+                    meter={Number(entry.meterMtp)}
                   />
-                ))}
+                )}
               </div>
               <Info label="UZEL">
                 Nepovinné číslice, alespoň 15 číslic je podporováno. Slouží pro párování Energisu;
-                hlavní identifikace je číslo elektroměru.
+                UZEL patří k vývodu a je nezávislý na výměně elektroměru.
               </Info>
               {mode === 'stylus' ? (
                 <>
@@ -666,6 +799,7 @@ export function Series({
                           begin([m], entry);
                         } else {
                           setMode('single');
+                          onModeChange?.('single');
                           setPreview(false);
                         }
                         setError('');
@@ -685,6 +819,7 @@ export function Series({
                     onClick={() =>
                       void act(async () => {
                         const created = await repo.first(entry);
+                        setLastBatch(created.batch.id);
                         setData((current) => ({
                           ...current,
                           batches: current.batches.some((b) => b.id === created.batch.id)
@@ -704,6 +839,17 @@ export function Series({
                     }
                   >
                     ULOŽIT DÍLČÍ ODEČET
+                  </button>
+                  <button
+                    className="button secondary"
+                    disabled={!lastBatch}
+                    onClick={() => {
+                      setBatch(lastBatch);
+                      setMode('history');
+                      setDetail('');
+                    }}
+                  >
+                    DOKONČIT DÍLČÍ ODEČET
                   </button>
                   <Info label="ULOŽIT DÍLČÍ ODEČET">
                     Uloží první stav bez druhého odečtu. TS a datum zůstanou, ostatní pracovní pole

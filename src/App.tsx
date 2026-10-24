@@ -245,48 +245,52 @@ export default function App() {
               : 'Offline se připravuje'}
         </span>
       </div>
-      <div className="segmented" aria-label="Hlavní části aplikace">
-        <button
-          className={mainSection === 'measurement' ? 'active' : ''}
-          onClick={() => setMainSection('measurement')}
-        >
-          MĚŘENÍ
-        </button>
-        <button
-          className={mainSection === 'rates' ? 'active' : ''}
-          onClick={() => setMainSection('rates')}
-        >
-          VÝPOČET SPOTŘEBY A SAZEB
-        </button>
-      </div>
-      <div className="segmented" aria-label="Odečty">
-        {(['single', 'series', 'stylus'] as const).map((v, i) => (
-          <button
-            key={v}
-            onClick={() => {
-              setReadingMode(v);
-              setMainSection('readings');
-            }}
-          >
-            {['JEDNOTLIVÝ ODEČET', 'SÉRIE ODEČTŮ', 'STYLUS'][i]}
-          </button>
-        ))}
-      </div>
-      {mainSection === 'readings' && (
+      {tab !== 'history' && (
+        <>
+          <div className="segmented" aria-label="Hlavní části aplikace">
+            <button
+              className={mainSection === 'measurement' ? 'active' : ''}
+              onClick={() => setMainSection('measurement')}
+            >
+              MĚŘENÍ + ODEČET ELEKTROMĚRU / ENERGIS
+            </button>
+            <button
+              className={mainSection === 'rates' ? 'active' : ''}
+              onClick={() => setMainSection('rates')}
+            >
+              VÝPOČET SPOTŘEBY A SAZEB
+            </button>
+          </div>
+          <div className="segmented" aria-label="Odečty">
+            {(['single', 'series', 'stylus'] as const).map((v, i) => (
+              <button
+                key={v}
+                className={mainSection === 'readings' && readingMode === v ? 'active' : ''}
+                onClick={() => {
+                  setReadingMode(v);
+                  setMainSection('readings');
+                }}
+              >
+                {['JEDNOTLIVÝ ODEČET', 'SÉRIE ODEČTŮ', 'STYLUS'][i]}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+      {tab !== 'history' && mainSection === 'readings' && (
         <main>
-          <Series initial={readingMode} />
+          <Series initial={readingMode} onModeChange={setReadingMode} />
         </main>
       )}
-      {mainSection === 'rates' && (
+      {tab !== 'history' && mainSection === 'rates' && (
         <section className="card">
           <h1>Výpočet spotřeby a sazeb</h1>
           <p>Připravuje se</p>
         </section>
       )}
-      <main hidden={mainSection !== 'measurement'}>
+      <main hidden={tab !== 'history' && mainSection !== 'measurement'}>
         {tab === 'history' ? (
           <>
-            <Series historyOnly />
             <History
               records={records}
               loading={loading}
@@ -766,15 +770,12 @@ export default function App() {
           </div>
         )}
       </main>
-      <nav
-        hidden={mainSection !== 'measurement'}
-        className="bottom-nav"
-        aria-label="Hlavní navigace"
-      >
+      <nav className="bottom-nav" aria-label="Hlavní navigace">
         <button
           className={tab === 'measure' ? 'active' : ''}
           onClick={() => {
             setTab('measure');
+            setMainSection('measurement');
             setError('');
           }}
         >

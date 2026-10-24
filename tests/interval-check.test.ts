@@ -264,7 +264,7 @@ describe('1.2.4 actual interval presentation', () => {
     d.interval.from = from;
     d.interval.to = to;
     const record = createIntervalCheck(d);
-    expect(historyMarkup([record])).toContain(`Interval: ${label}`);
+    expect(historyMarkup([record])).toContain(label.split(' → ')[1]);
     expect(historyMarkup([record])).not.toContain('2026-10-19');
     for (const section of ['result', 'detail'])
       expect(renderToStaticMarkup(createElement(IntervalResult, { record, section }))).toContain(
@@ -282,7 +282,7 @@ describe('1.2.4 actual interval presentation', () => {
   });
   it('opens legacy combined interval fields and falls back safely when absent', () => {
     const record = createIntervalCheck(draft());
-    expect(historyMarkup([record])).toContain('20.10.2026 08:00 → 20.10.2026 09:00');
+    expect(historyMarkup([record])).toContain('20.10.2026 09:00');
     delete (record.input as Partial<typeof record.input>).interval;
     expect(historyMarkup([record])).toContain('2026-10-20');
     for (const section of ['result', 'detail'])
@@ -312,7 +312,7 @@ describe('1.2.4 actual interval presentation', () => {
     });
     for (const record of [evaluateCurrent(current), power]) {
       const markup = historyMarkup([record]);
-      expect(markup).toContain('Datum měření: 2026-10-19');
+      expect(markup).toContain('19.10.2026');
       expect(markup).toContain(record.localTimestamp);
       expect(toTSV([record]).split('\t')[0]).toBe('2026-10-19');
     }

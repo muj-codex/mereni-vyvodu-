@@ -14,6 +14,8 @@ export interface Meter {
   active: boolean;
   actualMtp: number;
   meterMtp: number;
+  /** Last explicit tracking or outlet identity edit, preserved when merging backups. */
+  trackingUpdatedAt?: string;
 }
 export interface EnergisMeta {
   file: string;
@@ -35,6 +37,7 @@ export interface Reading {
   active: boolean;
   energis?: number;
   import?: EnergisMeta;
+  boundary?: 'previous' | 'next';
   result?: ReturnType<typeof compareEnergy>;
 }
 export interface SeriesData {
@@ -80,7 +83,22 @@ export const numberValue = (s: string) => {
   if (!Number.isFinite(n)) throw Error('Číslo je příliš velké.');
   return n;
 };
+export function normalizeTime(time: string) {
+  return /^\d:[0-5]\d$/.test(time) ? `0${time}` : time;
+}
+export function localTime(now = new Date()) {
+  return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+}
+export interface NodeLocation {
+  node: string;
+  location: string;
+  placement: string;
+}
+export function lookupNode(node: string, directory: readonly NodeLocation[] = []) {
+  return directory.find((item) => item.node === node);
+}
 export function timestamp(date: string, time: string) {
+  time = normalizeTime(time);
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !/^([01]\d|2[0-3]):[0-5]\d$/.test(time))
     throw Error('Vyplňte platné datum a ručně čas HH:MM.');
   const d = new Date(`${date}T${time}:00Z`);
@@ -127,7 +145,7 @@ export function firstReading(e: Entry, batchId: string) {
     id: crypto.randomUUID(),
     meterId: meter.id,
     date: e.date,
-    time: e.time,
+    time: normalizeTime(e.time),
     value: numberValue(e.value),
     active: true,
   };
@@ -143,6 +161,7 @@ export function nextReading(
     energis: string;
     active: boolean;
     import?: EnergisMeta;
+    boundary?: 'previous' | 'next';
   },
 ): Reading {
   const value = numberValue(e.value);
@@ -159,11 +178,12 @@ export function nextReading(
     meterId: m.id,
     previousId: previous.id,
     date: e.date,
-    time: e.time,
+    time: normalizeTime(e.time),
     value,
     active: e.active,
     energis: energy,
     import: e.import,
+    ...(e.boundary ? { boundary: e.boundary } : {}),
     result: energy === undefined ? undefined : result,
   };
 }
@@ -184,6 +204,11 @@ export function validateSeries(value: unknown): SeriesData {
   for (const m of d.meters) {
     if (!d.batches.some((b) => b.id === m.batchId) || typeof m.active !== 'boolean')
       throw Error('Chybí vazba elektroměru.');
+    if (
+      m.trackingUpdatedAt !== undefined &&
+      (typeof m.trackingUpdatedAt !== 'string' || !Number.isFinite(Date.parse(m.trackingUpdatedAt)))
+    )
+      throw Error('Neplatná metadata sledování.');
     validateEntry({
       ...m,
       date: '2026-01-01',
@@ -208,6 +233,8 @@ export function validateSeries(value: unknown): SeriesData {
       (typeof r.energis !== 'number' || !Number.isFinite(r.energis) || r.energis < 0)
     )
       throw Error('Neplatná hodnota Energis.');
+    if (r.boundary !== undefined && !['previous', 'next'].includes(r.boundary))
+      throw Error('Neplatná hranice Energisu.');
     if (r.import) {
       const i = r.import;
       if (

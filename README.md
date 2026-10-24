@@ -194,3 +194,17 @@ IndexedDB zůstává `mereni-vyvodu-v1`, schéma se bezpečně zvýšilo na 3 s 
 `series`, `meters`, `readings`. Původní `measurements` se nemaže ani nepřepočítává.
 Nové zápisy aktualizují UI přírůstkově; párování a čtení historie elektroměru používá indexy.
 ExcelJS se načítá odděleně a PWA jej zahrnuje do offline precache.
+
+## Verze 1.3.1 – terénní odečty (24. 10. 2026)
+
+- Jednotlivý a sériový odečet sdílejí historii. Výběr série zahrnuje elektroměry stejné TS/R i z jiného dne.
+- Přednastavené TS/R a MTP pro NN /5 A a VN /1 A, vlastní MTP a viditelný korekční koeficient.
+- UZEL je první údaj, nepovinný řetězec číslic nezávislý na čísle elektroměru; připravený typ a lookup pro budoucí adresář vývodů.
+- TEĎ vyplní lokální HH:MM až po kliknutí; zápis 8:32 se normalizuje na 08:32.
+- Společné datum kola, individuální úpravy a ODEČÍST pro přeskočení návštěvy bez změny historie či sledování.
+- Ukončení a výslovná reaktivace sledování zachovávají poslední skutečný odečet i celou historii.
+- Dokončení dílčího odečtu přejde do historie bez vytvoření záznamu.
+- Jedno live vyhledávání nad výsledky a odečty, kompaktní řádky a řazení podle skutečného času odečtu.
+- Energis XLSX/TXT pouze podle UZLU aktivních řádků; doplněný UZEL se uloží. Výsledek ukazuje podepsaný počet minut E pro importovanou i ruční hranici.
+- IndexedDB zůstává ve verzi 3: přidaná volitelná metadata nevyžadují změnu object stores. Starší data a JSON zálohy zůstávají podporované.
+- Výpočetní jádro `src/core` a parser Energisu zůstávají beze změn; matematické regrese i kontrola otisků chrání výsledky verze 1.3.0.

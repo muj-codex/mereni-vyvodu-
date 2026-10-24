@@ -6,7 +6,7 @@ async function start(page: Page) {
 }
 async function first(page: Page, serial = '12345678', node = '21208142') {
   const s = scope(page);
-  await s.getByLabel('TS / rozvodna', { exact: true }).fill('TS 3831/257');
+  await s.getByLabel('TS / rozvodna', { exact: true }).selectOption('TS 3831/257');
   await s.getByLabel('Pole / kobka / umístění', { exact: true }).fill('11P');
   await s.getByLabel('Číslo elektroměru', { exact: true }).fill(serial);
   await s.getByLabel('UZEL (nepovinný)', { exact: true }).fill(node);
@@ -34,7 +34,7 @@ const meterCard = (page: Page, serial = '12345678') =>
 async function fillRound(page: Page) {
   const s = scope(page);
   const card = meterCard(page);
-  await s.getByLabel('Datum pracovního kola', { exact: true }).fill('2026-10-29');
+  await s.getByLabel('Datum nového odečtu', { exact: true }).fill('2026-10-29');
   await card.getByLabel('Nový čas', { exact: true }).fill('09:12');
   await card.getByLabel('Nový stav [kWh]', { exact: true }).fill('24110');
   await card.getByLabel('SUMA ENERGIS [kWh]', { exact: true }).fill('654');
@@ -64,7 +64,7 @@ test('první kolo: zachová TS a datum, vyčistí pracovní pole a seskupí hist
   await s.getByRole('button', { name: /Odečtová série · TS/ }).click();
   await expect(s.getByRole('checkbox', { name: 'Vybrat EM 12345678', exact: true })).toBeVisible();
 });
-test('další kolo: výběr, zamčené údaje, prázdný řádek neblokuje, ukončení uchová historii', async ({
+test('další kolo: výběr, zamčené údaje, přeskočení a ukončení uchová historii', async ({
   page,
 }) => {
   await start(page);
@@ -79,16 +79,20 @@ test('další kolo: výběr, zamčené údaje, prázdný řádek neblokuje, ukon
   await expect(s.getByLabel('Předchozí stav [kWh]', { exact: true }).first()).toBeDisabled();
   await expect(s.getByLabel('Nový čas', { exact: true }).first()).toHaveValue('');
   await fillRound(page);
+  await meterCard(page, '222').getByRole('checkbox', { name: 'ODEČÍST', exact: true }).uncheck();
   await meterCard(page)
     .getByRole('checkbox', { name: 'Pokračovat dalším odečtem', exact: true })
     .uncheck();
   await s.getByRole('button', { name: 'ULOŽIT VYPLNĚNÉ ODEČTY', exact: true }).click();
   await expect(s.getByRole('status')).toContainText('Uloženo 1');
-  await s.getByRole('button', { name: 'Zpět do historie', exact: true }).click();
   await s.getByRole('button', { name: 'Historie EM 12345678', exact: true }).click();
   await expect(s.getByText('2026-10-22 08:37 – 23456 kWh', { exact: true })).toBeVisible();
   await expect(s.getByText('2026-10-29 09:12 – 24110 kWh', { exact: true })).toBeVisible();
-  await expect(s.getByText('Ukončený – historie zachována', { exact: true })).toBeVisible();
+  await expect(s.getByText('Sledování: UKONČENO', { exact: true })).toBeVisible();
+  await expect(
+    s.getByRole('button', { name: 'POKRAČOVAT DALŠÍM ODEČTEM', exact: true }),
+  ).toHaveCount(0);
+  await s.getByRole('button', { name: 'ZNOVU AKTIVOVAT SLEDOVÁNÍ', exact: true }).click();
   await begin(page);
   await expect(s.getByLabel('Předchozí stav [kWh]', { exact: true })).toHaveValue('24110');
 });
@@ -115,6 +119,7 @@ test('import TXT doplní jen vybrané UZLY a označí nenalezený', async ({ pag
     meterCard(page, '222').getByLabel('SUMA ENERGIS [kWh]', { exact: true }),
   ).toHaveValue('');
   await fillRound(page);
+  await meterCard(page, '222').getByRole('checkbox', { name: 'ODEČÍST', exact: true }).uncheck();
   await s.getByRole('button', { name: 'ULOŽIT VYPLNĚNÉ ODEČTY', exact: true }).click();
   await expect(s.getByRole('status')).toContainText('Uloženo 1');
 });
@@ -151,7 +156,9 @@ test('JSON záloha obnoví série v čisté DB a podruhé nevytvoří duplicity'
   await begin(page);
   await fillRound(page);
   await scope(page).getByRole('button', { name: 'ULOŽIT VYPLNĚNÉ ODEČTY', exact: true }).click();
-  await page.getByRole('button', { name: 'MĚŘENÍ', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'MĚŘENÍ + ODEČET ELEKTROMĚRU / ENERGIS', exact: true })
+    .click();
   await page.getByRole('button', { name: /Výsledky měření/ }).click();
   await page.evaluate(() => {
     Object.defineProperty(navigator, 'share', { value: undefined, configurable: true });
@@ -168,6 +175,7 @@ test('JSON záloha obnoví série v čisté DB a podruhé nevytvoří duplicity'
     await clean.getByRole('button', { name: 'IMPORTOVAT', exact: true }).click();
     await expect(clean.getByRole('dialog')).toHaveCount(0);
   }
+  await clean.getByRole('button', { name: /Historie odečtů · výběr/ }).click();
   const s = scope(clean);
   await expect(s.getByRole('button', { name: /Odečtová série · TS/ })).toHaveCount(1);
   await s.getByRole('button', { name: 'Historie EM 12345678', exact: true }).click();
@@ -260,13 +268,13 @@ test('XLSX import a export XLSX/TXT zachová UZEL a hodnoty', async ({ page }) =
   await expect(s.getByLabel('SUMA ENERGIS [kWh]', { exact: true })).toHaveValue('654');
   await expect(s.getByText(/Energis: 2026-10-29 08:45/)).toBeVisible();
 });
-test('již otevřená historie zobrazuje odečet přidaný v jiné části aplikace', async ({ page }) => {
+test('historie zobrazí odečet přidaný v jiné části aplikace', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('button', { name: /Výsledky měření/ }).click();
+  await expect(page.getByRole('button', { name: 'SÉRIE ODEČTŮ', exact: true })).toHaveCount(0);
+  await page.getByRole('button', { name: 'Nové měření', exact: false }).click();
   await page.getByRole('button', { name: 'SÉRIE ODEČTŮ', exact: true }).click();
   await first(page);
-  await page.getByRole('button', { name: 'MĚŘENÍ', exact: true }).click();
-  await expect(
-    scope(page).getByRole('button', { name: 'Historie EM 12345678', exact: true }),
-  ).toBeVisible();
+  await page.getByRole('button', { name: /Výsledky měření/ }).click();
+  await expect(page.locator('.record-open')).toContainText('21208142');
 });

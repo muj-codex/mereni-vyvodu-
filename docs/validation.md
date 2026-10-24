@@ -55,3 +55,14 @@ Test souborového Web Share používá mock systémového rozhraní. Fyzický iP
 - Importní testy používají **syntetická data**, nikoliv fotografie nebo nepřiložený skutečný Energis export. Ověřují sumy 940 / 816 / 1028, identitu výsledku XLSX/TXT, posunuté řádky, 100 intervalů, velký export s nevybranými UZLY, chybějící a duplicitní uzly, nesoulad SUMA, různé agregace, půlnoc, oddělené tabulky metadat/dat a posuny −7 / +8 min E. Hodnoty kW se skrytě nekonvertují.
 
 Mobilní profily jsou emulace v Chromiu, nikoli fyzické iPadOS/Safari. Apple Pencil/Scribble a neznámé varianty skutečných Energis exportů vyžadují ověření na cílovém zařízení a souboru; nejednoznačný import se označí k ruční kontrole. STYLUS používá standardní HTML pole bez vlastního OCR a nikdy sám nezapisuje rozpoznaný text do databáze.
+
+## Ověření 1.3.1 – terénní workflow (24. 10. 2026)
+
+- `npm test`: 14 sad, 269 testů prošlo.
+- `npm run test:e2e -- --workers=2`: všech 100 scénářů prošlo na Chromium profilech iPhone 13 / iPad (gen 7).
+- `npm run build`: TypeScript, produkční Vite build a PWA/service worker prošly; offline precache obsahuje všech 8 souborů včetně lazy XLSX modulu.
+- Matematická regrese: ARON, 1f, 3f, VN, U/I/PF ↔ Kyoritsu, Kyoritsu ↔ Energis, Kontrola stavů a MTP v celé unit/E2E sadě. Přesné otisky všech souborů `src/core` odpovídají produkci 1.3.0. Parser Energisu a STYLUS jsou rovněž beze změn.
+- IndexedDB zůstává ve verzi 3 bez potřeby změny schématu; testy migrace v1/v2 → v3 zachovávají staré záznamy. Volitelná metadata stavu sledování a hranice Energisu se ukládají do stávajících objektů.
+- JSON backup/restore: staré zálohy, úplná historie, doplněné UZLY, ukončené/reaktivované sledování, Energis, opakovaný import bez duplicit a transakční rollback prošly.
+- Nové scénáře pokrývají NN/VN dropdowny, MTP a koeficient, explicitní lokální TEĎ, normalizaci 8:32, společné/individuální datum, přeskočenou návštěvu bez posunu historie, reaktivaci z posledního odečtu, společnou historii jednotlivého/sériového odečtu, částečné live hledání, chronologické řazení, kompaktní řádky, UZEL první v detailu a skrytou horní navigaci ve výsledcích.
+- Reálný Apple Pencil / Scribble nebyl k dispozici; standardní input/textarea a automatické testy parseru zůstaly zachované.

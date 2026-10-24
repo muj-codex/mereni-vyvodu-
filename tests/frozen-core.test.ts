@@ -1,7 +1,7 @@
 import { it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
-// Exact source identity against production 1.2.7; existing numerical regression suites remain mandatory.
+// Exact source identity against production 1.3.0 (unchanged since 1.2.7); existing numerical regression suites remain mandatory.
 const baseline = {
   'src/core/aron.ts': '885537633a9433092748ce8ba2f2182c29777031526f62794be9f85cf8c2c022',
   'src/core/comparisons.ts': '2f9040893199cc2da274e96b5ad55a887a9ba0e6811c31d6a922f31713d0c8f3',
@@ -18,7 +18,7 @@ const baseline = {
     '456090e5275dde8233d051e3a7c3e72d7ea7cb42233a6918a0c5f86ecb378a6b',
   'src/core/types.ts': '565cacae382f078927842a4226b57535d16eb8f72a4a0d16b69e1f445380e61f',
 };
-it('ověřené výpočtové jádro je beze změny proti 1.2.7', () => {
+it('ověřené výpočtové jádro je beze změny proti 1.3.0', () => {
   for (const [path, sha] of Object.entries(baseline))
     expect(createHash('sha256').update(readFileSync(path)).digest('hex'), path).toBe(sha);
 });

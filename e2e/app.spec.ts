@@ -88,7 +88,7 @@ test('sériové měření, historie, výběr, export a bezpečné mazání', asy
   await expect(page.locator('#serial')).toBeVisible();
   await page.getByRole('button', { name: 'Výsledky měření', exact: false }).last().click();
   await expect(page.locator('.history-item')).toHaveCount(2);
-  await page.locator('.record-open').filter({ hasText: '0012345678' }).click();
+  await page.locator('.record-open').locator('xpath=self::*[@data-serial="0012345678"]').click();
   await expect(page.getByRole('heading', { name: 'MĚŘENÍ V POŘÁDKU' })).toBeVisible();
   await noOverflow(page);
   await page.getByRole('button', { name: 'Data / detail' }).click();
@@ -178,10 +178,10 @@ test('volitelný interval bez pulzů, MTP a nezávislá historie při rozpracova
   await page.getByLabel('VÝROBNÍ ČÍSLO ELEKTROMĚRU', { exact: true }).fill('999');
   await page.getByRole('button', { name: 'Výsledky měření', exact: false }).last().click();
   await page.locator('.record-open').click();
-  await expect(page.getByRole('heading', { name: '00042', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'UZEL neuveden', exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Smazat toto měření' }).click();
   await page.getByRole('button', { name: 'Zrušit', exact: true }).click();
-  await expect(page.getByRole('heading', { name: '00042', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'UZEL neuveden', exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Smazat toto měření' }).click();
   await page.getByRole('button', { name: 'Trvale smazat' }).click();
   await expect(page.getByRole('heading', { name: 'Zatím žádná měření' })).toBeVisible();

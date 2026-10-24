@@ -58,7 +58,7 @@ test('samostatná kontrola: korekce, uložení bez Kyoritsu a tři různé zálo
   await page
     .getByRole('button', { name: 'Informace o korekčním koeficientu', exact: true })
     .click();
-  await expect(page.getByText(/Korekční koeficient se používá při porovnání/)).toBeVisible();
+  await expect(page.getByText(/Koeficient se použije při výpočtu/)).toBeVisible();
   await save(page);
   await page.getByLabel('POLE / UMÍSTĚNÍ', { exact: true }).fill('pozdější změna');
   await history(page);
@@ -70,7 +70,7 @@ test('samostatná kontrola: korekce, uložení bez Kyoritsu a tři různé zálo
     path: `test-results/${test.info().project.name}-interval-history.png`,
     fullPage: true,
   });
-  await expect(page.locator('.record-open')).toContainText('Kontrola stavů');
+  await expect(page.locator('.record-open')).toHaveAttribute('data-type', 'Kontrola stavů');
   await page.locator('.record-open').click();
   const result = await page.locator('main').innerText();
   await page.getByRole('button', { name: 'Prověřit', exact: true }).click();
@@ -107,30 +107,30 @@ test('odeslání aktuální kontroly obsahuje čisté TSV a žádné files/pří
 test('historie: všechna místa, napětí a nejnovější nahoře', async ({ page }) => {
   await threeRecords(page);
   await expect(page.locator('.history-item')).toHaveCount(3);
-  await expect(page.locator('.record-open').first()).toContainText('000VN');
-  for (const value of ['TS 0425/259', 'TS 3308/250', 'R201', 'VN 10,3 kV', 'NN 500 V – ARON'])
+  await expect(page.locator('.record-open').first()).toHaveAttribute('data-serial', '000VN');
+  for (const value of ['TS 0425/259', 'TS 3308/250', 'R201'])
     expect(await page.locator('.history-list').innerText()).toContain(value);
 });
 test('filtr konkrétní TS a zrušení filtru vrací všechna data', async ({ page }) => {
   await threeRecords(page);
-  await page.getByLabel('Filtr umístění', { exact: true }).selectOption('TS 0425/259');
+  await page.getByLabel('Hledat ve všech výsledcích a odečtech').fill('0425');
   await expect(page.locator('.history-item')).toHaveCount(1);
-  await expect(page.locator('.record-open')).toContainText('000TS');
-  await page.getByRole('button', { name: 'Zrušit filtry', exact: true }).click();
+  await expect(page.locator('.record-open')).toHaveAttribute('data-serial', '000TS');
+  await page.getByLabel('Hledat ve všech výsledcích a odečtech').fill('');
   await expect(page.locator('.history-item')).toHaveCount(3);
 });
 test('filtr VN 10,3 kV', async ({ page }) => {
   await threeRecords(page);
-  await page.getByLabel('Filtr režim / napětí', { exact: true }).selectOption('10300');
+  await page.getByLabel('Hledat ve všech výsledcích a odečtech').fill('10,3');
   await expect(page.locator('.history-item')).toHaveCount(1);
-  await expect(page.locator('.record-open')).toContainText('000VN');
+  await expect(page.locator('.record-open')).toHaveAttribute('data-serial', '000VN');
 });
 test('kombinace umístění a napětí, včetně prázdného výsledku', async ({ page }) => {
   await threeRecords(page);
-  await page.getByLabel('Filtr umístění', { exact: true }).selectOption('R201');
-  await page.getByLabel('Filtr režim / napětí', { exact: true }).selectOption('10300');
+  await page.getByLabel('Hledat ve všech výsledcích a odečtech').fill('R20');
+  await page.getByLabel('Hledat ve všech výsledcích a odečtech').fill('10,3');
   await expect(page.locator('.history-item')).toHaveCount(1);
-  await page.getByLabel('Filtr režim / napětí', { exact: true }).selectOption('400');
+  await page.getByLabel('Hledat ve všech výsledcích a odečtech').fill('nenalezeno');
   await expect(page.locator('.history-item')).toHaveCount(0);
   await expect(
     page.getByText('Žádné záznamy neodpovídají filtrům.', { exact: true }),
@@ -194,7 +194,7 @@ test('legacy v1 zůstane beze změny vedle nové kontroly po reloadu', async ({ 
   await page.reload();
   await history(page);
   await expect(page.locator('.history-item')).toHaveCount(2);
-  await page.locator('.record-open').filter({ hasText: '000LEGACY' }).click();
+  await page.locator('.record-open').locator('xpath=self::*[@data-serial="000LEGACY"]').click();
   await page.getByRole('button', { name: 'Data / detail', exact: true }).click();
   await expect(page.getByText('0,2 kWh', { exact: true })).toBeVisible();
   const legacy = await page.evaluate(
@@ -224,7 +224,7 @@ test('offline reload zachová starší měření i novou kontrolu stavů', async
   await page.reload();
   await history(page);
   await expect(page.locator('.history-item')).toHaveCount(2);
-  await page.locator('.record-open').filter({ hasText: '000CHECK' }).click();
+  await page.locator('.record-open').locator('xpath=self::*[@data-serial="000CHECK"]').click();
   await expect(
     page.getByText('Spotřeba elektroměru a Energis odpovídá.', { exact: true }),
   ).toBeVisible();
@@ -301,7 +301,9 @@ for (const [fromTime, toDate, toTime, label] of [
     await save(page);
     await page.reload();
     await history(page);
-    await expect(page.locator('.record-open')).toContainText(`Interval: ${label}`);
+    await expect(page.locator('.record-open')).toContainText(
+      `${toDate.split('-').reverse().join('.')} ${toTime}`,
+    );
     await expect(page.locator('.record-open')).not.toContainText('2026-10-19');
     await page.locator('.record-open').click();
     await expect(page.locator('.identification-summary')).toContainText(`Interval: ${label}`);
@@ -345,10 +347,10 @@ test('1.2.4 legacy Kontrola stavů: původní interval i chybějící interval s
   await page.reload();
   await history(page);
   await expect(page.locator('.history-item')).toHaveCount(2);
-  await expect(page.locator('.record-open').filter({ hasText: '000CHECK' })).toContainText(
-    '20.10.2026 08:00 → 20.10.2026 09:00',
-  );
-  await page.locator('.record-open').filter({ hasText: '000MISSING' }).click();
+  await expect(
+    page.locator('.record-open').locator('xpath=self::*[@data-serial="000CHECK"]'),
+  ).toContainText('20.10.2026 09:00');
+  await page.locator('.record-open').locator('xpath=self::*[@data-serial="000MISSING"]').click();
   await expect(page.locator('.interval-result')).toContainText('Interval: 2026-10-20');
   await page.getByRole('button', { name: 'Data / detail', exact: true }).click();
   await expect(page.locator('.interval-result')).toContainText('Interval: 2026-10-20');

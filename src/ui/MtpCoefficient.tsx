@@ -18,8 +18,7 @@ export function MtpCoefficient({ primary, meter }: { primary: number; meter: num
       <output aria-label="Korekční koeficient">× {formatNumber(primary / meter, 3, true)}</output>
       {info && (
         <p className="hint">
-          Korekční koeficient se používá při porovnání stavů elektroměru s Energis. Vypočítává se z
-          poměru skutečného MTP a MTP nastaveného v elektroměru. Příklad: 300 / 600 = 0,500.
+          Koeficient se použije při výpočtu skutečné spotřeby z rozdílu stavů elektroměru.
         </p>
       )}
     </div>
