@@ -262,3 +262,7 @@ V detailu série nahrazuje vyhledávací pole kompaktní chronologický seznam u
 Duplicitní řady nahrazuje jedna společná navigace: Jednotlivý odečet | Série odečtů | Stylus | Historie odečtů. V odečtech je právě jedna aktivní položka se stejným stylem; menší displeje dovolují zalomení. Hlavní moduly, lokální ← Zpět a globální spodní navigace zůstávají zachované. Ve Výsledcích měření se pracovní navigace nezobrazuje.
 
 Změna se týká pouze navigačního zobrazení. Výpočty, formuláře, rozpracovaná data, odečtová kola, historie, Stylus parser, Energis, +E/-E, IndexedDB a backup/restore zůstávají beze změny.
+
+## Verze 1.3.9 – zjednodušení navigace a nadpisu
+
+Horní navigace odečtů obsahuje pouze Jednotlivý odečet | Série odečtů | Stylus. Uložené výsledky, série a samostatné odečty jsou nadále přístupné přes spodní globální Výsledky měření. Na prvním kroku hlavního měření se nezobrazuje pouze nadpis „Základ / kontrola stavů“; ELEKTROMĚR, krokový indikátor, pomocný text, identifikace a celý formulář zůstávají zachované. Výpočty, odečtová logika, historie, Energis, Kyoritsu, +E/-E, IndexedDB a backup/restore nebyly změněny.

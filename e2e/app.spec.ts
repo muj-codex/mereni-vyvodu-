@@ -135,7 +135,7 @@ test('PWA se znovu načte offline a uchová historii', async ({ page, context })
   );
   await context.setOffline(true);
   await page.reload();
-  await expect(page.getByRole('heading', { name: 'Základ / kontrola stavů' })).toBeVisible();
+  await expect(page.getByText('ELEKTROMĚR', { exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Výsledky měření', exact: false }).last().click();
   await expect(page.locator('.history-item')).toHaveCount(1);
   await page.getByRole('button', { name: 'Nové měření', exact: true }).click();

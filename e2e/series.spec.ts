@@ -21,7 +21,8 @@ async function first(page: Page, serial = '12345678', node = '21208142') {
   await expect(s.getByRole('status')).toContainText('uložen');
 }
 async function history(page: Page, open = true) {
-  await scope(page).getByRole('button', { name: 'Historie odečtů', exact: true }).click();
+  await page.getByRole('button', { name: /Výsledky měření/ }).click();
+  await page.getByRole('button', { name: /Historie odečtů · výběr/ }).click();
   if (open)
     await scope(page)
       .getByRole('button', { name: /Odečtová série · TS/ })
@@ -168,10 +169,13 @@ test('JSON záloha obnoví série v čisté DB a podruhé nevytvoří duplicity'
   await begin(page);
   await fillRound(page);
   await scope(page).getByRole('button', { name: 'ULOŽIT VYPLNĚNÉ ODEČTY', exact: true }).click();
-  await page
-    .getByRole('button', { name: 'MĚŘENÍ + ODEČET ELEKTROMĚRU / ENERGIS', exact: true })
-    .click();
-  await page.getByRole('button', { name: /Výsledky měření/ }).click();
+  // The series is now opened within global results; return to their overview locally.
+  for (
+    let i = 0;
+    i < 4 && !(await page.getByRole('button', { name: 'ZÁLOHOVAT DATA', exact: true }).isVisible());
+    i++
+  )
+    await scope(page).getByRole('button', { name: '← Zpět', exact: true }).first().click();
   await page.evaluate(() => {
     Object.defineProperty(navigator, 'share', { value: undefined, configurable: true });
   });

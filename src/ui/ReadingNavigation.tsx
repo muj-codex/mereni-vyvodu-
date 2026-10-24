@@ -9,7 +9,7 @@ export function ReadingNavigation({
 }) {
   return (
     <nav className="segmented reading-navigation" aria-label="Odečty">
-      {(['single', 'series', 'stylus', 'history'] as const).map((mode, i) => (
+      {(['single', 'series', 'stylus'] as const).map((mode, i) => (
         <button
           key={mode}
           type="button"
@@ -17,7 +17,7 @@ export function ReadingNavigation({
           aria-pressed={active === mode}
           onClick={() => onChange(mode)}
         >
-          {['Jednotlivý odečet', 'Série odečtů', 'Stylus', 'Historie odečtů'][i]}
+          {['Jednotlivý odečet', 'Série odečtů', 'Stylus'][i]}
         </button>
       ))}
     </nav>

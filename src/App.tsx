@@ -408,9 +408,11 @@ export default function App() {
                         ? 'KYORITSU · KEW 6305'
                         : 'DIAGNOSTIKA MĚŘENÍ'}
                   </span>
-                  <h1 ref={heading} tabIndex={-1}>
-                    {STEPS[step]}
-                  </h1>
+                  {step !== 0 && (
+                    <h1 ref={heading} tabIndex={-1}>
+                      {STEPS[step]}
+                    </h1>
+                  )}
                   <p>
                     {
                       [
