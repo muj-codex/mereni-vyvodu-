@@ -34,13 +34,13 @@ export async function fillCompany(p: Page) {
   await s.getByLabel('Čas prvního odečtu', { exact: true }).fill('10:00');
   await s
     .getByRole('region', { name: 'První odečet', exact: true })
-    .getByLabel('Stav elektroměru [kWh]', { exact: true })
+    .getByLabel('Stav elektroměru VT / hlavní registr', { exact: true })
     .fill('1000');
   await s.getByLabel('Datum druhého odečtu', { exact: true }).fill('2026-01-11');
   await s.getByLabel('Čas druhého odečtu', { exact: true }).fill('10:00');
   await s
     .getByRole('region', { name: 'Druhý odečet', exact: true })
-    .getByLabel('Stav elektroměru [kWh]', { exact: true })
+    .getByLabel('Stav elektroměru VT / hlavní registr', { exact: true })
     .fill('2250');
 }
 export async function companyResult(p: Page) {

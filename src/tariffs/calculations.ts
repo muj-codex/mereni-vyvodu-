@@ -1,3 +1,4 @@
+import { assessOrlen } from './orlenCosts';
 import {
   standardBreakerAmps,
   suppliersFor,
@@ -120,7 +121,8 @@ export function readingInstant(reading: ReadingInput): number {
   return candidates[0];
 }
 export function calculateCompany(input: CompanyInputs) {
-  if (!tariffFor('C', input.tariffCode)) throw new TariffInputError('Vyberte původní sazbu C.');
+  const tariff = tariffFor('C', input.tariffCode);
+  if (!tariff) throw new TariffInputError('Vyberte původní sazbu C.');
   const first = readingInstant(input.first),
     second = readingInstant(input.second);
   if (second <= first)
@@ -130,12 +132,27 @@ export function calculateCompany(input: CompanyInputs) {
   if (secondKwh < firstKwh)
     throw new TariffInputError('Druhý stav elektroměru nesmí být nižší než první.');
   const elapsedHours = (second - first) / 3600000;
-  const consumptionKwh = secondKwh - firstKwh;
-  const annualKwh = consumptionKwh * ((365 * 24) / elapsedHours);
+  const consumptionVT = secondKwh - firstKwh;
+  let consumptionNT = 0;
+  if (tariff.dualTariff) {
+    const nt1 = numberInput(input.first.ntValue ?? '', 'První stav NT');
+    const nt2 = numberInput(input.second.ntValue ?? '', 'Druhý stav NT');
+    if (nt2 < nt1) throw new TariffInputError('Druhý stav NT nesmí být nižší než první.');
+    consumptionNT = nt2 - nt1;
+  }
+  const consumptionKwh = consumptionVT + consumptionNT;
+  const annualVT = consumptionVT * ((365 * 24) / elapsedHours);
+  const annualNT = consumptionNT * ((365 * 24) / elapsedHours);
+  const annualKwh = annualVT + annualNT;
   if (!Number.isFinite(annualKwh))
     throw new TariffInputError('Roční ekvivalent je mimo podporovaný rozsah.');
   return {
     consumptionKwh,
+    consumptionVT,
+    consumptionNT,
+    annualVT,
+    annualNT,
+    dualTariff: tariff.dualTariff,
     elapsedHours,
     annualKwh,
     breakerA: usedBreaker(input.breaker),
@@ -155,6 +172,7 @@ export function comparisonContext(
   annualKwh: number,
   breakerA: number,
   originalTariff: string | null = null,
+  annualSplit: { annualVT: number; annualNT: number } | null = null,
 ) {
   if (method === 'company' && customer !== 'C')
     throw new TariffInputError('Odhad / firmy je dostupný pouze v režimu C.');
@@ -169,6 +187,7 @@ export function comparisonContext(
     method,
     distributionArea: area,
     originalTariff,
+    annualSplit,
     annualKwh,
     breakerA,
     verdict: { kind: 'pending' } as TariffVerdict,
@@ -181,6 +200,10 @@ export function comparisonContext(
         annualKwh,
         eligibility: 'not-evaluated' as const,
         annualCosts: unknownAnnualCosts(),
+        orlenAssessment:
+          supplier.id === 'orlen'
+            ? assessOrlen(tariff.code, area, breakerA, annualKwh, annualSplit)
+            : null,
       })),
     ),
   };

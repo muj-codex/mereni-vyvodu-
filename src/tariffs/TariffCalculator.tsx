@@ -1,3 +1,4 @@
+import { OrlenPrices } from './OrlenPrices';
 import { useState } from 'react';
 import { BackButton } from '../ui/BackButton';
 import { SelectField } from '../ui/Fields';
@@ -38,12 +39,14 @@ function NumberInput({
   onChange,
   placeholder = '0,00',
   integer = false,
+  disabled = false,
 }: {
   label: string;
   value: string;
   onChange: (v: string) => void;
   placeholder?: string;
   integer?: boolean;
+  disabled?: boolean;
 }) {
   return (
     <label className="field">
@@ -54,7 +57,8 @@ function NumberInput({
           type="text"
           inputMode={integer ? 'numeric' : 'decimal'}
           pattern={integer ? '[0-9]+' : '[0-9]+([,.][0-9]+)?'}
-          required
+          required={!disabled}
+          disabled={disabled}
           autoComplete="off"
           value={value}
           placeholder={placeholder}
@@ -114,7 +118,10 @@ function TariffSelect({ value, onChange }: { value: string; onChange: (v: string
       <SelectField label="Původní sazba" value={value} onChange={onChange}>
         <option value="">Vyberte sazbu C</option>
         {tariffsFor('C').map((t) => (
-          <option key={t.code}>{t.code}</option>
+          <option key={t.code} value={t.code}>
+            {t.code}
+            {t.dualTariff ? ' · 2T' : ''}
+          </option>
         ))}
       </SelectField>
       {tariff && (
@@ -131,7 +138,9 @@ function ReadingFields({
   order,
   value,
   onChange,
+  dualTariff,
 }: {
+  dualTariff: boolean;
   order: 'first' | 'second';
   value: ReadingInput;
   onChange: (v: ReadingInput) => void;
@@ -164,9 +173,15 @@ function ReadingFields({
           />
         </label>
         <NumberInput
-          label="Stav elektroměru [kWh]"
+          label={dualTariff ? 'Stav VT [kWh]' : 'Stav elektroměru VT / hlavní registr'}
           value={value.value}
           onChange={(reading) => onChange({ ...value, value: reading })}
+        />
+        <NumberInput
+          label="Stav NT [kWh]"
+          disabled={!dualTariff}
+          value={value.ntValue ?? ''}
+          onChange={(ntValue) => onChange({ ...value, ntValue })}
         />
       </div>
     </section>
@@ -223,7 +238,12 @@ function Suppliers({ context }: { context: ComparisonContext }) {
   return (
     <section aria-label="Ceníky dodavatelů">
       <h2>CENÍKY DODAVATELŮ</h2>
-      <p className="hint">{context.distributionArea} · Ceník zatím není načten.</p>
+      <p className="hint">
+        {context.distributionArea} ·{' '}
+        {context.customer === 'C'
+          ? 'ORLEN: částečně ověřený ceník 2026.'
+          : 'Ceníky zatím nejsou načteny.'}
+      </p>
       <div
         className="tariff-suppliers"
         key={`${context.customer}:${context.method}:${context.distributionArea}`}
@@ -306,16 +326,38 @@ function ResultView({ result, draft }: { result: Result; draft: TariffDraft }) {
                 <dt>První odečet</dt>
                 <dd>
                   {draft.company.first.date} {draft.company.first.time} ·{' '}
-                  {draft.company.first.value} kWh
+                  {draft.company.first.value} kWh VT
+                  {result.values.dualTariff && ` · ${draft.company.first.ntValue} kWh NT`}
                 </dd>
               </div>
               <div>
                 <dt>Druhý odečet</dt>
                 <dd>
                   {draft.company.second.date} {draft.company.second.time} ·{' '}
-                  {draft.company.second.value} kWh
+                  {draft.company.second.value} kWh VT
+                  {result.values.dualTariff && ` · ${draft.company.second.ntValue} kWh NT`}
                 </dd>
               </div>
+              {result.values.dualTariff && (
+                <>
+                  <div>
+                    <dt>Spotřeba VT za období</dt>
+                    <dd>{formatTariffNumber(result.values.consumptionVT)} kWh</dd>
+                  </div>
+                  <div>
+                    <dt>Spotřeba NT za období</dt>
+                    <dd>{formatTariffNumber(result.values.consumptionNT)} kWh</dd>
+                  </div>
+                  <div>
+                    <dt>Roční VT</dt>
+                    <dd>{formatTariffNumber(result.values.annualVT)} kWh/rok</dd>
+                  </div>
+                  <div>
+                    <dt>Roční NT</dt>
+                    <dd>{formatTariffNumber(result.values.annualNT)} kWh/rok</dd>
+                  </div>
+                </>
+              )}
               <div>
                 <dt>Skutečná spotřeba za období</dt>
                 <dd>{formatTariffNumber(values.consumptionKwh)} kWh</dd>
@@ -339,10 +381,11 @@ function ResultView({ result, draft }: { result: Result; draft: TariffDraft }) {
         )}
         <p className="notice">
           {result.kind === 'company'
-            ? 'Bez skutečného ceníku ORLEN nelze určit, zda původní sazba odpovídá, ani doporučit jinou.'
+            ? 'Pro úplné porovnání zatím chybí ověřená cenová data.'
             : 'Výpočet cen a doporučení sazby bude doplněn v další etapě.'}
         </p>
       </section>
+      <OrlenPrices context={context} />
       <Suppliers context={context} />
     </>
   );
@@ -410,7 +453,7 @@ export function TariffCalculator() {
                 ? 'Distribuční oblast'
                 : step === 'result'
                   ? draft.method === 'company'
-                    ? 'Ceník zatím není načten.'
+                    ? 'Výsledek kontroly sazby'
                     : 'Výsledek výpočtu'
                   : draft.method && methodLabels[draft.method]}
         </h1>
@@ -546,11 +589,13 @@ export function TariffCalculator() {
                 </div>
               </section>
               <ReadingFields
+                dualTariff={tariffFor('C', draft.company.tariffCode)?.dualTariff ?? false}
                 order="first"
                 value={draft.company.first}
                 onChange={(first) => setDraft((d) => ({ ...d, company: { ...d.company, first } }))}
               />
               <ReadingFields
+                dualTariff={tariffFor('C', draft.company.tariffCode)?.dualTariff ?? false}
                 order="second"
                 value={draft.company.second}
                 onChange={(second) =>
@@ -584,6 +629,9 @@ export function TariffCalculator() {
                 companyResult.annualKwh,
                 companyResult.breakerA,
                 companyResult.originalTariff,
+                companyResult.dualTariff
+                  ? { annualVT: companyResult.annualVT, annualNT: companyResult.annualNT }
+                  : null,
               );
               setResult({ kind: 'company', values: companyResult, context });
               setStep('result');

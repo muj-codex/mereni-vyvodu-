@@ -114,7 +114,7 @@ describe('flat connection math kept inside tariffs', () => {
 });
 describe('company readings use actual elapsed time in Europe/Prague', () => {
   it('1250 kWh over ten days annualises deterministically without changing the installed 40 A breaker', () => {
-    expect(calculateCompany(company())).toEqual({
+    expect(calculateCompany(company())).toMatchObject({
       consumptionKwh: 1250,
       elapsedHours: 240,
       annualKwh: 45625,

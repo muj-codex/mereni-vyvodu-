@@ -48,6 +48,7 @@ export type Tariff = {
   code: TariffCode;
   category: Customer;
   tariffType: 'single' | 'dual';
+  dualTariff: boolean;
   usesVT: true;
   usesNT: boolean;
   usageNote: string;
@@ -61,6 +62,7 @@ function entry(code: TariffCode, category: Customer): Tariff {
     code,
     category,
     tariffType: single ? 'single' : 'dual',
+    dualTariff: !single,
     usesVT: true,
     usesNT: !single,
     usageNote: `${single ? 'Jednotarifní' : 'Dvoutarifní'} sazba pro ${category === 'C' ? 'podnikatele a firmy' : 'domácnosti'}. Podmínky použití budou doplněny.`,

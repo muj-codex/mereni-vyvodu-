@@ -296,3 +296,15 @@ Odhad / firmy začíná pouze původním jističem a sazbou C. Následují dvě 
 Paušální C má osm karet: ORLEN Unipetrol, ČEZ, E.ON, PRE, innogy, MND, Centropol a EPET. Paušální D má sedm karet bez ORLEN. Katalog 12 C a 10 D zůstává zachovaný; budoucí kandidáti patří jedné oblasti a jednomu použitému jističi. Model ročních nákladů má prázdné položky pro silovou energii VT/NT, měsíční plat dodavatele, distribuci, jistič, regulované položky, systémové služby, POZE, OTE/povinné položky, daně, DPH a celkový rok. Zatím žádné cenové hodnoty nepočítá ani nedoplňuje. Dodavatelské stavy jsou nezávislé a budoucí neúspěšná aktualizace zachová poslední platný ceník.
 
 Celý modul Měření včetně jeho elektrotechnické matematiky zůstává nezměněný.
+
+## Verze 1.4.3 – VT/NT a částečný ověřený zdroj ORLEN 2026
+
+Odhad / firmy rozlišuje sazby explicitním příznakem `dualTariff`. V nabídce jsou dvoutarifní C sazby označené `· 2T`. Jednotarif používá VT / hlavní registr a NT zobrazuje zašedlé, disabled a nepovinné; ani dříve vyplněné NT neovlivní výpočet. Dvoutarif vyžaduje obě sady VT/NT, které sdílejí jedno datum/čas pro první a jedno pro druhý odečet. Validují se oba aktivní registry, spotřeba i roční přepočet zůstávají oddělené VT/NT i celkem. Nemění se původní jistič, nevzniká tlačítko TEĎ ani soudobost ve firemním výsledku.
+
+Nový statický cenový zdroj zachycuje výhradně uživatelem ověřený přepis fotografií: **ORLEN C01d, C02d, C03d, C25d, C45d**, platnost **1. 1. 2026**, ověření **25. 10. 2026**, vše **bez DPH**. Obsahuje silovou cenu 2 599 Kč/MWh, oddělené distribuční VT/NT ceny **pouze pro ČEZ Distribuci**, systémové služby, doložené nulové POZE, OTE a přesné ověřené jističové tabulky/pásma. C01d/C02d vlastní nevyjmenovaná hodnota pod 160 A se neinterpoluje; C03d 50 A ani neověřené nižší jističe C25d/C45d se nedoplňují. Ověřená vyšší pásma se používají přesně podle jejich hranic. EG.D ani PRE nepřebírají žádné distribuční/jističové ceny ČEZ. Jednofázové výjimky jsou uloženy pouze tam, kde byly doloženy, bez zásahu do 1f Měření.
+
+Ostatní ORLEN sazby zůstávají cenově neověřené. Doložený zvláštní údaj C60d 2 599 Kč pro stálý měsíční / bezměrný odběr je uložený s poznámkou o nejasném významu a automaticky se nepoužívá.
+
+Výsledek ukazuje ověřené jednotkové ceny a **částečné roční položky**, nikoli konečný součet. Roční VT/NT ovlivňuje odpovídající dvoutarifní náklady; samotný celkový odběr se na neznámý poměr VT/NT nerozděluje. Chybějící stálý plat dodavatele, další povinné/OTE a daňové položky zůstávají `null`. Proto zatím **žádná kombinace nemá konečnou roční cenu ani doporučení sazby**. Model odděluje `priceWithoutVat` a `priceWithVat`; sazba DPH je samostatná nevyplněná konfigurace a DPH se nepřičítá.
+
+ORLEN karta uvádí částečně ověřený zdroj a obě odlišná data. Všech osm dodavatelů má viditelné, ale disabled aktualizační tlačítko s důvodem; není připojené webové načítání, API ani scraping. ORLEN zůstává pouze v C, Odhad / firmy pouze C/ORLEN, bez ukládání kalkulací. Celý modul Měření zůstal beze změny.

@@ -73,3 +73,13 @@
 .tariff-module .tariff-info {
   grid-column: 1 / -1;
 }
+
+.tariff-module input:disabled {
+  background: #e6edef;
+  color: #6c8189;
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+.tariff-module .orlen-prices .hint {
+  overflow-wrap: anywhere;
+}

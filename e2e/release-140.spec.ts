@@ -64,11 +64,11 @@ test('C flat connection: 26 A, 32 A recommendation, manual 64 A, annualisation a
   await context.setOffline(true);
   const requests: string[] = [];
   page.on('request', (r) => requests.push(r.url()));
-  await cards.nth(2).getByRole('button', { name: 'AKTUALIZOVAT CENÍK', exact: true }).click();
-  await expect(cards.nth(2).getByRole('status')).toHaveText(
-    'Aktualizace ceníku bude doplněna v další etapě.',
-  );
-  await expect(cards.first().getByRole('status')).toHaveCount(0);
+  for (const card of await cards.all())
+    await expect(
+      card.getByRole('button', { name: 'AKTUALIZOVAT CENÍK', exact: true }),
+    ).toBeDisabled();
+  await expect(cards.getByRole('status')).toHaveCount(0);
   expect(requests).toEqual([]);
   await back(page).click();
   await s.getByLabel('Použitý jistič', { exact: true }).selectOption('custom');
@@ -131,9 +131,9 @@ test('company readings compute consumption and annual equivalent with unchanged 
   await expect(s.locator('.tariff-supplier')).toHaveCount(1);
   await expect(s.locator('.tariff-supplier')).toHaveAttribute('data-supplier-id', 'orlen');
   await expect(
-    s.getByRole('heading', { name: 'Ceník zatím není načten.', exact: true }),
+    s.getByRole('heading', { name: 'Výsledek kontroly sazby', exact: true }),
   ).toBeVisible();
-  await expect(s).not.toContainText(/Kč|Doporučená sazba ORLEN: C|Původní sazba C02d odpovídá/);
+  await expect(s).not.toContainText(/Doporučená sazba ORLEN: C|Původní sazba C02d odpovídá/);
   await expect(s.getByLabel('Návrh jističe')).toHaveCount(0);
   await tariffLayout(page);
   await page.screenshot({

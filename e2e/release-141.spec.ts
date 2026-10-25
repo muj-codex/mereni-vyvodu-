@@ -12,15 +12,15 @@ test('company workflow keeps the complete C catalog and single/dual tariff infor
     'C01d',
     'C02d',
     'C03d',
-    'C25d',
-    'C26d',
-    'C27d',
-    'C35d',
-    'C45d',
-    'C46d',
-    'C56d',
-    'C60d',
-    'C62d',
+    'C25d · 2T',
+    'C26d · 2T',
+    'C27d · 2T',
+    'C35d · 2T',
+    'C45d · 2T',
+    'C46d · 2T',
+    'C56d · 2T',
+    'C60d · 2T',
+    'C62d · 2T',
   ]);
   for (const code of ['C02d', 'C25d']) {
     await select.selectOption(code);
@@ -30,13 +30,14 @@ test('company workflow keeps the complete C catalog and single/dual tariff infor
     await expect(note).toContainText(code === 'C02d' ? 'Jednotarifní' : 'Dvoutarifní');
     await expect(note).toContainText(code === 'C02d' ? 'NT: ne' : 'NT: ano');
   }
+  for (const nt of await s.getByLabel('Stav NT [kWh]', { exact: true }).all()) await nt.fill('0');
   await companyResult(page);
   await expect(s.getByRole('region', { name: 'Shrnutí vstupů', exact: true })).toContainText(
     'C25d',
   );
   await expect(s.locator('.tariff-supplier')).toHaveCount(1);
 });
-test('D flat connection has exactly the seven household suppliers, independent placeholder messages and no ORLEN', async ({
+test('D flat connection has exactly the seven household suppliers, disabled update buttons and no ORLEN', async ({
   page,
   context,
 }) => {
@@ -52,21 +53,15 @@ test('D flat connection has exactly the seven household suppliers, independent p
   await context.setOffline(true);
   const requests: string[] = [];
   page.on('request', (r) => requests.push(r.url()));
-  await s
-    .locator('[data-supplier-id=eon]')
-    .getByRole('button', { name: 'AKTUALIZOVAT CENÍK', exact: true })
-    .click();
   for (const card of await cards.all()) {
     await expect(card).toHaveAttribute('data-update-state', 'idle');
     await expect(card).toHaveAttribute('data-source-status', 'not-loaded');
     await expect(card).toContainText('zatím nenahrán');
     await expect(card).toContainText('zatím neověřeno');
-    await expect(card.getByRole('status')).toHaveCount(
-      (await card.getAttribute('data-supplier-id')) === 'eon' ? 1 : 0,
-    );
+    await expect(
+      card.getByRole('button', { name: 'AKTUALIZOVAT CENÍK', exact: true }),
+    ).toBeDisabled();
   }
-  for (const card of await cards.all())
-    await card.getByRole('button', { name: 'AKTUALIZOVAT CENÍK', exact: true }).click();
-  await expect(cards.getByRole('status')).toHaveCount(7);
+  await expect(cards.getByRole('status')).toHaveCount(0);
   expect(requests).toEqual([]);
 });

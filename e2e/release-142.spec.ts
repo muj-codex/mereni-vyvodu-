@@ -49,13 +49,13 @@ test('company rejects invalid chronology, falling states and ambiguous DST time 
   await s.getByLabel('Datum druhého odečtu', { exact: true }).fill('2026-01-11');
   await s
     .getByRole('region', { name: 'Druhý odečet', exact: true })
-    .getByLabel('Stav elektroměru [kWh]', { exact: true })
+    .getByLabel('Stav elektroměru VT / hlavní registr', { exact: true })
     .fill('999');
   await next.click();
   await expect(s.getByRole('alert')).toContainText('nižší');
   await s
     .getByRole('region', { name: 'Druhý odečet', exact: true })
-    .getByLabel('Stav elektroměru [kWh]', { exact: true })
+    .getByLabel('Stav elektroměru VT / hlavní registr', { exact: true })
     .fill('2250');
   await s.getByLabel('Datum druhého odečtu', { exact: true }).fill('2026-10-25');
   await s.getByLabel('Čas druhého odečtu', { exact: true }).fill('02:30');

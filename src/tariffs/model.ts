@@ -15,7 +15,7 @@ export type FlatInputs = {
   customPeriodMonths: string;
   breaker: BreakerInput;
 };
-export type ReadingInput = { date: string; time: string; value: string };
+export type ReadingInput = { date: string; time: string; value: string; ntValue?: string };
 export type CompanyInputs = {
   tariffCode: string;
   breaker: BreakerInput;
@@ -47,8 +47,8 @@ export function blankTariffDraft(): TariffDraft {
     company: {
       tariffCode: '',
       breaker: { choice: '', custom: '' },
-      first: { date: '', time: '', value: '' },
-      second: { date: '', time: '', value: '' },
+      first: { date: '', time: '', value: '', ntValue: '' },
+      second: { date: '', time: '', value: '', ntValue: '' },
     },
   };
 }
@@ -89,6 +89,7 @@ export type PriceList = {
 export type SupplierId = 'orlen' | 'cez' | 'eon' | 'pre' | 'innogy' | 'mnd' | 'centropol' | 'epet';
 export type SupplierSource =
   | { kind: 'unconfigured' }
+  | { kind: 'verified-transcription'; reference: string }
   | {
       kind: 'pdf' | 'html' | 'form' | 'interactive-web' | 'area-selection' | 'other';
       url: string | null;
@@ -104,7 +105,7 @@ export type SupplierUpdate = {
   status: 'idle' | 'updating' | 'success' | 'error';
   validFrom: string | null;
   lastChecked: string | null;
-  sourceStatus: 'not-loaded' | 'not-verified' | 'verified' | 'unavailable';
+  sourceStatus: 'not-loaded' | 'not-verified' | 'verified' | 'unavailable' | 'partial-verified';
   error: string | null;
   message: string;
   lastValidPriceList: PriceList | null;
@@ -158,7 +159,10 @@ export function suppliersFor(customer: Customer, method: Method = 'flat'): Suppl
             name: 'ORLEN Unipetrol',
             workingReference: true,
             brand: { accentColor: '#ab2030' },
-            source: { kind: 'unconfigured' },
+            source: {
+              kind: 'verified-transcription',
+              reference: 'ORLEN 2026 – ověřený přepis fotografií',
+            },
           },
           ...common,
         ]

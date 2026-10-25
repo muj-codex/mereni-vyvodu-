@@ -38,6 +38,7 @@ describe('complete tariff metadata', () => {
       expect(tariff.tariffType).toBe(single.includes(code) ? 'single' : 'dual');
       expect(tariff.usesVT).toBe(true);
       expect(tariff.usesNT).toBe(!single.includes(code));
+      expect(tariff.dualTariff).toBe(!single.includes(code));
       expect(tariff.usageNote.length).toBeGreaterThan(0);
       expect(tariff.technicalConditions).toEqual({
         lowTariffHoursPerDay: null,
@@ -85,8 +86,8 @@ describe('individual supplier state and card presentation', () => {
         expect(after[i]).toContain('data-update-state="error"');
         expect(after[i]).toContain('role="alert"');
         expect(after[i]).toContain('Budoucí zdroj E.ON není dostupný.');
-        expect(after[i]).toContain('2026-01-01');
-        expect(after[i]).toContain('2026-10-25');
+        expect(after[i]).toContain('1. 1. 2026');
+        expect(after[i]).toContain('25. 10. 2026');
       }
     });
     expect(eon.update.validFrom).toBe('2026-01-01');
@@ -117,7 +118,9 @@ describe('individual supplier state and card presentation', () => {
   });
   it('keeps source strategies unconfigured, branding separate and ORLEN out of households', () => {
     for (const supplier of suppliersFor('C')) {
-      expect(supplier.source).toEqual({ kind: 'unconfigured' });
+      expect(supplier.source.kind).toBe(
+        supplier.id === 'orlen' ? 'verified-transcription' : 'unconfigured',
+      );
       expect(supplier.brand.accentColor).toMatch(/^#[0-9a-f]{6}$/i);
       expect(supplier.brand.logoPath).toBeUndefined();
     }
