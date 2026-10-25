@@ -83,7 +83,7 @@ test('NT activates only for 2T, shares timestamps and stale NT never affects a s
   await context.setOffline(true);
   await tariffLayout(page);
   await page.screenshot({
-    path: `/workspace/work/tariffs143-C02d-${test.info().project.name}.png`,
+    path: test.info().outputPath('tariffs143-C02d.png'),
     fullPage: true,
   });
 });
@@ -129,7 +129,7 @@ test('C25d separates consumption, annual VT/NT and real distribution rates witho
   await expect(pricePanel(page)).toContainText('chybí ověřené cenové položky');
   await tariffLayout(page);
   await page.screenshot({
-    path: `/workspace/work/tariffs143-C25d-${test.info().project.name}.png`,
+    path: test.info().outputPath('tariffs143-C25d.png'),
     fullPage: true,
   });
 });

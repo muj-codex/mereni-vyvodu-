@@ -80,7 +80,7 @@ test('C flat connection: 26 A, 32 A recommendation, manual 64 A, annualisation a
   await expect(summary).not.toContainText('3×63 A');
   await tariffLayout(page);
   await page.screenshot({
-    path: `/workspace/work/tariffs142-C-${test.info().project.name}.png`,
+    path: test.info().outputPath('tariffs142-C.png'),
     fullPage: true,
   });
   expect(await storage(page)).toEqual(before);
@@ -137,7 +137,7 @@ test('company readings compute consumption and annual equivalent with unchanged 
   await expect(s.getByLabel('Návrh jističe')).toHaveCount(0);
   await tariffLayout(page);
   await page.screenshot({
-    path: `/workspace/work/tariffs142-company-${test.info().project.name}.png`,
+    path: test.info().outputPath('tariffs142-company.png'),
     fullPage: true,
   });
   await back(page).click();
