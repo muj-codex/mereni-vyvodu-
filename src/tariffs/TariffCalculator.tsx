@@ -1,9 +1,9 @@
-import { tariffsFor, tariffFor } from './catalog';
-import { SupplierCard } from './SupplierCard';
 import { useState } from 'react';
 import { BackButton } from '../ui/BackButton';
 import { SelectField } from '../ui/Fields';
 import { Info } from '../ui/Info';
+import { tariffsFor, tariffFor } from './catalog';
+import { SupplierCard } from './SupplierCard';
 import {
   blankTariffDraft,
   breakers,
@@ -13,17 +13,25 @@ import {
   type BreakerInput,
   type Customer,
   type DistributionArea,
+  type ReadingInput,
   type TariffDraft,
 } from './model';
+import {
+  calculateFlat,
+  calculateCompany,
+  loadAfterSimultaneity,
+  comparisonContext,
+  type FlatResult,
+  type CompanyResult,
+  type ComparisonContext,
+} from './calculations';
 import './tariffs.css';
 
-type Step = 'customer' | 'method' | 'inputs' | 'summary';
+type Step = 'customer' | 'method' | 'inputs' | 'area' | 'result';
 const customerLabels = { C: 'C – PODNIKATEL / FIRMA', D: 'D – DOMÁCNOST' };
-const methodLabels = {
-  estimate: 'ODHAD PŘED PŘIPOJENÍM',
-  actual: 'KONTROLA PODLE SKUTEČNÉ SPOTŘEBY',
-};
-
+const methodLabels = { flat: 'PAUŠÁLNÍ PŘIPOJENÍ', company: 'ODHAD / FIRMY' };
+export const formatTariffNumber = (n: number) =>
+  new Intl.NumberFormat('cs-CZ', { maximumFractionDigits: 2 }).format(n);
 function NumberInput({
   label,
   value,
@@ -33,7 +41,7 @@ function NumberInput({
 }: {
   label: string;
   value: string;
-  onChange: (value: string) => void;
+  onChange: (v: string) => void;
   placeholder?: string;
   integer?: boolean;
 }) {
@@ -60,10 +68,14 @@ function BreakerField({
   label,
   value,
   onChange,
+  automatic = false,
+  recommendation,
 }: {
   label: string;
   value: BreakerInput;
-  onChange: (value: BreakerInput) => void;
+  onChange: (v: BreakerInput) => void;
+  automatic?: boolean;
+  recommendation?: number | null;
 }) {
   return (
     <>
@@ -72,121 +84,266 @@ function BreakerField({
         value={value.choice}
         onChange={(choice) => onChange({ ...value, choice })}
       >
-        <option value="">Vyberte jistič</option>
+        {automatic ? (
+          <option value="auto">
+            {recommendation ? `Doporučený 3×${recommendation} A` : 'Automatický návrh'}
+          </option>
+        ) : (
+          <option value="">Vyberte jistič</option>
+        )}
         {breakers.map((b) => (
           <option key={b}>{b}</option>
         ))}
-        <option value="custom">vlastní</option>
+        <option value="custom">VLASTNÍ HODNOTA</option>
       </SelectField>
       {value.choice === 'custom' && (
-        <label className="field">
-          <span>Vlastní hodnota jističe</span>
-          <div className="input-wrap">
-            <input
-              aria-label="Vlastní hodnota jističe"
-              required
-              value={value.custom}
-              placeholder="např. 1×25 A"
-              onChange={(e) => onChange({ ...value, custom: e.target.value })}
-            />
-          </div>
-        </label>
+        <NumberInput
+          label="Vlastní jistič [A]"
+          value={value.custom}
+          onChange={(custom) => onChange({ ...value, custom })}
+          placeholder="např. 64"
+        />
       )}
     </>
   );
 }
-function TariffInfo({ customer, code }: { customer: Customer; code: string }) {
-  const tariff = tariffFor(customer, code);
-  if (!tariff) return null;
+function TariffSelect({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const tariff = tariffFor('C', value);
   return (
-    <div className="tariff-info" key={code}>
-      <Info label={`sazba ${tariff.code}`}>
-        <span>
-          Kód sazby: {tariff.code} · Kategorie: {tariff.category} ·{' '}
+    <div>
+      <SelectField label="Původní sazba" value={value} onChange={onChange}>
+        <option value="">Vyberte sazbu C</option>
+        {tariffsFor('C').map((t) => (
+          <option key={t.code}>{t.code}</option>
+        ))}
+      </SelectField>
+      {tariff && (
+        <Info key={value} label={`sazba ${value}`}>
+          Kód sazby: {value} · Kategorie: C ·{' '}
           {tariff.tariffType === 'single' ? 'Jednotarifní' : 'Dvoutarifní'} · VT: ano · NT:{' '}
           {tariff.usesNT ? 'ano' : 'ne'}
-        </span>
-      </Info>
+        </Info>
+      )}
     </div>
   );
 }
-function Summary({ draft }: { draft: TariffDraft & { customer: Customer } }) {
-  const { customer, method, distributionArea, estimate, actual } = draft;
-  const breaker = method === 'estimate' ? estimate.breaker : actual.breaker;
-  const showBreaker = breaker.choice === 'custom' ? breaker.custom : breaker.choice;
+function ReadingFields({
+  order,
+  value,
+  onChange,
+}: {
+  order: 'first' | 'second';
+  value: ReadingInput;
+  onChange: (v: ReadingInput) => void;
+}) {
+  const first = order === 'first',
+    name = first ? 'První odečet' : 'Druhý odečet',
+    suffix = first ? 'prvního' : 'druhého';
+  return (
+    <section className="card tariff-reading" aria-label={name}>
+      <h2>{name}</h2>
+      <div className="field-grid">
+        <label className="field">
+          <span>Datum {suffix} odečtu</span>
+          <input
+            aria-label={`Datum ${suffix} odečtu`}
+            type="date"
+            required
+            value={value.date}
+            onChange={(e) => onChange({ ...value, date: e.target.value })}
+          />
+        </label>
+        <label className="field">
+          <span>Čas {suffix} odečtu</span>
+          <input
+            aria-label={`Čas ${suffix} odečtu`}
+            type="time"
+            required
+            value={value.time}
+            onChange={(e) => onChange({ ...value, time: e.target.value })}
+          />
+        </label>
+        <NumberInput
+          label="Stav elektroměru [kWh]"
+          value={value.value}
+          onChange={(reading) => onChange({ ...value, value: reading })}
+        />
+      </div>
+    </section>
+  );
+}
+function AreaField({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (v: DistributionArea | '') => void;
+}) {
+  return (
+    <SelectField
+      label="Distribuční oblast"
+      value={value}
+      onChange={(v) => onChange(v as DistributionArea | '')}
+    >
+      <option value="">Vyberte distribuční oblast</option>
+      {distributionAreas.map((a) => (
+        <option key={a}>{a}</option>
+      ))}
+    </SelectField>
+  );
+}
+function PeriodField({
+  value,
+  custom,
+  onChange,
+  onCustom,
+}: {
+  value: string;
+  custom: string;
+  onChange: (v: string) => void;
+  onCustom: (v: string) => void;
+}) {
+  return (
+    <>
+      <SelectField label="Délka období" value={value} onChange={onChange}>
+        {periods.map((p) => (
+          <option key={p} value={p}>
+            {p} {p === '1' ? 'měsíc' : p === '2' || p === '3' ? 'měsíce' : 'měsíců'}
+          </option>
+        ))}
+        <option value="custom">vlastní počet měsíců</option>
+      </SelectField>
+      {value === 'custom' && (
+        <NumberInput label="Vlastní počet měsíců" integer value={custom} onChange={onCustom} />
+      )}
+    </>
+  );
+}
+function Suppliers({ context }: { context: ComparisonContext }) {
+  return (
+    <section aria-label="Ceníky dodavatelů">
+      <h2>CENÍKY DODAVATELŮ</h2>
+      <p className="hint">{context.distributionArea} · Ceník zatím není načten.</p>
+      <div
+        className="tariff-suppliers"
+        key={`${context.customer}:${context.method}:${context.distributionArea}`}
+      >
+        {suppliersFor(context.customer, context.method).map((s) => (
+          <SupplierCard supplier={s} key={s.id} />
+        ))}
+      </div>
+    </section>
+  );
+}
+type Result =
+  | { kind: 'flat'; values: FlatResult; context: ComparisonContext }
+  | { kind: 'company'; values: CompanyResult; context: ComparisonContext };
+function ResultView({ result, draft }: { result: Result; draft: TariffDraft }) {
+  const { context, values } = result;
   return (
     <>
       <section className="card" aria-label="Shrnutí vstupů">
-        <h2>Shrnutí vstupů</h2>
+        <h2>{result.kind === 'flat' ? 'Paušální připojení' : 'Odhad / firmy'}</h2>
         <dl className="tariff-summary">
           <div>
             <dt>Typ odběru</dt>
-            <dd>{customerLabels[customer]}</dd>
+            <dd>{customerLabels[context.customer]}</dd>
           </div>
           <div>
-            <dt>Způsob výpočtu</dt>
-            <dd>{method && methodLabels[method]}</dd>
+            <dt>Výpočet</dt>
+            <dd>{methodLabels[result.kind]}</dd>
           </div>
           <div>
             <dt>Distribuční oblast</dt>
-            <dd>{distributionArea}</dd>
+            <dd>{context.distributionArea}</dd>
           </div>
           <div>
-            <dt>Hlavní jistič</dt>
-            <dd>{showBreaker || 'Nezadáno'}</dd>
+            <dt>{result.kind === 'flat' ? 'Použitý jistič' : 'Původní hlavní jistič'}</dt>
+            <dd>3×{formatTariffNumber(values.breakerA)} A</dd>
           </div>
-          {method === 'estimate' ? (
+          {result.kind === 'flat' ? (
             <>
               <div>
-                <dt>Výkon spotřebičů</dt>
-                <dd>{estimate.powerKw} kW</dd>
-              </div>
-              <div>
                 <dt>Proudové zatížení</dt>
-                <dd>{estimate.currentA} A</dd>
+                <dd>{draft.flat.currentA} A</dd>
               </div>
               <div>
                 <dt>Soudobost</dt>
-                <dd>{estimate.simultaneity}</dd>
+                <dd>{draft.flat.simultaneity}</dd>
               </div>
               <div>
-                <dt>Odhadovaná roční spotřeba</dt>
-                <dd>{estimate.annualConsumptionKwh} kWh/rok</dd>
+                <dt>Proud po soudobosti</dt>
+                <dd>{formatTariffNumber(result.values.concurrentA)} A</dd>
+              </div>
+              <div>
+                <dt>Doporučený jistič</dt>
+                <dd>
+                  {result.values.recommendedA
+                    ? `3×${result.values.recommendedA} A`
+                    : 'Mimo standardní řadu'}
+                </dd>
+              </div>
+              <div>
+                <dt>Spotřeba za období</dt>
+                <dd>{formatTariffNumber(result.values.consumptionKwh)} kWh</dd>
+              </div>
+              <div>
+                <dt>Délka období</dt>
+                <dd>{result.values.months} měsíců</dd>
+              </div>
+              <div>
+                <dt>Předpokládaná roční spotřeba</dt>
+                <dd>{formatTariffNumber(values.annualKwh)} kWh/rok</dd>
               </div>
             </>
           ) : (
             <>
               <div>
-                <dt>Současná sazba</dt>
-                <dd>{actual.tariffCode || 'Nezadáno'}</dd>
+                <dt>Původní sazba</dt>
+                <dd>{result.values.originalTariff}</dd>
               </div>
               <div>
-                <dt>Spotřeba za období</dt>
-                <dd>{actual.consumptionKwh} kWh</dd>
+                <dt>První odečet</dt>
+                <dd>
+                  {draft.company.first.date} {draft.company.first.time} ·{' '}
+                  {draft.company.first.value} kWh
+                </dd>
+              </div>
+              <div>
+                <dt>Druhý odečet</dt>
+                <dd>
+                  {draft.company.second.date} {draft.company.second.time} ·{' '}
+                  {draft.company.second.value} kWh
+                </dd>
+              </div>
+              <div>
+                <dt>Skutečná spotřeba za období</dt>
+                <dd>{formatTariffNumber(values.consumptionKwh)} kWh</dd>
               </div>
               <div>
                 <dt>Délka období</dt>
-                <dd>
-                  {actual.periodMonths === 'custom'
-                    ? actual.customPeriodMonths
-                    : actual.periodMonths}{' '}
-                  měsíců
-                </dd>
+                <dd>{formatTariffNumber(result.values.elapsedHours)} hodin</dd>
+              </div>
+              <div>
+                <dt>Přepočtená roční spotřeba</dt>
+                <dd>{formatTariffNumber(values.annualKwh)} kWh/rok</dd>
               </div>
             </>
           )}
         </dl>
-        <p className="notice">Výpočet cen a doporučení sazby bude doplněn v další etapě.</p>
+        {result.kind === 'company' && (
+          <Info label="Roční ekvivalent">
+            Časy odečtů jsou v pásmu Europe/Prague včetně změn letního času. Roční ekvivalent
+            používá model 365 dní (8 760 hodin) a skutečný časový rozdíl mezi odečty.
+          </Info>
+        )}
+        <p className="notice">
+          {result.kind === 'company'
+            ? 'Bez skutečného ceníku ORLEN nelze určit, zda původní sazba odpovídá, ani doporučit jinou.'
+            : 'Výpočet cen a doporučení sazby bude doplněn v další etapě.'}
+        </p>
       </section>
-      <section aria-label="Ceníky dodavatelů">
-        <h2>CENÍKY DODAVATELŮ</h2>
-        <p className="hint">{distributionArea} · Ceníky zatím nejsou načteny.</p>
-        <div className="tariff-suppliers" key={`${customer}:${distributionArea}`}>
-          {suppliersFor(customer).map((s) => (
-            <SupplierCard key={s.id} supplier={s} />
-          ))}
-        </div>
-      </section>
+      <Suppliers context={context} />
     </>
   );
 }
@@ -194,11 +351,50 @@ export function TariffCalculator() {
   const [step, setStep] = useState<Step>('customer');
   const [draft, setDraft] = useState(blankTariffDraft);
   const [error, setError] = useState('');
-  const estimate = draft.estimate,
-    actual = draft.actual;
+  const [result, setResult] = useState<Result | null>(null);
+  const [companyResult, setCompanyResult] = useState<CompanyResult | null>(null);
+  let preview: ReturnType<typeof loadAfterSimultaneity> | null = null;
+  try {
+    preview = loadAfterSimultaneity(draft.flat.currentA, draft.flat.simultaneity);
+  } catch {
+    /* Incomplete input has no preview. */
+  }
   function back() {
     setError('');
-    setStep(step === 'summary' ? 'inputs' : step === 'inputs' ? 'method' : 'customer');
+    setStep(
+      step === 'result'
+        ? draft.method === 'company'
+          ? 'area'
+          : 'inputs'
+        : step === 'area'
+          ? 'inputs'
+          : step === 'inputs'
+            ? 'method'
+            : 'customer',
+    );
+  }
+  function submit() {
+    try {
+      if (draft.method === 'company') {
+        if (draft.customer !== 'C') throw new Error('Odhad / firmy je dostupný pouze v režimu C.');
+        setCompanyResult(calculateCompany(draft.company));
+        setStep('area');
+      } else {
+        const values = calculateFlat(draft.flat);
+        const context = comparisonContext(
+          draft.customer!,
+          'flat',
+          draft.distributionArea as DistributionArea,
+          values.annualKwh,
+          values.breakerA,
+        );
+        setResult({ kind: 'flat', values, context });
+        setStep('result');
+      }
+      setError('');
+    } catch (e) {
+      setError((e as Error).message);
+    }
   }
   return (
     <main className="tariff-module" aria-label="Výpočet spotřeby a sazeb">
@@ -209,29 +405,25 @@ export function TariffCalculator() {
           {step === 'customer'
             ? 'Typ odběru'
             : step === 'method'
-              ? 'Způsob výpočtu'
-              : step === 'summary'
-                ? 'Porovnání – připravujeme'
-                : draft.method && methodLabels[draft.method]}
+              ? 'Výpočet'
+              : step === 'area'
+                ? 'Distribuční oblast'
+                : step === 'result'
+                  ? draft.method === 'company'
+                    ? 'Ceník zatím není načten.'
+                    : 'Výsledek výpočtu'
+                  : draft.method && methodLabels[draft.method]}
         </h1>
-        <p>Vstupní podklady pro budoucí porovnání. Výpočty a ceny zatím nejsou dostupné.</p>
       </div>
       {step === 'customer' && (
         <div className="tariff-choices">
           {(['C', 'D'] as const).map((customer) => (
             <button
-              key={customer}
               type="button"
               className="button secondary"
+              key={customer}
               onClick={() => {
-                setDraft((d) => ({
-                  ...d,
-                  customer,
-                  actual: {
-                    ...d.actual,
-                    tariffCode: d.customer === customer ? d.actual.tariffCode : '',
-                  },
-                }));
+                setDraft((d) => ({ ...d, customer, method: null }));
                 setStep('method');
               }}
             >
@@ -243,157 +435,130 @@ export function TariffCalculator() {
       {step === 'method' && (
         <div className="tariff-choices">
           <p className="hint">{draft.customer && customerLabels[draft.customer]}</p>
-          {(['estimate', 'actual'] as const).map((method) => (
-            <button
-              key={method}
-              type="button"
-              className="button secondary"
-              onClick={() => {
-                setDraft((d) => ({ ...d, method }));
-                setStep('inputs');
-              }}
-            >
-              {methodLabels[method]}
-            </button>
-          ))}
+          {(draft.customer === 'C' ? (['flat', 'company'] as const) : (['flat'] as const)).map(
+            (method) => (
+              <button
+                type="button"
+                className="button secondary"
+                key={method}
+                onClick={() => {
+                  setDraft((d) => ({ ...d, method }));
+                  setStep('inputs');
+                }}
+              >
+                {methodLabels[method]}
+              </button>
+            ),
+          )}
         </div>
       )}
       {step === 'inputs' && (
         <form
-          className="card"
           onSubmit={(e) => {
             e.preventDefault();
-            const breaker = draft.method === 'estimate' ? estimate.breaker : actual.breaker;
-            if (
-              !draft.distributionArea ||
-              !breaker.choice ||
-              (draft.method === 'actual' && !actual.periodMonths)
-            ) {
-              setError('Vyberte distribuční oblast, hlavní jistič a případně délku období.');
-              return;
-            }
-            setError('');
-            setStep('summary');
+            submit();
           }}
         >
-          <div className="field-grid">
-            <SelectField
-              label="Distribuční oblast"
-              value={draft.distributionArea}
-              onChange={(area) =>
-                setDraft((d) => ({ ...d, distributionArea: area as DistributionArea | '' }))
-              }
-            >
-              <option value="">Vyberte distribuční oblast</option>
-              {distributionAreas.map((area) => (
-                <option key={area}>{area}</option>
-              ))}
-            </SelectField>
-            {draft.method === 'estimate' ? (
-              <>
-                <NumberInput
-                  label="Výkon spotřebičů [kW]"
-                  value={estimate.powerKw}
-                  onChange={(powerKw) =>
-                    setDraft((d) => ({ ...d, estimate: { ...d.estimate, powerKw } }))
-                  }
+          {draft.method === 'flat' ? (
+            <section className="card">
+              <div className="field-grid">
+                <AreaField
+                  value={draft.distributionArea}
+                  onChange={(distributionArea) => setDraft((d) => ({ ...d, distributionArea }))}
                 />
                 <NumberInput
                   label="Proudové zatížení [A]"
-                  value={estimate.currentA}
+                  value={draft.flat.currentA}
                   onChange={(currentA) =>
-                    setDraft((d) => ({ ...d, estimate: { ...d.estimate, currentA } }))
+                    setDraft((d) => ({ ...d, flat: { ...d.flat, currentA } }))
                   }
+                  placeholder="např. 40"
                 />
                 <div>
                   <NumberInput
                     label="Soudobost"
-                    placeholder="0,65"
-                    value={estimate.simultaneity}
+                    value={draft.flat.simultaneity}
                     onChange={(simultaneity) =>
-                      setDraft((d) => ({ ...d, estimate: { ...d.estimate, simultaneity } }))
+                      setDraft((d) => ({ ...d, flat: { ...d.flat, simultaneity } }))
                     }
+                    placeholder="0,65"
                   />
                   <Info label="Soudobost">
-                    Koeficient soudobosti bude později použit pro odhad skutečného současného
-                    zatížení. Hodnota zůstává ručně editovatelná.
+                    Koeficient musí být větší než 0 a nejvýše 1. Proud po soudobosti je zadaný proud
+                    × soudobost. Návrh použije nejbližší vyšší standardní jistič; použitý jistič
+                    můžete ručně změnit.
                   </Info>
                 </div>
-                <BreakerField
-                  label="Navržený hlavní jistič"
-                  value={estimate.breaker}
-                  onChange={(breaker) =>
-                    setDraft((d) => ({ ...d, estimate: { ...d.estimate, breaker } }))
-                  }
-                />
-                <NumberInput
-                  label="Odhadovaná roční spotřeba [kWh/rok]"
-                  value={estimate.annualConsumptionKwh}
-                  onChange={(annualConsumptionKwh) =>
-                    setDraft((d) => ({ ...d, estimate: { ...d.estimate, annualConsumptionKwh } }))
-                  }
-                />
-              </>
-            ) : (
-              <>
-                <SelectField
-                  label="Současná sazba"
-                  value={actual.tariffCode}
-                  onChange={(tariffCode) =>
-                    setDraft((d) => ({ ...d, actual: { ...d.actual, tariffCode } }))
-                  }
-                >
-                  <option value="">Vyberte sazbu {draft.customer}</option>
-                  {draft.customer &&
-                    tariffsFor(draft.customer).map((tariff) => (
-                      <option key={tariff.code}>{tariff.code}</option>
-                    ))}
-                </SelectField>
-                {draft.customer && (
-                  <TariffInfo customer={draft.customer} code={actual.tariffCode} />
-                )}
-                <BreakerField
-                  label="Současný hlavní jistič"
-                  value={actual.breaker}
-                  onChange={(breaker) =>
-                    setDraft((d) => ({ ...d, actual: { ...d.actual, breaker } }))
-                  }
-                />
                 <NumberInput
                   label="Spotřeba za období [kWh]"
-                  value={actual.consumptionKwh}
+                  value={draft.flat.consumptionKwh}
                   onChange={(consumptionKwh) =>
-                    setDraft((d) => ({ ...d, actual: { ...d.actual, consumptionKwh } }))
+                    setDraft((d) => ({ ...d, flat: { ...d.flat, consumptionKwh } }))
                   }
                 />
-                <SelectField
-                  label="Délka období"
-                  value={actual.periodMonths}
+                <PeriodField
+                  value={draft.flat.periodMonths}
+                  custom={draft.flat.customPeriodMonths}
                   onChange={(periodMonths) =>
-                    setDraft((d) => ({ ...d, actual: { ...d.actual, periodMonths } }))
+                    setDraft((d) => ({ ...d, flat: { ...d.flat, periodMonths } }))
                   }
-                >
-                  <option value="">Vyberte délku období</option>
-                  {periods.map((p) => (
-                    <option key={p} value={p}>
-                      {p} {p === '1' ? 'měsíc' : p === '2' || p === '3' ? 'měsíce' : 'měsíců'}
-                    </option>
-                  ))}
-                  <option value="custom">vlastní počet měsíců</option>
-                </SelectField>
-                {actual.periodMonths === 'custom' && (
-                  <NumberInput
-                    label="Vlastní počet měsíců"
-                    integer
-                    value={actual.customPeriodMonths}
-                    onChange={(customPeriodMonths) =>
-                      setDraft((d) => ({ ...d, actual: { ...d.actual, customPeriodMonths } }))
+                  onCustom={(customPeriodMonths) =>
+                    setDraft((d) => ({ ...d, flat: { ...d.flat, customPeriodMonths } }))
+                  }
+                />
+                <BreakerField
+                  automatic
+                  recommendation={preview?.recommendedA}
+                  label="Použitý jistič"
+                  value={draft.flat.breaker}
+                  onChange={(breaker) => setDraft((d) => ({ ...d, flat: { ...d.flat, breaker } }))}
+                />
+              </div>
+              {preview && (
+                <div className="notice" aria-label="Návrh jističe">
+                  <p>Proud po soudobosti: {formatTariffNumber(preview.concurrentA)} A</p>
+                  <p>
+                    Doporučený jistič:{' '}
+                    {preview.recommendedA
+                      ? `3×${preview.recommendedA} A`
+                      : 'mimo standardní řadu – zadejte vlastní hodnotu'}
+                  </p>
+                </div>
+              )}
+            </section>
+          ) : (
+            <>
+              <section className="card" aria-label="Původní nastavení">
+                <div className="field-grid">
+                  <BreakerField
+                    label="Původní hlavní jistič"
+                    value={draft.company.breaker}
+                    onChange={(breaker) =>
+                      setDraft((d) => ({ ...d, company: { ...d.company, breaker } }))
                     }
                   />
-                )}
-              </>
-            )}
-          </div>
+                  <TariffSelect
+                    value={draft.company.tariffCode}
+                    onChange={(tariffCode) =>
+                      setDraft((d) => ({ ...d, company: { ...d.company, tariffCode } }))
+                    }
+                  />
+                </div>
+              </section>
+              <ReadingFields
+                order="first"
+                value={draft.company.first}
+                onChange={(first) => setDraft((d) => ({ ...d, company: { ...d.company, first } }))}
+              />
+              <ReadingFields
+                order="second"
+                value={draft.company.second}
+                onChange={(second) =>
+                  setDraft((d) => ({ ...d, company: { ...d.company, second } }))
+                }
+              />
+            </>
+          )}
           {error && (
             <p role="alert" className="notice error">
               {error}
@@ -401,14 +566,50 @@ export function TariffCalculator() {
           )}
           <div className="step-actions">
             <button className="button primary" type="submit">
-              POKRAČOVAT K POROVNÁNÍ
+              {draft.method === 'company' ? 'POKRAČOVAT K OBLASTI' : 'POKRAČOVAT K POROVNÁNÍ'}
             </button>
           </div>
         </form>
       )}
-      {step === 'summary' && draft.customer && (
-        <Summary draft={{ ...draft, customer: draft.customer }} />
+      {step === 'area' && companyResult && (
+        <form
+          className="card"
+          onSubmit={(e) => {
+            e.preventDefault();
+            try {
+              const context = comparisonContext(
+                'C',
+                'company',
+                draft.distributionArea as DistributionArea,
+                companyResult.annualKwh,
+                companyResult.breakerA,
+                companyResult.originalTariff,
+              );
+              setResult({ kind: 'company', values: companyResult, context });
+              setStep('result');
+              setError('');
+            } catch (e) {
+              setError((e as Error).message);
+            }
+          }}
+        >
+          <AreaField
+            value={draft.distributionArea}
+            onChange={(distributionArea) => setDraft((d) => ({ ...d, distributionArea }))}
+          />
+          {error && (
+            <p role="alert" className="notice error">
+              {error}
+            </p>
+          )}
+          <div className="step-actions">
+            <button className="button primary" type="submit">
+              VYHODNOTIT
+            </button>
+          </div>
+        </form>
       )}
+      {step === 'result' && result && <ResultView result={result} draft={draft} />}
     </main>
   );
 }

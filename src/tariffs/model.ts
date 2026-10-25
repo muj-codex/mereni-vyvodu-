@@ -1,68 +1,92 @@
-// Input-only scaffold. No calculation, storage, price data or network adapters.
+// Separate tariff workflow. No measurement imports or persistence.
 export type Customer = 'C' | 'D';
-export type Method = 'estimate' | 'actual';
+export type Method = 'flat' | 'company';
 export const distributionAreas = ['ČEZ Distribuce', 'EG.D', 'PREdistribuce'] as const;
 export type DistributionArea = (typeof distributionAreas)[number];
-export const breakers = [
-  '3×16 A',
-  '3×20 A',
-  '3×25 A',
-  '3×32 A',
-  '3×40 A',
-  '3×50 A',
-  '3×63 A',
-  '3×80 A',
-  '3×100 A',
-];
+export const standardBreakerAmps = [10, 16, 20, 25, 32, 40, 50, 63, 80, 100, 125, 160] as const;
+export const breakers = standardBreakerAmps.map((amps) => `3×${amps} A`);
 export const periods = ['1', '2', '3', '6', '12'];
 export type BreakerInput = { choice: string; custom: string };
-export type EstimateInputs = {
-  powerKw: string;
+export type FlatInputs = {
   currentA: string;
   simultaneity: string;
-  breaker: BreakerInput;
-  annualConsumptionKwh: string;
-};
-export type ActualInputs = {
-  tariffCode: string;
-  breaker: BreakerInput;
   consumptionKwh: string;
   periodMonths: string;
   customPeriodMonths: string;
-  // Reserved input fields; no conversion, annualisation or aggregation.
+  breaker: BreakerInput;
+};
+export type ReadingInput = { date: string; time: string; value: string };
+export type CompanyInputs = {
+  tariffCode: string;
+  breaker: BreakerInput;
+  first: ReadingInput;
+  second: ReadingInput;
   vtKwh?: string;
   ntKwh?: string;
 };
 export type TariffDraft = {
   customer: Customer | null;
   method: Method | null;
-  // Exactly one area for the entire comparison and its supplier catalog.
   distributionArea: DistributionArea | '';
-  estimate: EstimateInputs;
-  actual: ActualInputs;
+  flat: FlatInputs;
+  company: CompanyInputs;
 };
 export function blankTariffDraft(): TariffDraft {
   return {
     customer: null,
     method: null,
     distributionArea: '',
-    estimate: {
-      powerKw: '',
+    flat: {
       currentA: '',
       simultaneity: '',
-      breaker: { choice: '', custom: '' },
-      annualConsumptionKwh: '',
+      consumptionKwh: '',
+      periodMonths: '1',
+      customPeriodMonths: '',
+      breaker: { choice: 'auto', custom: '' },
     },
-    actual: {
+    company: {
       tariffCode: '',
       breaker: { choice: '', custom: '' },
-      consumptionKwh: '',
-      periodMonths: '',
-      customPeriodMonths: '',
+      first: { date: '', time: '', value: '' },
+      second: { date: '', time: '', value: '' },
     },
   };
 }
-export type SupplierId = 'orlen' | 'cez' | 'eon' | 'pre' | 'innogy';
+// Unknown costs stay null. No price arithmetic or simulated values.
+export type AnnualCosts = {
+  commodity: { vt: number | null; nt: number | null; total: number | null };
+  supplierMonthlyFixed: number | null;
+  distribution: number | null;
+  breakerPayment: number | null;
+  regulatedItems: number | null;
+  systemServices: number | null;
+  poze: number | null;
+  oteAndMandatoryItems: number | null;
+  taxes: number | null;
+  vat: number | null;
+  annualTotal: number | null;
+};
+export function unknownAnnualCosts(): AnnualCosts {
+  return {
+    commodity: { vt: null, nt: null, total: null },
+    supplierMonthlyFixed: null,
+    distribution: null,
+    breakerPayment: null,
+    regulatedItems: null,
+    systemServices: null,
+    poze: null,
+    oteAndMandatoryItems: null,
+    taxes: null,
+    vat: null,
+    annualTotal: null,
+  };
+}
+export type PriceList = {
+  distributionArea: DistributionArea;
+  validFrom: string;
+  tariffs: { code: string; annualCosts: AnnualCosts }[];
+};
+export type SupplierId = 'orlen' | 'cez' | 'eon' | 'pre' | 'innogy' | 'mnd' | 'centropol' | 'epet';
 export type SupplierSource =
   | { kind: 'unconfigured' }
   | {
@@ -83,6 +107,7 @@ export type SupplierUpdate = {
   sourceStatus: 'not-loaded' | 'not-verified' | 'verified' | 'unavailable';
   error: string | null;
   message: string;
+  lastValidPriceList: PriceList | null;
 };
 export function blankSupplierUpdate(): SupplierUpdate {
   return {
@@ -92,9 +117,10 @@ export function blankSupplierUpdate(): SupplierUpdate {
     sourceStatus: 'not-loaded',
     error: null,
     message: '',
+    lastValidPriceList: null,
   };
 }
-export function suppliersFor(customer: Customer): Supplier[] {
+export function suppliersFor(customer: Customer, method: Method = 'flat'): Supplier[] {
   const common: Supplier[] = [
     { id: 'cez', name: 'ČEZ', brand: { accentColor: '#a34d0b' }, source: { kind: 'unconfigured' } },
     {
@@ -110,17 +136,34 @@ export function suppliersFor(customer: Customer): Supplier[] {
       brand: { accentColor: '#823783' },
       source: { kind: 'unconfigured' },
     },
+    { id: 'mnd', name: 'MND', brand: { accentColor: '#275d99' }, source: { kind: 'unconfigured' } },
+    {
+      id: 'centropol',
+      name: 'Centropol',
+      brand: { accentColor: '#9c4a0b' },
+      source: { kind: 'unconfigured' },
+    },
+    {
+      id: 'epet',
+      name: 'EPET',
+      brand: { accentColor: '#813e70' },
+      source: { kind: 'unconfigured' },
+    },
   ];
-  return customer === 'C'
-    ? [
-        {
-          id: 'orlen',
-          name: 'ORLEN Unipetrol',
-          workingReference: true,
-          brand: { accentColor: '#ab2030' },
-          source: { kind: 'unconfigured' },
-        },
-        ...common,
-      ]
-    : common;
+  const available: Supplier[] =
+    customer === 'C'
+      ? [
+          {
+            id: 'orlen',
+            name: 'ORLEN Unipetrol',
+            workingReference: true,
+            brand: { accentColor: '#ab2030' },
+            source: { kind: 'unconfigured' },
+          },
+          ...common,
+        ]
+      : common;
+  return method === 'company'
+    ? available.filter((s) => customer === 'C' && s.id === 'orlen')
+    : available;
 }

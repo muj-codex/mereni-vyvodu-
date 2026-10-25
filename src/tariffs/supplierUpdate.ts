@@ -1,10 +1,10 @@
-import type { SupplierUpdate } from './model';
+import type { SupplierUpdate, PriceList } from './model';
 
 // Individual-card transitions for future source adapters. No I/O, timers or fabricated dates.
 export type SupplierUpdateAction =
   | { type: 'placeholder' }
   | { type: 'start' }
-  | { type: 'success'; validFrom: string | null; lastChecked: string }
+  | { type: 'success'; validFrom: string | null; lastChecked: string; priceList?: PriceList }
   | { type: 'error'; message: string };
 export function supplierUpdateReducer(
   state: SupplierUpdate,
@@ -23,6 +23,7 @@ export function supplierUpdateReducer(
         sourceStatus: 'verified',
         error: null,
         message: '',
+        lastValidPriceList: action.priceList ?? state.lastValidPriceList,
       };
     case 'error':
       return {

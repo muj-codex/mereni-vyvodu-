@@ -284,3 +284,15 @@ Modul sazeb obsahuje úplný zadaný katalog **12 C sazeb** (C01d, C02d, C03d, C
 Každá sazba má poznámku, prázdné technické podmínky (hodiny NT, ohřev vody, akumulace, přímotop, tepelné čerpadlo, elektromobil, další podmínky) a samostatná prázdná cenová místa pro ČEZ Distribuci, EG.D a PREdistribuci. Podmínky ani ceny se nevyhodnocují a nic se automaticky nedoporučuje.
 
 Karty dodavatelů mají jemný vlastní barevný akcent, místo pro budoucí malé logo a zdrojový adaptér, oddělené `validFrom` / `lastChecked` / `sourceStatus` a vlastní `idle/updating/success/error`. Skutečné načítání není zapojené: tlačítko zobrazí jen „Aktualizace ceníku bude doplněna v další etapě.“ a nevymyslí datum ani úspěšné ověření. ORLEN UNIPETROL zůstává první pracovní referencí pouze v C; v D se jeho karta vůbec nevytváří. Zůstávají oba formuláře, shrnutí vstupů, lokální návraty a jedna distribuční oblast na kalkulaci, bez historie a ukládání. Modul Měření nebyl změněn.
+
+## Verze 1.4.2 – Paušální připojení a Odhad / firmy
+
+Výběr **Výpočet** nabízí **PAUŠÁLNÍ PŘIPOJENÍ** pro C i D a **ODHAD / FIRMY** pouze pro C. Oba režimy mají samostatné vstupy a lokální ← Zpět; nic se neukládá do historie, IndexedDB, Výsledků měření ani záloh.
+
+Paušální připojení přijímá oblast, již uživatelem určený proud, soudobost `0 < k <= 1`, spotřebu za období a počet měsíců (výchozí 1). Počítá `I × k` a spotřebu `× 12 / N`. Automatický jistič je nejbližší **striktně vyšší** člen řady 10/16/20/25/32/40/50/63/80/100/125/160 A; rozhoduje interní proud bez zaokrouhlení displeje. Příklad 40 A × 0,65 = 26 A → 3×32 A. Při překročení řady se návrh nesníží na maximum; uživatel musí zvolit vlastní hodnotu. Použitý jistič lze ručně přepsat standardní nebo vlastní hodnotou (například 64 A), která zůstává přesně stejná v budoucím cenovém modelu. Původní povinný výkon a ručně odhadovaná roční spotřeba již nejsou vstupy.
+
+Odhad / firmy začíná pouze původním jističem a sazbou C. Následují dvě ručně editované sekce datum/čas/stav bez TEĎ. Druhý okamžik musí být pozdější a stav nesmí klesat. Spotřeba je rozdíl stavů; roční ekvivalent používá přesný časový interval v **Europe/Prague** včetně letního času a pevný model **365 dní / 8 760 hodin**. Neexistující nebo nejednoznačné místní časy během změny času se odmítnou. Teprve potom se volí distribuční oblast. Původní jistič se nenavrhuje ani nemění a jediným dodavatelem je ORLEN. Bez skutečných cen se nevydává cenový verdikt ani doporučení sazby.
+
+Paušální C má osm karet: ORLEN Unipetrol, ČEZ, E.ON, PRE, innogy, MND, Centropol a EPET. Paušální D má sedm karet bez ORLEN. Katalog 12 C a 10 D zůstává zachovaný; budoucí kandidáti patří jedné oblasti a jednomu použitému jističi. Model ročních nákladů má prázdné položky pro silovou energii VT/NT, měsíční plat dodavatele, distribuci, jistič, regulované položky, systémové služby, POZE, OTE/povinné položky, daně, DPH a celkový rok. Zatím žádné cenové hodnoty nepočítá ani nedoplňuje. Dodavatelské stavy jsou nezávislé a budoucí neúspěšná aktualizace zachová poslední platný ceník.
+
+Celý modul Měření včetně jeho elektrotechnické matematiky zůstává nezměněný.

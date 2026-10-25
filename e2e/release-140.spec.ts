@@ -1,29 +1,14 @@
 import { test, expect, type Page } from '@playwright/test';
 import { fillMainCheck, finishPower } from './measurement';
-const rates = (p: Page) => p.getByRole('main', { name: 'Výpočet spotřeby a sazeb', exact: true });
-const back = (p: Page) => rates(p).getByRole('button', { name: '← Zpět', exact: true });
-const next = (p: Page) =>
-  rates(p).getByRole('button', { name: 'POKRAČOVAT K POROVNÁNÍ', exact: true });
-async function open(p: Page) {
-  await p.getByRole('button', { name: 'VÝPOČET SPOTŘEBY A SAZEB', exact: true }).click();
-  await expect(rates(p).getByRole('heading', { name: 'Typ odběru', exact: true })).toBeVisible();
-  await expect(rates(p).getByRole('button')).toHaveCount(2);
-  await expect(p.getByRole('navigation', { name: 'Odečty', exact: true })).toHaveCount(0);
-}
-async function layout(p: Page) {
-  const s = rates(p);
-  expect(await p.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(
-    true,
-  );
-  const width = p.viewportSize()!.width;
-  for (const el of await s.locator('input, select, .button').all()) {
-    const box = await el.boundingBox();
-    if (box) {
-      expect(box.x).toBeGreaterThanOrEqual(0);
-      expect(box.x + box.width).toBeLessThanOrEqual(width);
-    }
-  }
-}
+import {
+  rates,
+  back,
+  fillFlat,
+  fillCompany,
+  companyResult,
+  tariffLayout,
+  openTariffs,
+} from './tariffs';
 async function storage(p: Page) {
   return p.evaluate(async () => {
     const db = await new Promise<IDBDatabase>((resolve, reject) => {
@@ -53,147 +38,116 @@ async function storage(p: Page) {
   });
 }
 
-test('C estimate: raw inputs, custom breaker, local back and independent offline supplier placeholders', async ({
+test('C flat connection: 26 A, 32 A recommendation, manual 64 A, annualisation and independent offline cards', async ({
   page,
   context,
 }) => {
   await page.goto('/');
   await expect(page.getByText('Offline připraveno', { exact: true })).toBeVisible();
   const before = await storage(page);
-  await open(page);
+  await fillFlat(page);
   const s = rates(page);
-  await s.getByRole('button', { name: 'C – PODNIKATEL / FIRMA', exact: true }).click();
-  await s.getByRole('button', { name: 'ODHAD PŘED PŘIPOJENÍM', exact: true }).click();
-  await s.getByLabel('Distribuční oblast', { exact: true }).selectOption('EG.D');
-  await s.getByLabel('Výkon spotřebičů [kW]', { exact: true }).fill('17,35');
-  await expect(s.getByLabel('Proudové zatížení [A]', { exact: true })).toHaveValue('');
-  await s.getByLabel('Proudové zatížení [A]', { exact: true }).fill('42,7');
-  await s.getByLabel('Soudobost', { exact: true }).fill('0,65');
-  await s.getByRole('button', { name: 'Informace: Soudobost', exact: true }).click();
-  await expect(s.getByRole('note')).toContainText('Hodnota zůstává ručně editovatelná.');
-  await s.getByLabel('Navržený hlavní jistič', { exact: true }).selectOption('custom');
-  await s.getByLabel('Vlastní hodnota jističe', { exact: true }).fill('1×40 A');
-  await s.getByLabel('Odhadovaná roční spotřeba [kWh/rok]', { exact: true }).fill('12345,67');
-  await layout(page);
-  await next(page).click();
+  await expect(s.getByLabel('Odhadovaná roční spotřeba [kWh/rok]', { exact: true })).toHaveCount(0);
+  await expect(s.getByLabel('Výkon spotřebičů [kW]', { exact: true })).toHaveCount(0);
+  await expect(s.getByLabel('Délka období', { exact: true })).toHaveValue('1');
+  await expect(s.getByLabel('Návrh jističe')).toContainText('Proud po soudobosti: 26 A');
+  await expect(s.getByLabel('Návrh jističe')).toContainText('Doporučený jistič: 3×32 A');
+  await expect(s.getByLabel('Návrh jističe')).not.toContainText('3×25 A');
+  await tariffLayout(page);
+  await s.getByRole('button', { name: 'POKRAČOVAT K POROVNÁNÍ', exact: true }).click();
   const summary = s.getByRole('region', { name: 'Shrnutí vstupů', exact: true });
-  for (const text of [
-    'C – PODNIKATEL / FIRMA',
-    'EG.D',
-    '17,35 kW',
-    '42,7 A',
-    '0,65',
-    '1×40 A',
-    '12345,67 kWh/rok',
-  ])
-    await expect(summary).toContainText(text);
-  await expect(summary).toContainText('Výpočet cen a doporučení sazby bude doplněn v další etapě.');
+  await expect(summary).toContainText(/Předpokládaná roční spotřeba\s*12\s*000 kWh\/rok/);
+  await expect(summary).toContainText('Použitý jistič3×32 A');
   const cards = s.locator('.tariff-supplier');
-  await expect(cards).toHaveCount(5);
+  await expect(cards).toHaveCount(8);
   await expect(cards.first()).toHaveAttribute('aria-label', 'ORLEN Unipetrol');
-  await expect(cards.first()).toContainText('Pracovní reference pro firmy');
-  await page.screenshot({
-    path: `/workspace/work/tariff-C-${test.info().project.name}.png`,
-    fullPage: true,
-  });
   await context.setOffline(true);
   const requests: string[] = [];
   page.on('request', (r) => requests.push(r.url()));
-  await cards.first().getByRole('button', { name: 'AKTUALIZOVAT CENÍK', exact: true }).click();
-  await expect(cards.first().getByRole('status')).toHaveText(
+  await cards.nth(2).getByRole('button', { name: 'AKTUALIZOVAT CENÍK', exact: true }).click();
+  await expect(cards.nth(2).getByRole('status')).toHaveText(
     'Aktualizace ceníku bude doplněna v další etapě.',
   );
-  await expect(cards.nth(1).getByRole('status')).toHaveCount(0);
-  await cards.nth(1).getByRole('button', { name: 'AKTUALIZOVAT CENÍK', exact: true }).click();
-  await expect(cards.nth(1).getByRole('status')).toBeVisible();
+  await expect(cards.first().getByRole('status')).toHaveCount(0);
   expect(requests).toEqual([]);
-  await layout(page);
   await back(page).click();
-  await expect(s.getByLabel('Výkon spotřebičů [kW]', { exact: true })).toHaveValue('17,35');
-  await expect(s.getByLabel('Vlastní hodnota jističe', { exact: true })).toHaveValue('1×40 A');
-  await s.getByLabel('Distribuční oblast', { exact: true }).selectOption('PREdistribuce');
-  await next(page).click();
-  await expect(summary).toContainText('PREdistribuce');
-  await expect(s.getByRole('region', { name: 'Ceníky dodavatelů', exact: true })).not.toContainText(
-    'EG.D',
-  );
-  await expect(cards.getByRole('status')).toHaveCount(0);
+  await s.getByLabel('Použitý jistič', { exact: true }).selectOption('custom');
+  await s.getByLabel('Vlastní jistič [A]', { exact: true }).fill('64');
+  await s.getByLabel('Proudové zatížení [A]', { exact: true }).fill('41');
+  await expect(s.getByLabel('Vlastní jistič [A]', { exact: true })).toHaveValue('64');
+  await s.getByRole('button', { name: 'POKRAČOVAT K POROVNÁNÍ', exact: true }).click();
+  await expect(summary).toContainText('Použitý jistič3×64 A');
+  await expect(summary).not.toContainText('3×63 A');
+  await tariffLayout(page);
+  await page.screenshot({
+    path: `/workspace/work/tariffs142-C-${test.info().project.name}.png`,
+    fullPage: true,
+  });
   expect(await storage(page)).toEqual(before);
 });
 
-test('D actual consumption: household tariffs, custom months and no ORLEN anywhere', async ({
+test('D offers only flat connection, seven suppliers and no ORLEN; all local back levels preserve inputs', async ({
   page,
 }) => {
   await page.goto('/');
-  await open(page);
+  await fillFlat(page, 'D');
   const s = rates(page);
-  await s.getByRole('button', { name: 'D – DOMÁCNOST', exact: true }).click();
-  await s.getByRole('button', { name: 'KONTROLA PODLE SKUTEČNÉ SPOTŘEBY', exact: true }).click();
-  await expect(
-    s.getByLabel('Současná sazba', { exact: true }).locator('option').first(),
-  ).toHaveText('Vyberte sazbu D');
-  await expect(s.getByLabel('Současná sazba', { exact: true }).locator('option')).not.toContainText(
-    ['C01d'],
-  );
-  await s.getByLabel('Současná sazba', { exact: true }).selectOption('D02d');
-  await s.getByLabel('Distribuční oblast', { exact: true }).selectOption('ČEZ Distribuce');
-  await s.getByLabel('Současný hlavní jistič', { exact: true }).selectOption('3×25 A');
-  await s.getByLabel('Spotřeba za období [kWh]', { exact: true }).fill('456,78');
   await s.getByLabel('Délka období', { exact: true }).selectOption('custom');
   await s.getByLabel('Vlastní počet měsíců', { exact: true }).fill('5');
-  await layout(page);
-  await next(page).click();
-  const summary = s.getByRole('region', { name: 'Shrnutí vstupů', exact: true });
-  for (const text of [
-    'D – DOMÁCNOST',
-    'ČEZ Distribuce',
-    'D02d',
-    '3×25 A',
-    '456,78 kWh',
-    '5 měsíců',
-  ])
-    await expect(summary).toContainText(text);
-  await expect(s.locator('.tariff-supplier')).toHaveCount(4);
+  await s.getByRole('button', { name: 'POKRAČOVAT K POROVNÁNÍ', exact: true }).click();
+  await expect(s.locator('.tariff-supplier')).toHaveCount(7);
   await expect(page.getByText(/ORLEN/i)).toHaveCount(0);
-  await page.screenshot({
-    path: `/workspace/work/tariff-D-${test.info().project.name}.png`,
-    fullPage: true,
-  });
-  await layout(page);
+  await expect(s.getByRole('region', { name: 'Shrnutí vstupů', exact: true })).toContainText(
+    '2 400 kWh/rok',
+  );
+  await tariffLayout(page);
   await back(page).click();
-  await expect(s.getByLabel('Spotřeba za období [kWh]', { exact: true })).toHaveValue('456,78');
+  await expect(s.getByLabel('Vlastní počet měsíců', { exact: true })).toHaveValue('5');
   await back(page).click();
-  await expect(s.getByRole('heading', { name: 'Způsob výpočtu', exact: true })).toBeVisible();
+  await expect(s.getByRole('heading', { name: 'Výpočet', exact: true })).toBeVisible();
+  await expect(s.getByRole('button', { name: 'ODHAD / FIRMY', exact: true })).toHaveCount(0);
   await back(page).click();
   await expect(s.getByRole('heading', { name: 'Typ odběru', exact: true })).toBeVisible();
   await expect(s.getByRole('button', { name: '← Zpět', exact: true })).toHaveCount(0);
 });
 
-test('changing C to D clears the company tariff without introducing a company supplier', async ({
+test('company readings compute consumption and annual equivalent with unchanged installed breaker and ORLEN only', async ({
   page,
 }) => {
   await page.goto('/');
-  await open(page);
+  const before = await storage(page);
+  await fillCompany(page);
   const s = rates(page);
-  await s.getByRole('button', { name: 'C – PODNIKATEL / FIRMA', exact: true }).click();
-  await s.getByRole('button', { name: 'KONTROLA PODLE SKUTEČNÉ SPOTŘEBY', exact: true }).click();
+  await expect(s.getByLabel('Distribuční oblast', { exact: true })).toHaveCount(0);
+  await expect(s.getByRole('button', { name: 'TEĎ', exact: true })).toHaveCount(0);
+  await expect(s.getByText('Soudobost', { exact: true })).toHaveCount(0);
+  await expect(s.getByLabel('Původní nastavení').locator('select')).toHaveCount(2);
+  await companyResult(page);
+  const summary = s.getByRole('region', { name: 'Shrnutí vstupů', exact: true });
+  await expect(summary).toContainText(/Skutečná spotřeba za období\s*1\s*250 kWh/);
+  await expect(summary).toContainText(/Přepočtená roční spotřeba\s*45\s*625 kWh\/rok/);
+  await expect(summary).toContainText('Původní hlavní jistič3×40 A');
+  await expect(summary).toContainText('Původní sazbaC02d');
+  await expect(s.locator('.tariff-supplier')).toHaveCount(1);
+  await expect(s.locator('.tariff-supplier')).toHaveAttribute('data-supplier-id', 'orlen');
   await expect(
-    s.getByLabel('Současná sazba', { exact: true }).locator('option').first(),
-  ).toHaveText('Vyberte sazbu C');
-  await s.getByLabel('Současná sazba', { exact: true }).selectOption('C02d');
+    s.getByRole('heading', { name: 'Ceník zatím není načten.', exact: true }),
+  ).toBeVisible();
+  await expect(s).not.toContainText(/Kč|Doporučená sazba ORLEN: C|Původní sazba C02d odpovídá/);
+  await expect(s.getByLabel('Návrh jističe')).toHaveCount(0);
+  await tariffLayout(page);
+  await page.screenshot({
+    path: `/workspace/work/tariffs142-company-${test.info().project.name}.png`,
+    fullPage: true,
+  });
   await back(page).click();
   await back(page).click();
-  await s.getByRole('button', { name: 'D – DOMÁCNOST', exact: true }).click();
-  await s.getByRole('button', { name: 'KONTROLA PODLE SKUTEČNÉ SPOTŘEBY', exact: true }).click();
-  await expect(s.getByLabel('Současná sazba', { exact: true })).toHaveValue('');
-  await expect(page.getByText(/ORLEN/i)).toHaveCount(0);
-  await back(page).click();
-  await s.getByRole('button', { name: 'ODHAD PŘED PŘIPOJENÍM', exact: true }).click();
-  await expect(s.getByLabel('Výkon spotřebičů [kW]', { exact: true })).toHaveValue('');
-  await expect(page.getByText(/ORLEN/i)).toHaveCount(0);
+  await expect(s.getByLabel('Původní hlavní jistič', { exact: true })).toHaveValue('3×40 A');
+  await expect(s.getByLabel('Datum druhého odečtu', { exact: true })).toHaveValue('2026-01-11');
+  expect(await storage(page)).toEqual(before);
 });
 
-test('switching the new module preserves existing measurement draft, completed history and database', async ({
+test('switching tariff workflows preserves measurement draft, completed history and database', async ({
   page,
 }) => {
   await page.goto('/');
@@ -206,11 +160,8 @@ test('switching the new module preserves existing measurement draft, completed h
   await expect(page.getByLabel('VÝROBNÍ ČÍSLO ELEKTROMĚRU', { exact: true })).toHaveValue('136777');
   await fillMainCheck(page);
   const before = await storage(page);
-  await open(page);
-  const s = rates(page);
-  await s.getByRole('button', { name: 'D – DOMÁCNOST', exact: true }).click();
-  await s.getByRole('button', { name: 'ODHAD PŘED PŘIPOJENÍM', exact: true }).click();
-  await s.getByLabel('Výkon spotřebičů [kW]', { exact: true }).fill('99');
+  await openTariffs(page, 'D', 'flat');
+  await rates(page).getByLabel('Proudové zatížení [A]', { exact: true }).fill('99');
   await page
     .getByRole('button', { name: 'MĚŘENÍ + ODEČET ELEKTROMĚRU / ENERGIS', exact: true })
     .click();

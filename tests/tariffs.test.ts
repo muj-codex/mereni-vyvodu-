@@ -8,7 +8,15 @@ describe('tariff input scaffold boundaries', () => {
       name: 'ORLEN Unipetrol',
       workingReference: true,
     });
-    expect(suppliersFor('D').map((s) => s.id)).toEqual(['cez', 'eon', 'pre', 'innogy']);
+    expect(suppliersFor('D').map((s) => s.id)).toEqual([
+      'cez',
+      'eon',
+      'pre',
+      'innogy',
+      'mnd',
+      'centropol',
+      'epet',
+    ]);
     expect(JSON.stringify(suppliersFor('D'))).not.toMatch(/orlen|reference/i);
   });
   it('keeps update and verification state independent for each supplier', () => {
@@ -30,12 +38,12 @@ describe('tariff input scaffold boundaries', () => {
     expect(a.method).toBeNull();
     expect(a.distributionArea).toBe('');
     a.distributionArea = 'EG.D';
-    a.estimate.powerKw = '123,456';
-    a.estimate.breaker.custom = '1×40 A';
-    a.actual.vtKwh = '100';
-    a.actual.ntKwh = '200';
+    a.flat.currentA = '123,456';
+    a.flat.breaker.custom = '64';
+    a.company.vtKwh = '100';
+    a.company.ntKwh = '200';
     expect(b).toEqual(blankTariffDraft());
-    expect(a.estimate.powerKw).toBe('123,456');
-    expect(a.actual.consumptionKwh).toBe('');
+    expect(a.flat.currentA).toBe('123,456');
+    expect(a.flat.consumptionKwh).toBe('');
   });
 });

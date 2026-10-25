@@ -72,7 +72,9 @@ export function SupplierCardView({
       </button>
       {update.error && (
         <p className="notice error" role="alert">
-          {update.error}
+          {update.lastValidPriceList
+            ? 'Aktualizace selhala – používá se poslední platný ceník.'
+            : update.error}
         </p>
       )}
       {update.message && (
