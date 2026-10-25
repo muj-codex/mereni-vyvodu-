@@ -1,10 +1,11 @@
+import { tariffsFor, tariffFor } from './catalog';
+import { SupplierCard } from './SupplierCard';
 import { useState } from 'react';
 import { BackButton } from '../ui/BackButton';
 import { SelectField } from '../ui/Fields';
 import { Info } from '../ui/Info';
 import {
   blankTariffDraft,
-  blankSupplierUpdate,
   breakers,
   distributionAreas,
   periods,
@@ -12,7 +13,6 @@ import {
   type BreakerInput,
   type Customer,
   type DistributionArea,
-  type Supplier,
   type TariffDraft,
 } from './model';
 import './tariffs.css';
@@ -95,47 +95,19 @@ function BreakerField({
     </>
   );
 }
-function SupplierCard({ supplier }: { supplier: Supplier }) {
-  // Each mounted card owns its update state. No request is made in this release.
-  const [update, setUpdate] = useState(blankSupplierUpdate);
+function TariffInfo({ customer, code }: { customer: Customer; code: string }) {
+  const tariff = tariffFor(customer, code);
+  if (!tariff) return null;
   return (
-    <article className="card tariff-supplier" aria-label={supplier.name}>
-      <div className="tariff-supplier-title">
-        <span className="tariff-logo" aria-hidden="true">
-          {supplier.name.slice(0, 1)}
+    <div className="tariff-info" key={code}>
+      <Info label={`sazba ${tariff.code}`}>
+        <span>
+          Kód sazby: {tariff.code} · Kategorie: {tariff.category} ·{' '}
+          {tariff.tariffType === 'single' ? 'Jednotarifní' : 'Dvoutarifní'} · VT: ano · NT:{' '}
+          {tariff.usesNT ? 'ano' : 'ne'}
         </span>
-        <h3>{supplier.name}</h3>
-      </div>
-      {supplier.workingReference && <p className="hint">Pracovní reference pro firmy</p>}
-      <dl>
-        <div>
-          <dt>Ceník platný od:</dt>
-          <dd>{update.validFrom ?? '—'}</dd>
-        </div>
-        <div>
-          <dt>Naposledy ověřeno:</dt>
-          <dd>{update.lastVerifiedAt ?? '—'}</dd>
-        </div>
-        <div>
-          <dt>Stav ceníku</dt>
-          <dd>{update.status === 'not-loaded' ? 'Ceník zatím není načten' : update.status}</dd>
-        </div>
-      </dl>
-      <button
-        type="button"
-        className="button secondary"
-        onClick={() =>
-          setUpdate((s) => ({ ...s, message: 'Aktualizace ceníků bude doplněna v dalším kroku.' }))
-        }
-      >
-        AKTUALIZOVAT CENÍK
-      </button>
-      {update.message && (
-        <p className="notice" role="status">
-          {update.message}
-        </p>
-      )}
-    </article>
+      </Info>
+    </div>
   );
 }
 function Summary({ draft }: { draft: TariffDraft & { customer: Customer } }) {
@@ -204,7 +176,7 @@ function Summary({ draft }: { draft: TariffDraft & { customer: Customer } }) {
             </>
           )}
         </dl>
-        <p className="notice">Výpočet sazeb a porovnání dodavatelů bude doplněn v dalším kroku.</p>
+        <p className="notice">Výpočet cen a doporučení sazby bude doplněn v další etapě.</p>
       </section>
       <section aria-label="Ceníky dodavatelů">
         <h2>CENÍKY DODAVATELŮ</h2>
@@ -372,13 +344,14 @@ export function TariffCalculator() {
                   }
                 >
                   <option value="">Vyberte sazbu {draft.customer}</option>
-                  {(draft.customer === 'C'
-                    ? ['C01d', 'C02d', 'C03d']
-                    : ['D01d', 'D02d', 'D25d']
-                  ).map((code) => (
-                    <option key={code}>{code}</option>
-                  ))}
+                  {draft.customer &&
+                    tariffsFor(draft.customer).map((tariff) => (
+                      <option key={tariff.code}>{tariff.code}</option>
+                    ))}
                 </SelectField>
+                {draft.customer && (
+                  <TariffInfo customer={draft.customer} code={actual.tariffCode} />
+                )}
                 <BreakerField
                   label="Současný hlavní jistič"
                   value={actual.breaker}

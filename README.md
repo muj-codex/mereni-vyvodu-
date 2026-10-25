@@ -276,3 +276,11 @@ Zadává se jedna distribuční oblast (ČEZ Distribuce, EG.D, PREdistribuce), b
 Ceníky dodavatelů jsou výhradně placeholder karty bez cen a načítání. ORLEN Unipetrol je pracovní referencí pouze v režimu C; v D se vůbec nevykresluje. Každá karta má vlastní stav aktualizace, platnosti, ověření a chyby. Tlačítko aktualizace pouze zobrazí informaci o budoucím doplnění. Katalog je vázaný na jedinou vybranou distribuční oblast.
 
 Verze neobsahuje žádné výpočty cen, převody výkon/proud, roční přepočty, doporučení ani stahování ceníků. Nový stav žije jen v paměti během otevřeného workflow; nevytváří historii, IndexedDB ani backup záznamy. Existující modul Měření a jeho data, výpočty a funkce zůstávají beze změny.
+
+## Verze 1.4.1 – katalog sazeb a dodavatelské karty
+
+Modul sazeb obsahuje úplný zadaný katalog **12 C sazeb** (C01d, C02d, C03d, C25d, C26d, C27d, C35d, C45d, C46d, C56d, C60d, C62d) a **10 D sazeb** (D01d, D02d, D25d, D26d, D27d, D35d, D45d, D56d, D57d, D61d). Kategorie se nemíchají. Informační tlačítko u zvolené sazby ukazuje kód, kategorii, jednotarifní/dvoutarifní režim a VT/NT. C01d/C02d/C03d a D01d/D02d jsou jednotarifní s VT; ostatní zadané sazby mají VT i NT.
+
+Každá sazba má poznámku, prázdné technické podmínky (hodiny NT, ohřev vody, akumulace, přímotop, tepelné čerpadlo, elektromobil, další podmínky) a samostatná prázdná cenová místa pro ČEZ Distribuci, EG.D a PREdistribuci. Podmínky ani ceny se nevyhodnocují a nic se automaticky nedoporučuje.
+
+Karty dodavatelů mají jemný vlastní barevný akcent, místo pro budoucí malé logo a zdrojový adaptér, oddělené `validFrom` / `lastChecked` / `sourceStatus` a vlastní `idle/updating/success/error`. Skutečné načítání není zapojené: tlačítko zobrazí jen „Aktualizace ceníku bude doplněna v další etapě.“ a nevymyslí datum ani úspěšné ověření. ORLEN UNIPETROL zůstává první pracovní referencí pouze v C; v D se jeho karta vůbec nevytváří. Zůstávají oba formuláře, shrnutí vstupů, lokální návraty a jedna distribuční oblast na kalkulaci, bez historie a ukládání. Modul Měření nebyl změněn.

@@ -3,7 +3,7 @@ import { blankTariffDraft, blankSupplierUpdate, suppliersFor } from '../src/tari
 
 describe('tariff input scaffold boundaries', () => {
   it('offers ORLEN as the company reference and excludes it entirely for households', () => {
-    expect(suppliersFor('C')[0]).toEqual({
+    expect(suppliersFor('C')[0]).toMatchObject({
       id: 'orlen',
       name: 'ORLEN Unipetrol',
       workingReference: true,
@@ -16,13 +16,11 @@ describe('tariff input scaffold boundaries', () => {
     company[0].update.status = 'error';
     company[0].update.error = 'future update error';
     company[1].update.status = 'success';
-    company[1].update.lastVerifiedAt = '2026-10-25';
-    expect(company[0].update.lastVerifiedAt).toBeNull();
+    company[1].update.lastChecked = '2026-10-25';
+    expect(company[0].update.lastChecked).toBeNull();
     expect(company[1].update.error).toBeNull();
     expect(
-      company
-        .slice(2)
-        .every((s) => s.update.status === 'not-loaded' && s.update.lastVerifiedAt === null),
+      company.slice(2).every((s) => s.update.status === 'idle' && s.update.lastChecked === null),
     ).toBe(true);
   });
   it('starts without customer or area and does not invent or share input values', () => {

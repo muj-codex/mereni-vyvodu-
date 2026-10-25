@@ -19,6 +19,7 @@
 .tariff-module .tariff-supplier {
   margin: 0;
   min-width: 0;
+  border-top: 3px solid var(--supplier-accent, #146e68);
 }
 .tariff-module .tariff-supplier-title {
   display: flex;
@@ -33,7 +34,7 @@
   flex: 0 0 44px;
   border-radius: 10px;
   background: #e6edef;
-  color: #146e68;
+  color: var(--supplier-accent, #146e68);
   font-weight: 750;
 }
 .tariff-module dl > div {
@@ -62,4 +63,13 @@
   .tariff-module .tariff-summary dd {
     text-align: left;
   }
+}
+
+.tariff-module .tariff-logo img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+.tariff-module .tariff-info {
+  grid-column: 1 / -1;
 }

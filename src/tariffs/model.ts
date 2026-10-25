@@ -63,25 +63,64 @@ export function blankTariffDraft(): TariffDraft {
   };
 }
 export type SupplierId = 'orlen' | 'cez' | 'eon' | 'pre' | 'innogy';
-export type Supplier = { id: SupplierId; name: string; workingReference?: true };
+export type SupplierSource =
+  | { kind: 'unconfigured' }
+  | {
+      kind: 'pdf' | 'html' | 'form' | 'interactive-web' | 'area-selection' | 'other';
+      url: string | null;
+    };
+export type Supplier = {
+  id: SupplierId;
+  name: string;
+  workingReference?: true;
+  brand: { accentColor: string; logoPath?: string };
+  source: SupplierSource;
+};
 export type SupplierUpdate = {
-  status: 'not-loaded' | 'loading' | 'success' | 'error';
+  status: 'idle' | 'updating' | 'success' | 'error';
   validFrom: string | null;
-  lastVerifiedAt: string | null;
+  lastChecked: string | null;
+  sourceStatus: 'not-loaded' | 'not-verified' | 'verified' | 'unavailable';
   error: string | null;
   message: string;
 };
 export function blankSupplierUpdate(): SupplierUpdate {
-  return { status: 'not-loaded', validFrom: null, lastVerifiedAt: null, error: null, message: '' };
+  return {
+    status: 'idle',
+    validFrom: null,
+    lastChecked: null,
+    sourceStatus: 'not-loaded',
+    error: null,
+    message: '',
+  };
 }
 export function suppliersFor(customer: Customer): Supplier[] {
   const common: Supplier[] = [
-    { id: 'cez', name: 'ČEZ' },
-    { id: 'eon', name: 'E.ON' },
-    { id: 'pre', name: 'PRE' },
-    { id: 'innogy', name: 'innogy' },
+    { id: 'cez', name: 'ČEZ', brand: { accentColor: '#a34d0b' }, source: { kind: 'unconfigured' } },
+    {
+      id: 'eon',
+      name: 'E.ON',
+      brand: { accentColor: '#aa1733' },
+      source: { kind: 'unconfigured' },
+    },
+    { id: 'pre', name: 'PRE', brand: { accentColor: '#205f9a' }, source: { kind: 'unconfigured' } },
+    {
+      id: 'innogy',
+      name: 'innogy',
+      brand: { accentColor: '#823783' },
+      source: { kind: 'unconfigured' },
+    },
   ];
   return customer === 'C'
-    ? [{ id: 'orlen', name: 'ORLEN Unipetrol', workingReference: true }, ...common]
+    ? [
+        {
+          id: 'orlen',
+          name: 'ORLEN Unipetrol',
+          workingReference: true,
+          brand: { accentColor: '#ab2030' },
+          source: { kind: 'unconfigured' },
+        },
+        ...common,
+      ]
     : common;
 }

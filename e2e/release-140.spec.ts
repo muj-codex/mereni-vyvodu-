@@ -87,9 +87,7 @@ test('C estimate: raw inputs, custom breaker, local back and independent offline
     '12345,67 kWh/rok',
   ])
     await expect(summary).toContainText(text);
-  await expect(summary).toContainText(
-    'Výpočet sazeb a porovnání dodavatelů bude doplněn v dalším kroku.',
-  );
+  await expect(summary).toContainText('Výpočet cen a doporučení sazby bude doplněn v další etapě.');
   const cards = s.locator('.tariff-supplier');
   await expect(cards).toHaveCount(5);
   await expect(cards.first()).toHaveAttribute('aria-label', 'ORLEN Unipetrol');
@@ -103,7 +101,7 @@ test('C estimate: raw inputs, custom breaker, local back and independent offline
   page.on('request', (r) => requests.push(r.url()));
   await cards.first().getByRole('button', { name: 'AKTUALIZOVAT CENÍK', exact: true }).click();
   await expect(cards.first().getByRole('status')).toHaveText(
-    'Aktualizace ceníků bude doplněna v dalším kroku.',
+    'Aktualizace ceníku bude doplněna v další etapě.',
   );
   await expect(cards.nth(1).getByRole('status')).toHaveCount(0);
   await cards.nth(1).getByRole('button', { name: 'AKTUALIZOVAT CENÍK', exact: true }).click();
