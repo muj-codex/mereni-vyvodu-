@@ -266,3 +266,13 @@ Změna se týká pouze navigačního zobrazení. Výpočty, formuláře, rozprac
 ## Verze 1.3.9 – zjednodušení navigace a nadpisu
 
 Horní navigace odečtů obsahuje pouze Jednotlivý odečet | Série odečtů | Stylus. Uložené výsledky, série a samostatné odečty jsou nadále přístupné přes spodní globální Výsledky měření. Na prvním kroku hlavního měření se nezobrazuje pouze nadpis „Základ / kontrola stavů“; ELEKTROMĚR, krokový indikátor, pomocný text, identifikace a celý formulář zůstávají zachované. Výpočty, odečtová logika, historie, Energis, Kyoritsu, +E/-E, IndexedDB a backup/restore nebyly změněny.
+
+## Verze 1.4.0 – kostra výpočtu spotřeby a sazeb
+
+Nový samostatný modul nabízí povinný výběr C (firma) / D (domácnost), volbu odhadu před připojením nebo kontroly podle skutečné spotřeby, vstupní formuláře a shrnutí ručně zadaných údajů. Vnořené kroky mají lokální ← Zpět se zachováním vstupů. Používá stejné obecné formulářové komponenty a vzhled aplikace, vlastní styly jsou omezeny na nový modul.
+
+Zadává se jedna distribuční oblast (ČEZ Distribuce, EG.D, PREdistribuce), běžný nebo vlastní jistič, spotřeba a podle režimu výkon/proud/soudobost či sazba a délka období včetně vlastního počtu měsíců. Výběr sazeb obsahuje pouze několik výchozích kódů; nejde o kompletní katalog. Model ponechává prostor i pro budoucí VT/NT.
+
+Ceníky dodavatelů jsou výhradně placeholder karty bez cen a načítání. ORLEN Unipetrol je pracovní referencí pouze v režimu C; v D se vůbec nevykresluje. Každá karta má vlastní stav aktualizace, platnosti, ověření a chyby. Tlačítko aktualizace pouze zobrazí informaci o budoucím doplnění. Katalog je vázaný na jedinou vybranou distribuční oblast.
+
+Verze neobsahuje žádné výpočty cen, převody výkon/proud, roční přepočty, doporučení ani stahování ceníků. Nový stav žije jen v paměti během otevřeného workflow; nevytváří historii, IndexedDB ani backup záznamy. Existující modul Měření a jeho data, výpočty a funkce zůstávají beze změny.

@@ -1,3 +1,4 @@
+import { TariffCalculator } from './tariffs/TariffCalculator';
 import { ReadingNavigation } from './ui/ReadingNavigation';
 import { BackButton } from './ui/BackButton';
 import { Series } from './series/Series';
@@ -299,7 +300,7 @@ export default function App() {
               VÝPOČET SPOTŘEBY A SAZEB
             </button>
           </div>
-          {mainSection !== 'readings' && (
+          {mainSection === 'measurement' && (
             <ReadingNavigation
               onChange={(mode) => {
                 setReadingMode(mode);
@@ -314,12 +315,7 @@ export default function App() {
           <Series initial={readingMode} onModeChange={setReadingMode} />
         </main>
       )}
-      {tab !== 'history' && mainSection === 'rates' && (
-        <section className="card">
-          <h1>Výpočet spotřeby a sazeb</h1>
-          <p>Připravuje se</p>
-        </section>
-      )}
+      {tab !== 'history' && mainSection === 'rates' && <TariffCalculator />}
       <main hidden={tab !== 'history' && mainSection !== 'measurement'}>
         {tab === 'history' ? (
           <>

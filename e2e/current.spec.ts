@@ -190,7 +190,7 @@ test('hlavní navigace i přepínání karet zachovají rozepsané hodnoty', asy
   await identify(page);
   await current(page);
   await page.getByRole('button', { name: 'VÝPOČET SPOTŘEBY A SAZEB', exact: true }).click();
-  await expect(page.getByText('Připravuje se', { exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Typ odběru', exact: true })).toBeVisible();
   await expect(
     page.getByRole('button', { name: 'VYHODNOTIT PROUDY', exact: true }),
   ).not.toBeVisible();
