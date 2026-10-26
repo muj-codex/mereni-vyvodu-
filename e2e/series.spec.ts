@@ -10,6 +10,10 @@ async function first(page: Page, serial = '12345678', node = '21208142') {
   await s.getByLabel('Pole / kobka / umístění', { exact: true }).fill('11P');
   await s.getByLabel('Číslo elektroměru', { exact: true }).fill(serial);
   await s.getByLabel('UZEL (nepovinný)', { exact: true }).fill(node);
+  // Reference prefill supplies the physical CT; this legacy workflow explicitly uses a matching meter CT.
+  await s
+    .getByLabel('MTP elektroměr', { exact: true })
+    .selectOption(await s.getByLabel('MTP primár', { exact: true }).inputValue());
   await s.getByLabel('Datum odečtu', { exact: true }).fill('2026-10-22');
   await s.getByLabel('Čas odečtu (HH:MM)', { exact: true }).fill('08:37');
   await s
@@ -146,6 +150,7 @@ test('STYLUS vyžaduje náhled a následné standardní uložení, pokračován�
   await s.getByRole('button', { name: 'ROZPOZNAT ÚDAJE', exact: true }).click();
   await expect(s.getByText(/Nový elektroměr – první/)).toBeVisible();
   await s.getByRole('button', { name: 'PŘEVÉST DO ODEČTU', exact: true }).click();
+  await s.getByLabel('MTP elektroměr', { exact: true }).selectOption('600');
   await s.getByLabel('Datum kola', { exact: true }).fill('2026-10-22');
   await s.getByLabel('Čas kola', { exact: true }).fill('08:00');
   await s.getByRole('button', { name: 'ULOŽIT DÍLČÍ ODEČET', exact: true }).click();

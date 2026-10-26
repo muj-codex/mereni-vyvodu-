@@ -1,17 +1,20 @@
 import type { DistributionArea } from './model';
 export const ORLEN_2026_SOURCE = {
   validFrom: '2026-01-01',
-  lastChecked: '2026-10-25',
-  provenance: 'Uživatelem ověřený přepis fotografií – zadání verze 1.4.3.',
+  lastChecked: '2026-10-26',
+  provenance: 'Uživatelem ověřené hodnoty pro verzi 1.4.4, doplněné 26. 10. 2026.',
   distributionArea: 'ČEZ Distribuce' as const,
   verifiedTariffs: ['C01d', 'C02d', 'C03d', 'C25d', 'C45d'] as const,
   priceBasis: 'without-vat' as const,
 };
 export type VerifiedOrlenTariff = (typeof ORLEN_2026_SOURCE.verifiedTariffs)[number];
-export type Price = { priceWithoutVat: number; priceWithVat: null };
-const net = (priceWithoutVat: number): Price => ({ priceWithoutVat, priceWithVat: null });
-// No VAT is applied without separately verified tax configuration.
-export const ORLEN_TAX_CONFIG = { vatRate: null, electricityTaxPerMwh: null };
+export type Price = { priceWithoutVat: number; priceWithVat: number };
+const net = (priceWithoutVat: number): Price => ({
+  priceWithoutVat,
+  priceWithVat: priceWithoutVat * 1.21,
+});
+// User-verified tax configuration supplied for release 1.4.4.
+export const ORLEN_TAX_CONFIG = { vatRate: 0.21, electricityTaxPerMwh: 28.3 };
 export const ORLEN_COMMON = {
   systemServicesPerMwh: net(164.24),
   pozePerMwh: net(0),
@@ -47,59 +50,13 @@ export const ORLEN_CEZ_DISTRIBUTION: Record<
   C25d: { vtPerMwh: net(2208.39), ntPerMwh: net(116.5) },
   C45d: { vtPerMwh: net(635.38), ntPerMwh: net(116.5) },
 };
-const exact: Partial<Record<VerifiedOrlenTariff, Record<number, number>>> = {
-  C01d: {
-    10: 66,
-    16: 105,
-    20: 131,
-    25: 164,
-    32: 210,
-    40: 263,
-    50: 329,
-    63: 414,
-    80: 526,
-    100: 657,
-    125: 821,
-    160: 1051,
-  },
-  C02d: {
-    10: 144,
-    16: 231,
-    20: 289,
-    25: 361,
-    32: 462,
-    40: 577,
-    50: 722,
-    63: 909,
-    80: 1154,
-    100: 1443,
-    125: 1804,
-    160: 2309,
-  },
-  C03d: { 10: 819, 16: 1311, 20: 1639, 25: 2048, 32: 2622, 40: 3277 },
-};
-const bands: Partial<Record<VerifiedOrlenTariff, readonly [number, number, number][]>> = {
-  C03d: [
-    [50, 63, 5162],
-    [63, 80, 6554],
-    [80, 100, 8193],
-    [100, 125, 10241],
-    [125, 160, 13109],
-  ],
-  C25d: [
-    [50, 63, 1329],
-    [63, 80, 1687],
-    [80, 100, 2109],
-    [100, 125, 2636],
-    [125, 160, 3374],
-  ],
-  C45d: [
-    [50, 63, 3691],
-    [63, 80, 4687],
-    [80, 100, 5859],
-    [100, 125, 7324],
-    [125, 160, 9374],
-  ],
+export const ORLEN_BREAKER_AMPS = [10, 16, 20, 25, 32, 40, 50, 63, 80, 100, 125, 160] as const;
+export const ORLEN_BREAKER_MONTHLY: Record<VerifiedOrlenTariff, readonly number[]> = {
+  C01d: [66, 105, 131, 164, 210, 263, 329, 414, 526, 657, 821, 1051],
+  C02d: [144, 231, 289, 361, 462, 577, 722, 909, 1154, 1443, 1804, 2309],
+  C03d: [819, 1311, 1639, 2048, 2622, 3277, 4097, 5162, 6554, 8193, 10241, 13109],
+  C25d: [211, 337, 422, 527, 675, 844, 1055, 1329, 1687, 2109, 2636, 3374],
+  C45d: [586, 937, 1172, 1465, 1875, 2344, 2930, 3691, 4687, 5859, 7324, 9374],
 };
 const above160: Record<VerifiedOrlenTariff, number> = {
   C01d: 6.57,
@@ -107,6 +64,13 @@ const above160: Record<VerifiedOrlenTariff, number> = {
   C03d: 81.93,
   C25d: 21.09,
   C45d: 58.59,
+};
+const singlePhasePerA: Record<VerifiedOrlenTariff, number> = {
+  C01d: 2.19,
+  C02d: 4.81,
+  C03d: 27.31,
+  C25d: 7.03,
+  C45d: 19.53,
 };
 export function isVerifiedOrlenTariff(code: string): code is VerifiedOrlenTariff {
   return (ORLEN_2026_SOURCE.verifiedTariffs as readonly string[]).includes(code);
@@ -130,12 +94,9 @@ export function orlenBreakerMonthly(
   )
     return null;
   if (phases === 1)
-    return amps > 25 && (code === 'C01d' || code === 'C02d')
-      ? net(amps * (code === 'C01d' ? 2.19 : 4.81))
-      : null;
-  const fixed = exact[code]?.[amps];
-  if (fixed !== undefined) return net(fixed);
-  const band = bands[code]?.find(([lower, upper]) => amps > lower && amps <= upper);
-  if (band) return net(band[2]);
-  return amps > 160 ? net(amps * above160[code]) : null;
+    return net(amps <= 25 ? ORLEN_BREAKER_MONTHLY[code][0] : amps * singlePhasePerA[code]);
+  if (phases !== 3) return null;
+  if (amps > 160) return net(amps * above160[code]);
+  const index = ORLEN_BREAKER_AMPS.findIndex((upper) => amps <= upper);
+  return index < 0 ? null : net(ORLEN_BREAKER_MONTHLY[code][index]);
 }

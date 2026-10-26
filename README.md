@@ -308,3 +308,15 @@ Ostatní ORLEN sazby zůstávají cenově neověřené. Doložený zvláštní �
 Výsledek ukazuje ověřené jednotkové ceny a **částečné roční položky**, nikoli konečný součet. Roční VT/NT ovlivňuje odpovídající dvoutarifní náklady; samotný celkový odběr se na neznámý poměr VT/NT nerozděluje. Chybějící stálý plat dodavatele, další povinné/OTE a daňové položky zůstávají `null`. Proto zatím **žádná kombinace nemá konečnou roční cenu ani doporučení sazby**. Model odděluje `priceWithoutVat` a `priceWithVat`; sazba DPH je samostatná nevyplněná konfigurace a DPH se nepřičítá.
 
 ORLEN karta uvádí částečně ověřený zdroj a obě odlišná data. Všech osm dodavatelů má viditelné, ale disabled aktualizační tlačítko s důvodem; není připojené webové načítání, API ani scraping. ORLEN zůstává pouze v C, Odhad / firmy pouze C/ORLEN, bez ukládání kalkulací. Celý modul Měření zůstal beze změny.
+
+## Verze 1.4.4 – referenční UZEL a dokončení ORLEN 2026
+
+Statický přepis pěti fotografií obsahuje 994 řádků původního listu (880 různých čitelných UZLŮ). Zdroj každého řádku, původní zápis MTP a neověřené buňky jsou v `src/series/reference/uzel.json`. Nečitelné, zakryté, oříznuté a nejednoznačné údaje zůstávají `null`. Report [validace UZEL](docs/uzel-validation-1.4.4.md) vzniká příkazem `npm run validate:uzel`; podrobnosti jsou i v JSON.
+
+UZEL v existujícím formuláři prvního odečtu doplní ověřenou TS/rozvodnu, umístění a MTP primární. Jednoznačná dvojice TS/rozvodna + umístění doplní UZEL a MTP primární. Shodné duplicity jsou použitelné, konflikty v obou směrech automatické doplnění zastaví. Malá a velká písmena umístění se rozlišují. Neověřené buňky se nepřenášejí, MTP elektroměru a ostatní odečtové údaje zůstávají nezávislé a editovatelné. Uložená měření se dodatečně neupravují. Hlavní identifikace Měření a elektrotechnické výpočty se nemění.
+
+ORLEN 2026 pro ČEZ Distribuce používá uživatelem ověřené hodnoty dodané 26. 10. 2026: všechny jističové intervaly C01d/C02d/C03d/C25d/C45d, zvláštní ceny 1f nad 25 A a 3f nad 160 A, daň z elektřiny 28,30 Kč/MWh a DPH 21 %. Roční daň se násobí spotřebou v MWh, měsíční položky dvanácti. Zaokrouhluje se až zobrazení. Samostatný nedoložený obchodní plat ani další neurčené poplatky nejsou přidané položky ani důvod blokace výsledku. Ostatní oblasti, sazby bez cen a dvoutarif bez VT/NT nemají vymyšlenou konečnou cenu.
+
+Odhad / firmy porovnává cenu C01d/C02d/C03d a případné stávající dvoutarifní sazby při stejné spotřebě a jističi; používá stav „SAZBA ODPOVÍDÁ“ nebo cenové doporučení. Nová dvoutarifní sazba se nenavrhuje bez znalosti jejích technických podmínek. Před změnou sazby je třeba ověřit podmínky u distributora. Loga dodavatelů nejsou podmínkou release; existující textové značky zůstávají.
+
+`npm run build` vytváří produkční aplikaci včetně service workeru a offline precache. `npm run build:pwa` je výslovný alias stejného úplného PWA buildu. Obě varianty obsahují dataset pro offline použití.

@@ -58,9 +58,11 @@ export function SupplierCardView({
         <div>
           <dt>Naposledy ověřeno:</dt>
           <dd>
-            {update.lastChecked === '2026-10-25'
-              ? '25. 10. 2026'
-              : (update.lastChecked ?? 'zatím neověřeno')}
+            {update.lastChecked
+              ? new Intl.DateTimeFormat('cs-CZ', { timeZone: 'UTC' }).format(
+                  new Date(update.lastChecked),
+                )
+              : 'zatím neověřeno'}
           </dd>
         </div>
         <div>
@@ -118,7 +120,7 @@ export function SupplierCard({ supplier }: { supplier: Supplier }) {
       ? {
           ...blankSupplierUpdate(),
           status: 'success',
-          sourceStatus: 'partial-verified',
+          sourceStatus: 'verified',
           validFrom: ORLEN_2026_SOURCE.validFrom,
           lastChecked: ORLEN_2026_SOURCE.lastChecked,
         }

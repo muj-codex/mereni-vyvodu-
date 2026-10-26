@@ -182,7 +182,7 @@ export function comparisonContext(
     throw new TariffInputError('Spotřeba a jistič musí být platné číselné hodnoty.');
   if (method === 'company' && (!originalTariff || !tariffFor('C', originalTariff)))
     throw new TariffInputError('Vyberte původní sazbu C.');
-  return {
+  const context = {
     customer,
     method,
     distributionArea: area,
@@ -207,5 +207,29 @@ export function comparisonContext(
       })),
     ),
   };
+  if (method === 'company') {
+    const current = context.candidates.find(
+      (c) => c.supplierId === 'orlen' && c.tariffCode === originalTariff,
+    )?.orlenAssessment;
+    // Single-register data does not establish a low-tariff split or technical eligibility.
+    // Compare the three universal single tariffs and the user's existing dual tariff only.
+    const comparable = context.candidates.filter(
+      (c) =>
+        c.supplierId === 'orlen' &&
+        c.orlenAssessment?.complete &&
+        (!c.orlenAssessment.dualTariff || c.tariffCode === originalTariff),
+    );
+    if (current?.complete && comparable.length > 1) {
+      const best = comparable.reduce((a, b) =>
+        a.orlenAssessment!.priceWithVat! <= b.orlenAssessment!.priceWithVat! ? a : b,
+      );
+      const matches = current.priceWithVat! <= best.orlenAssessment!.priceWithVat! + 1e-8;
+      context.verdict = {
+        kind: matches ? 'matches' : 'recommended',
+        tariffCode: matches ? originalTariff! : best.tariffCode,
+      };
+    }
+  }
+  return context;
 }
 export type ComparisonContext = ReturnType<typeof comparisonContext>;

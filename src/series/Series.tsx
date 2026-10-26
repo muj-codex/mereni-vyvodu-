@@ -1,3 +1,4 @@
+import { prefillReading, referenceLocations, type ReferenceMatch } from './reference/directory';
 import { ReadingNavigation } from '../ui/ReadingNavigation';
 import { BackButton } from '../ui/BackButton';
 import { EnergisBoundary, type Boundary } from './EnergisBoundary';
@@ -101,6 +102,8 @@ export function Series({
   const [data, setData] = useState<SeriesData>(emptySeries);
   const [mode, setMode] = useState<Mode>(historyOnly ? 'history' : initial);
   const [vn, setVn] = useState(false);
+  const [referenceMatch, setReferenceMatch] = useState<ReferenceMatch | null>(null);
+  const [referenceRevision, setReferenceRevision] = useState(0);
   const [lastBatch, setLastBatch] = useState('');
   const [entry, setEntry] = useState<Entry>(blankEntry);
   const [error, setError] = useState('');
@@ -193,7 +196,16 @@ export function Series({
     setSearch('');
     setSelected(data.meters.filter((m) => m.batchId === id && m.active).map((m) => m.id));
   };
-  const update = (key: keyof Entry, v: string) => setEntry((e) => ({ ...e, [key]: v }));
+  const update = (key: keyof Entry, v: string) => {
+    const result = prefillReading(entry, key, v);
+    setEntry(result.entry);
+    if (result.match) {
+      setReferenceMatch(result.match);
+      if (result.match.status === 'matched') {
+        setReferenceRevision((revision) => revision + 1);
+      }
+    }
+  };
   const act = async (fn: () => Promise<void>) => {
     if (busy) return;
     setBusy(true);
@@ -935,8 +947,16 @@ export function Series({
                         .replace(/^(?=\d)/, 'TS')
                         .toLowerCase(),
                   );
+                  const recognized = { ...parsed, location: matched || parsed.location };
+                  const reference = prefillReading(
+                    recognized,
+                    recognized.node ? 'node' : 'location',
+                    recognized.node || recognized.location,
+                  );
                   setVn((matched || parsed.location).startsWith('R'));
-                  setEntry({ ...parsed, location: matched || parsed.location });
+                  setEntry(reference.entry);
+                  setReferenceMatch(reference.match);
+                  setReferenceRevision((revision) => revision + 1);
                   setPreview(true);
                 }}
               >
@@ -995,9 +1015,16 @@ export function Series({
                         {!locations(vn).includes(entry.location) && entry.location && (
                           <option>{entry.location}</option>
                         )}
-                        {locations(vn).map((v) => (
-                          <option key={v}>{v}</option>
-                        ))}
+                        {[
+                          ...new Set([
+                            ...locations(vn),
+                            ...referenceLocations.filter((v) => /^R/i.test(v) === vn),
+                          ]),
+                        ]
+                          .filter((v) => v !== entry.location || locations(vn).includes(v))
+                          .map((v) => (
+                            <option key={v}>{v}</option>
+                          ))}
                       </select>
                     </label>
                   ) : (
@@ -1013,12 +1040,14 @@ export function Series({
               </div>
               <div className="field-grid">
                 <MtpSelect
+                  key={`primary-${referenceRevision}-${vn}`}
                   label="MTP primár"
                   secondary={vn ? 1 : 5}
                   value={Number(entry.actualMtp)}
                   onChange={(v) => update('actualMtp', String(v))}
                 />
                 <MtpSelect
+                  key={`meter-${vn}`}
                   label="MTP elektroměr"
                   secondary={vn ? 1 : 5}
                   value={Number(entry.meterMtp)}
@@ -1031,6 +1060,19 @@ export function Series({
                   />
                 )}
               </div>
+              {referenceMatch?.status === 'ambiguous' && (
+                <p aria-live="polite" className="notice">
+                  Nejednoznačná vazba v referenční tabulce – údaje doplňte ručně.
+                </p>
+              )}
+              {referenceMatch?.status === 'matched' && (
+                <p aria-live="polite" className="hint">
+                  Referenční tabulka: {referenceMatch.record.cell}.
+                  {referenceMatch.record.unverified.length > 0 &&
+                    ' Neúplný záznam – neověřené údaje nebyly doplněny.'}{' '}
+                  Předvyplněné údaje lze ručně upravit. MTP elektroměru zůstává nezávislé.
+                </p>
+              )}
               <Info label="UZEL">
                 Nepovinné číslice, alespoň 15 číslic je podporováno. Slouží pro párování Energisu;
                 UZEL patří k vývodu a je nezávislý na výměně elektroměru.
@@ -1116,6 +1158,7 @@ export function Series({
                         }));
                         broadcast();
                         setEntry(resetEntry(entry));
+                        setReferenceMatch(null);
                         setNotice('Dílčí odečet uložen. Připraveno pro další elektroměr.');
                       })
                     }

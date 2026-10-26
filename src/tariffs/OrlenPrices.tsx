@@ -29,8 +29,8 @@ export function OrlenPrices({ context }: { context: ComparisonContext }) {
     <section className="card orlen-prices" aria-label="Ověřené cenové položky ORLEN">
       <h2>ORLEN 2026 – {code}</h2>
       <p className="hint">
-        {context.distributionArea} · 3×{number(context.breakerA)} A · všechny uvedené ceny bez DPH.
-        Částečná data.
+        {context.distributionArea} · 3×{number(context.breakerA)} A · jednotkové ceny a rozpad bez
+        DPH. Konečná cena zahrnuje DPH 21 %.
       </p>
       {context.method === 'flat' && (
         <label className="field">
@@ -101,7 +101,9 @@ export function OrlenPrices({ context }: { context: ComparisonContext }) {
               <dd>{number(ORLEN_COMMON.otePerSupplyPointMonth.priceWithoutVat)} Kč/OM/měsíc</dd>
             </div>
           </dl>
-          <h3>Částečný roční rozpad – bez DPH</h3>
+          <h3>
+            {assessment.complete ? 'Roční rozpad – bez DPH' : 'Částečný roční rozpad – bez DPH'}
+          </h3>
           <dl className="tariff-summary" aria-label="Částečné roční položky ORLEN">
             {assessment.lines
               .filter((line) => line.priceWithoutVat !== null)
@@ -114,12 +116,31 @@ export function OrlenPrices({ context }: { context: ComparisonContext }) {
           </dl>
         </>
       )}
-      <p className="notice">Výpočet nelze dokončit – chybí ověřené cenové položky.</p>
-      <p className="hint">
-        Chybí: {assessment.missing.join('; ')}. Konečná roční cena ani cena s DPH se nezobrazují.
-      </p>
-      {context.method === 'company' && (
-        <p className="notice">Pro úplné porovnání zatím chybí ověřená cenová data.</p>
+      {assessment.complete ? (
+        <dl className="tariff-summary" aria-label="Konečná roční cena ORLEN">
+          <div>
+            <dt>Celkem bez DPH</dt>
+            <dd>{number(assessment.priceWithoutVat!)} Kč/rok</dd>
+          </div>
+          <div>
+            <dt>DPH 21 %</dt>
+            <dd>{number(assessment.priceWithVat! - assessment.priceWithoutVat!)} Kč/rok</dd>
+          </div>
+          <div>
+            <dt>Konečná cena včetně DPH</dt>
+            <dd>
+              <strong>{number(assessment.priceWithVat!)} Kč/rok</strong>
+            </dd>
+          </div>
+        </dl>
+      ) : (
+        <>
+          <p className="notice">Výpočet nelze dokončit – chybí ověřené cenové položky.</p>
+          <p className="hint">
+            Chybí: {assessment.missing.join('; ')}. Konečná roční cena ani cena s DPH se
+            nezobrazují.
+          </p>
+        </>
       )}
     </section>
   );

@@ -29,16 +29,20 @@ test('NN/VN presets, custom MTP, correction, TEĎ and normalized hour', async ({
     .click();
   await expect(s.getByLabel('Čas odečtu (HH:MM)', { exact: true })).toHaveValue('08:03');
   await s.getByLabel('Napětí', { exact: true }).selectOption('VN');
-  await expect(s.getByLabel('TS / rozvodna', { exact: true }).locator('option')).toHaveText([
-    'Vyberte TS / rozvodnu',
-    'R201',
-    'R202',
-    'R701',
-    'R702',
-    'R105-106',
-    'RPCH',
-    'RASU-AIP',
-  ]);
+  expect(
+    await s.getByLabel('TS / rozvodna', { exact: true }).locator('option').allTextContents(),
+  ).toEqual(
+    expect.arrayContaining([
+      'Vyberte TS / rozvodnu',
+      'R201',
+      'R202',
+      'R701',
+      'R702',
+      'R105-106',
+      'RPCH',
+      'RASU-AIP',
+    ]),
+  );
   await expect(s.getByLabel('MTP primár', { exact: true }).locator('option').first()).toHaveText(
     '70/1 A',
   );

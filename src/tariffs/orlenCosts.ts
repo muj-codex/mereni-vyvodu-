@@ -42,7 +42,11 @@ export function assessOrlen(
   const add = (key: string, label: string, priceWithoutVat: number | null) => {
     if (priceWithoutVat !== null && !Number.isFinite(priceWithoutVat))
       throw new Error('Cenový model je mimo podporovaný rozsah.');
-    lines.push({ key, label, priceWithoutVat, priceWithVat: null });
+    const priceWithVat =
+      priceWithoutVat === null ? null : priceWithoutVat * (1 + ORLEN_TAX_CONFIG.vatRate);
+    if (priceWithVat !== null && !Number.isFinite(priceWithVat))
+      throw new Error('Cenový model je mimo podporovaný rozsah.');
+    lines.push({ key, label, priceWithoutVat, priceWithVat });
   };
   const vt = dual ? (split?.annualVT ?? null) : annualKwh;
   const nt = dual ? (split?.annualNT ?? null) : null;
@@ -82,17 +86,27 @@ export function assessOrlen(
     'OTE / provoz nesíťové infrastruktury',
     verified ? ORLEN_COMMON.otePerSupplyPointMonth.priceWithoutVat * 12 : null,
   );
-  add('supplierFixed', 'Stálý měsíční plat dodavatele', ORLEN_COMMON.supplierFixedMonthly);
-  add('otherMandatory', 'Další povinné / OTE položky', ORLEN_COMMON.otherOteCharges);
-  add('taxes', 'Daňové položky', ORLEN_TAX_CONFIG.electricityTaxPerMwh);
+  // The verified source defines no separate supplier fixed fee or extra mandatory fee.
+  add(
+    'taxes',
+    'Daň z elektřiny',
+    verified ? (annualKwh / 1000) * ORLEN_TAX_CONFIG.electricityTaxPerMwh : null,
+  );
   const missing = lines.filter((line) => line.priceWithoutVat === null).map((line) => line.label);
   if (dual && !split) missing.unshift('Ověřený rozpad roční spotřeby VT/NT');
   if (!verified) missing.unshift('Cenová data ORLEN zatím nejsou ověřena.');
-  // Current source is incomplete for every combination. Never compare partial subtotals.
+  // Unknown areas, tariffs and missing VT/NT retain an explicit completeness gate.
   const complete = missing.length === 0;
   const priceWithoutVat = complete
     ? lines.reduce((sum, line) => sum + line.priceWithoutVat!, 0)
     : null;
+  const priceWithVat =
+    priceWithoutVat === null ? null : priceWithoutVat * (1 + ORLEN_TAX_CONFIG.vatRate);
+  if (
+    priceWithoutVat !== null &&
+    (!Number.isFinite(priceWithoutVat) || !Number.isFinite(priceWithVat))
+  )
+    throw new Error('Cenový model je mimo podporovaný rozsah.');
   return {
     code,
     distributionArea: area,
@@ -103,7 +117,7 @@ export function assessOrlen(
     missing,
     complete,
     priceWithoutVat,
-    priceWithVat: null,
+    priceWithVat,
     vatRate: ORLEN_TAX_CONFIG.vatRate,
   };
 }

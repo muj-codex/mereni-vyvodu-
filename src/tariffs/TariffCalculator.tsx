@@ -380,11 +380,40 @@ function ResultView({ result, draft }: { result: Result; draft: TariffDraft }) {
           </Info>
         )}
         <p className="notice">
-          {result.kind === 'company'
-            ? 'Pro úplné porovnání zatím chybí ověřená cenová data.'
-            : 'Výpočet cen a doporučení sazby bude doplněn v další etapě.'}
+          {context.verdict.kind === 'matches'
+            ? `SAZBA ODPOVÍDÁ – ${context.verdict.tariffCode}`
+            : context.verdict.kind === 'recommended'
+              ? `CENOVÉ DOPORUČENÍ – ${context.verdict.tariffCode}`
+              : result.kind === 'company'
+                ? 'Pro úplné porovnání zatím chybí ověřená cenová data.'
+                : 'Zvolte sazbu pro výpočet ceny. Pro doporučení použijte Odhad / firmy.'}
         </p>
       </section>
+      {context.verdict.kind !== 'pending' && (
+        <section className="card" aria-label="Cenové porovnání sazeb ORLEN">
+          <h2>Cenové porovnání sazeb</h2>
+          <p className="hint">
+            Stejná roční spotřeba a jistič. Porovnání zahrnuje C01d, C02d, C03d a případnou
+            stávající dvoutarifní sazbu. Před změnou sazby ověřte její technické podmínky u
+            distributora.
+          </p>
+          <dl className="tariff-summary">
+            {context.candidates
+              .filter(
+                (c) =>
+                  c.supplierId === 'orlen' &&
+                  c.orlenAssessment?.complete &&
+                  (!c.orlenAssessment.dualTariff || c.tariffCode === context.originalTariff),
+              )
+              .map((c) => (
+                <div key={c.tariffCode}>
+                  <dt>{c.tariffCode}</dt>
+                  <dd>{formatTariffNumber(c.orlenAssessment!.priceWithVat!)} Kč/rok včetně DPH</dd>
+                </div>
+              ))}
+          </dl>
+        </section>
+      )}
       <OrlenPrices context={context} />
       <Suppliers context={context} />
     </>

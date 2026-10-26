@@ -66,14 +66,12 @@ test('NT activates only for 2T, shares timestamps and stale NT never affects a s
     '12,87 Kč/OM/měsíc',
   );
   await expect(row(page, 'Cena jističe')).toContainText('577 Kč/měsíc');
-  await expect(pricePanel(page)).toContainText(
-    'Výpočet nelze dokončit – chybí ověřené cenové položky.',
-  );
-  await expect(s).toContainText('Pro úplné porovnání zatím chybí ověřená cenová data.');
+  await expect(pricePanel(page)).toContainText('Konečná cena včetně DPH');
+  await expect(s).toContainText('CENOVÉ DOPORUČENÍ – C03d');
   const card = s.locator('[data-supplier-id=orlen]');
   await expect(card).toContainText('1. 1. 2026');
-  await expect(card).toContainText('25. 10. 2026');
-  await expect(card).toHaveAttribute('data-source-status', 'partial-verified');
+  await expect(card).toContainText('26. 10. 2026');
+  await expect(card).toHaveAttribute('data-source-status', 'verified');
   await expect(
     card.getByRole('button', { name: 'AKTUALIZOVAT CENÍK', exact: true }),
   ).toBeDisabled();
@@ -88,7 +86,7 @@ test('NT activates only for 2T, shares timestamps and stale NT never affects a s
   });
 });
 
-test('C25d separates consumption, annual VT/NT and real distribution rates without a final price', async ({
+test('C25d separates consumption, annual VT/NT and verified annual costs with VAT', async ({
   page,
 }) => {
   await page.goto('/');
@@ -126,7 +124,7 @@ test('C25d separates consumption, annual VT/NT and real distribution rates witho
   );
   await expect(s.locator('.tariff-supplier')).toHaveCount(1);
   await expect(s.locator('.tariff-supplier')).toHaveAttribute('data-supplier-id', 'orlen');
-  await expect(pricePanel(page)).toContainText('chybí ověřené cenové položky');
+  await expect(pricePanel(page)).toContainText('Konečná cena včetně DPH');
   await tariffLayout(page);
   await page.screenshot({
     path: test.info().outputPath('tariffs143-C25d.png'),
@@ -134,7 +132,7 @@ test('C25d separates consumption, annual VT/NT and real distribution rates witho
   });
 });
 
-test('unverified lower breaker and other areas stay unknown instead of copying ČEZ prices', async ({
+test('newly verified lower breaker completes ČEZ while other areas stay unknown', async ({
   page,
 }) => {
   await page.goto('/');
@@ -144,7 +142,7 @@ test('unverified lower breaker and other areas stay unknown instead of copying �
   for (const reading of readings(page))
     await reading.getByLabel('Stav NT [kWh]', { exact: true }).fill('0');
   await finish(page);
-  await expect(row(page, 'Cena jističe')).toContainText('Cena jističe zatím není ověřena.');
+  await expect(row(page, 'Cena jističe')).toContainText('844 Kč/měsíc');
   await back(page).click();
   await s.getByLabel('Distribuční oblast', { exact: true }).selectOption('EG.D');
   await s.getByRole('button', { name: 'VYHODNOTIT', exact: true }).click();

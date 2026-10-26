@@ -82,19 +82,19 @@ describe('single and dual register readings', () => {
       8,
     );
     expect(c.candidates.every((c) => c.supplierId === 'orlen' && c.breakerA === 63)).toBe(true);
-    expect(c.verdict).toEqual({ kind: 'pending' });
+    expect(c.verdict).toEqual({ kind: 'matches', tariffCode: 'C25d' });
   });
 });
 describe('verified ORLEN 2026 source', () => {
-  it('records provenance, validity, manual verification and net-only prices', () => {
+  it('records provenance, validity, manual verification and VAT-inclusive prices', () => {
     expect(ORLEN_2026_SOURCE.validFrom).toBe('2026-01-01');
-    expect(ORLEN_2026_SOURCE.lastChecked).toBe('2026-10-25');
+    expect(ORLEN_2026_SOURCE.lastChecked).toBe('2026-10-26');
     expect(ORLEN_2026_SOURCE.verifiedTariffs).toEqual(['C01d', 'C02d', 'C03d', 'C25d', 'C45d']);
     for (const entry of Object.values(ORLEN_ENERGY)) {
-      expect(entry.vtPerMwh).toEqual({ priceWithoutVat: 2599, priceWithVat: null });
+      expect(entry.vtPerMwh).toEqual({ priceWithoutVat: 2599, priceWithVat: 2599 * 1.21 });
       if (entry.ntPerMwh) expect(entry.ntPerMwh).toEqual(entry.vtPerMwh);
     }
-    expect(ORLEN_TAX_CONFIG.vatRate).toBeNull();
+    expect(ORLEN_TAX_CONFIG.vatRate).toBe(0.21);
     expect(ORLEN_COMMON.systemServicesPerMwh.priceWithoutVat).toBe(164.24);
     expect(ORLEN_COMMON.otePerSupplyPointMonth.priceWithoutVat).toBe(12.87);
     for (const key of ['pozePerMwh', 'pozePerA', 'pozePerMw'] as const)
@@ -121,13 +121,13 @@ describe('verified ORLEN 2026 source', () => {
     amps.forEach((a, i) =>
       expect(orlenBreakerMonthly(code, 'ČEZ Distribuce', a)!.priceWithoutVat).toBe(values[i]),
     );
-    expect(orlenBreakerMonthly(code, 'ČEZ Distribuce', 64)).toBeNull();
+    expect(orlenBreakerMonthly(code, 'ČEZ Distribuce', 64)!.priceWithoutVat).toBe(values[8]);
   });
-  it('preserves all six exact C03d values without guessing 50 A', () => {
+  it('preserves C03d values and uses the newly verified 50 A band', () => {
     [819, 1311, 1639, 2048, 2622, 3277].forEach((price, i) =>
       expect(orlenBreakerMonthly('C03d', 'ČEZ Distribuce', amps[i])!.priceWithoutVat).toBe(price),
     );
-    expect(orlenBreakerMonthly('C03d', 'ČEZ Distribuce', 50)).toBeNull();
+    expect(orlenBreakerMonthly('C03d', 'ČEZ Distribuce', 50)!.priceWithoutVat).toBe(4097);
   });
   it.each([
     ['C03d', [5162, 6554, 8193, 10241, 13109], 81.93],
@@ -140,17 +140,22 @@ describe('verified ORLEN 2026 source', () => {
     [50.01, 63.01, 80.01, 100.01, 125.01].forEach((a, i) =>
       expect(orlenBreakerMonthly(code, 'ČEZ Distribuce', a)!.priceWithoutVat).toBe(values[i]),
     );
-    expect(orlenBreakerMonthly(code, 'ČEZ Distribuce', 50)).toBeNull();
+    expect(orlenBreakerMonthly(code, 'ČEZ Distribuce', 50)!.priceWithoutVat).toBe(
+      { C03d: 4097, C25d: 1055, C45d: 2930 }[code],
+    );
     expect(orlenBreakerMonthly(code, 'ČEZ Distribuce', 200)!.priceWithoutVat).toBe(200 * perA);
-    if (code !== 'C03d') expect(orlenBreakerMonthly(code, 'ČEZ Distribuce', 40)).toBeNull();
+    if (code !== 'C03d')
+      expect(orlenBreakerMonthly(code, 'ČEZ Distribuce', 40)!.priceWithoutVat).toBe(
+        code === 'C25d' ? 844 : 2344,
+      );
   });
   it('keeps the supplied per-A exceptions separate from table values and phase counts', () => {
     expect(orlenBreakerMonthly('C01d', 'ČEZ Distribuce', 200)!.priceWithoutVat).toBe(1314);
     expect(orlenBreakerMonthly('C02d', 'ČEZ Distribuce', 200)!.priceWithoutVat).toBe(2886);
     expect(orlenBreakerMonthly('C01d', 'ČEZ Distribuce', 30, 1)!.priceWithoutVat).toBe(30 * 2.19);
     expect(orlenBreakerMonthly('C02d', 'ČEZ Distribuce', 30, 1)!.priceWithoutVat).toBe(30 * 4.81);
-    expect(orlenBreakerMonthly('C02d', 'ČEZ Distribuce', 25, 1)).toBeNull();
-    expect(orlenBreakerMonthly('C25d', 'ČEZ Distribuce', 30, 1)).toBeNull();
+    expect(orlenBreakerMonthly('C02d', 'ČEZ Distribuce', 25, 1)!.priceWithoutVat).toBe(144);
+    expect(orlenBreakerMonthly('C25d', 'ČEZ Distribuce', 30, 1)!.priceWithoutVat).toBe(30 * 7.03);
     expect(orlenBreakerMonthly('C01d', 'EG.D', 40)).toBeNull();
   });
   it.each(['C26d', 'C27d', 'C35d', 'C46d', 'C56d', 'C60d', 'C62d'])(
@@ -169,7 +174,7 @@ describe('verified ORLEN 2026 source', () => {
   });
 });
 describe('partial annual costs and completeness gate', () => {
-  it('scales MWh, monthly breaker and supply-point fees without inventing final prices or VAT', () => {
+  it('scales MWh, monthly fees, tax and VAT from the verified source', () => {
     const r = assessOrlen('C02d', 'ČEZ Distribuce', 40, 12000, null);
     const values = Object.fromEntries(r.lines.map((l) => [l.key, l.priceWithoutVat]));
     expect(values.energyVT).toBe(31188);
@@ -178,12 +183,12 @@ describe('partial annual costs and completeness gate', () => {
     expect(values.system).toBeCloseTo(1970.88, 8);
     expect(values.ote).toBeCloseTo(154.44, 8);
     expect(values.poze).toBe(0);
-    expect(values.supplierFixed).toBeNull();
-    expect(values.taxes).toBeNull();
-    expect(r.complete).toBe(false);
-    expect(r.priceWithoutVat).toBeNull();
-    expect(r.priceWithVat).toBeNull();
-    expect(r.lines.every((l) => l.priceWithVat === null)).toBe(true);
+    expect(values.supplierFixed).toBeUndefined();
+    expect(values.taxes).toBeCloseTo(339.6, 8);
+    expect(r.complete).toBe(true);
+    expect(r.priceWithoutVat).toBeCloseTo(67735.2, 8);
+    expect(r.priceWithVat).toBeCloseTo(81959.592, 8);
+    expect(r.lines.every((l) => l.priceWithVat !== null)).toBe(true);
   });
   it('changing VT/NT ratio changes two-tariff distribution with unchanged annual total', () => {
     const a = assessOrlen('C25d', 'ČEZ Distribuce', 63, 1000, { annualVT: 800, annualNT: 200 });
@@ -201,15 +206,21 @@ describe('partial annual costs and completeness gate', () => {
       )!.priceWithoutVat,
     ).toBeNull();
   });
-  it('never completes any currently supplied combination or ranks partial candidates', () => {
+  it('completes verified ČEZ combinations and keeps all other areas incomplete', () => {
     for (const area of ['ČEZ Distribuce', 'EG.D', 'PREdistribuce'] as const)
       for (const code of ORLEN_2026_SOURCE.verifiedTariffs)
         for (const amp of [10, 40, 50, 63, 64, 160, 200]) {
           const r = assessOrlen(code, area, amp, 1000, { annualVT: 600, annualNT: 400 });
-          expect(r.complete).toBe(false);
-          expect(r.priceWithoutVat).toBeNull();
-          expect(r.priceWithVat).toBeNull();
-          expect(r.missing).toContain('Stálý měsíční plat dodavatele');
+          expect(r.complete).toBe(area === 'ČEZ Distribuce');
+          if (area === 'ČEZ Distribuce') {
+            expect(r.priceWithoutVat).toBeGreaterThan(0);
+            expect(r.priceWithVat).toBeCloseTo(r.priceWithoutVat! * 1.21, 8);
+            expect(r.missing).toEqual([]);
+          } else {
+            expect(r.priceWithoutVat).toBeNull();
+            expect(r.priceWithVat).toBeNull();
+          }
+          expect(r.missing).not.toContain('Stálý měsíční plat dodavatele');
         }
   });
 });
