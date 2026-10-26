@@ -98,8 +98,8 @@ describe('photo-backed reference directory', () => {
       findByLocation(row.location!, row.placement!, [row, { ...row, node: null }]).status,
     ).toBe('ambiguous');
   });
-  it('has no UZEL field in main Measurement identification and no directory dependency in the electrical core', () => {
-    expect(readFileSync('src/ui/Identification.tsx', 'utf8')).not.toContain('UZEL');
+  it('offers optional UZEL in the main identification without moving reference logic into the electrical core', () => {
+    expect(readFileSync('src/ui/Identification.tsx', 'utf8')).toContain('<span>UZEL</span>');
     expect(readFileSync('src/series/reference/directory.ts', 'utf8')).not.toMatch(
       /from ['"].*core\//,
     );

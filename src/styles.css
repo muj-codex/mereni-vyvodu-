@@ -1416,3 +1416,7 @@ fieldset:disabled {
 .reading-navigation button {
   flex: 1 1 120px;
 }
+
+.reference-binding { margin-top: .65rem; }
+.reference-binding-verified { color: #256246; }
+.reference-binding-unverified { color: #b3261e; }

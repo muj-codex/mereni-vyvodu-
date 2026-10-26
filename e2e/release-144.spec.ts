@@ -57,7 +57,7 @@ test('conflicting and incomplete photo cells never overwrite unverified values',
   const s = await start(page);
   await s.getByLabel('MTP primár', { exact: true }).selectOption('75');
   await s.getByLabel('UZEL (nepovinný)', { exact: true }).fill('21201042');
-  await expect(s.getByText(/Nejednoznačná vazba/)).toBeVisible();
+  await expect(s.getByText(/Vazba UZEL ↔ TS\/R ↔ pole ↔ MTP není ověřena/)).toBeVisible();
   await expect(s.getByLabel('Pole / kobka / umístění', { exact: true })).toHaveValue('');
   await expect(s.getByLabel('MTP primár', { exact: true })).toHaveValue('75');
   await s.getByLabel('UZEL (nepovinný)', { exact: true }).fill('');
@@ -68,7 +68,7 @@ test('conflicting and incomplete photo cells never overwrite unverified values',
   await s.getByLabel('UZEL (nepovinný)', { exact: true }).fill('10105018');
   await expect(s.getByLabel('Pole / kobka / umístění', { exact: true })).toHaveValue('RM3.37L');
   await expect(s.getByLabel('MTP primár', { exact: true })).toHaveValue('75');
-  await expect(s.getByText(/Neúplný záznam/)).toBeVisible();
+  await expect(s.getByText(/Vazba UZEL ↔ TS\/R ↔ pole ↔ MTP není ověřena/)).toBeVisible();
 });
 test('verified ORLEN total includes tax and VAT and current economical tariff is acknowledged', async ({
   page,

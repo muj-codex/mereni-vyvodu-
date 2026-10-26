@@ -9,27 +9,30 @@ export function MtpSelect({
   secondary = 5,
   value,
   onChange,
+  empty = false,
 }: {
   label: string;
   secondary?: number;
   value: number;
+  empty?: boolean;
   onChange: (value: number) => void;
 }) {
   const [custom, setCustom] = useState(false);
-  const [text, setText] = useState(String(value));
+  const [text, setText] = useState(empty ? '' : String(value));
   const options: readonly number[] = secondary === 1 ? VN_MTP : MTP_OPTIONS;
-  const isCustom = custom || !options.some((option) => option === value);
+  const isCustom = custom || (!empty && !options.some((option) => option === value));
   return (
     <>
       <SelectField
         label={label}
-        value={isCustom ? 'custom' : value}
+        value={isCustom ? 'custom' : empty ? '' : value}
         onChange={(v) => {
           setCustom(v === 'custom');
-          if (v === 'custom') setText(String(value));
-          else onChange(Number(v));
+          if (v === 'custom') setText(empty ? '' : String(value));
+          else onChange(v === '' ? NaN : Number(v));
         }}
       >
+        {empty && <option value="">Vyberte MTP primární</option>}
         {options.map((v) => (
           <option key={v} value={v}>
             {formatNumber(v)}/{secondary} A
@@ -37,7 +40,7 @@ export function MtpSelect({
         ))}
         <option value="custom">VLASTNÍ MTP</option>
       </SelectField>
-      {isCustom && (
+      {isCustom && !empty && (
         <p>
           {formatNumber(value)}/{secondary} A
         </p>

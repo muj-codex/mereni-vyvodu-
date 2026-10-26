@@ -1,4 +1,11 @@
-import { prefillReading, referenceLocations, type ReferenceMatch } from './reference/directory';
+import {
+  editReference,
+  emptyReferenceState,
+  bindingStatus,
+  referenceLocations,
+  type ReferenceKey,
+} from './reference/directory';
+import { ReferenceBinding } from '../ui/ReferenceBinding';
 import { ReadingNavigation } from '../ui/ReadingNavigation';
 import { BackButton } from '../ui/BackButton';
 import { EnergisBoundary, type Boundary } from './EnergisBoundary';
@@ -102,7 +109,7 @@ export function Series({
   const [data, setData] = useState<SeriesData>(emptySeries);
   const [mode, setMode] = useState<Mode>(historyOnly ? 'history' : initial);
   const [vn, setVn] = useState(false);
-  const [referenceMatch, setReferenceMatch] = useState<ReferenceMatch | null>(null);
+  const [referenceState, setReferenceState] = useState(emptyReferenceState);
   const [referenceRevision, setReferenceRevision] = useState(0);
   const [lastBatch, setLastBatch] = useState('');
   const [entry, setEntry] = useState<Entry>(blankEntry);
@@ -197,14 +204,14 @@ export function Series({
     setSelected(data.meters.filter((m) => m.batchId === id && m.active).map((m) => m.id));
   };
   const update = (key: keyof Entry, v: string) => {
-    const result = prefillReading(entry, key, v);
-    setEntry(result.entry);
-    if (result.match) {
-      setReferenceMatch(result.match);
-      if (result.match.status === 'matched') {
-        setReferenceRevision((revision) => revision + 1);
-      }
+    if (!['node', 'location', 'placement', 'actualMtp'].includes(key)) {
+      setEntry((e) => ({ ...e, [key]: v }));
+      return;
     }
+    const result = editReference(entry, referenceState, key as ReferenceKey, v);
+    setEntry({ ...entry, ...result.values });
+    setReferenceState(result.state);
+    if (key !== 'actualMtp') setReferenceRevision((revision) => revision + 1);
   };
   const act = async (fn: () => Promise<void>) => {
     if (busy) return;
@@ -948,14 +955,15 @@ export function Series({
                         .toLowerCase(),
                   );
                   const recognized = { ...parsed, location: matched || parsed.location };
-                  const reference = prefillReading(
+                  const reference = editReference(
                     recognized,
+                    emptyReferenceState(),
                     recognized.node ? 'node' : 'location',
                     recognized.node || recognized.location,
                   );
                   setVn((matched || parsed.location).startsWith('R'));
-                  setEntry(reference.entry);
-                  setReferenceMatch(reference.match);
+                  setEntry({ ...recognized, ...reference.values });
+                  setReferenceState(reference.state);
                   setReferenceRevision((revision) => revision + 1);
                   setPreview(true);
                 }}
@@ -1043,8 +1051,9 @@ export function Series({
                   key={`primary-${referenceRevision}-${vn}`}
                   label="MTP primár"
                   secondary={vn ? 1 : 5}
+                  empty={entry.actualMtp === ''}
                   value={Number(entry.actualMtp)}
-                  onChange={(v) => update('actualMtp', String(v))}
+                  onChange={(v) => update('actualMtp', Number.isFinite(v) ? String(v) : '')}
                 />
                 <MtpSelect
                   key={`meter-${vn}`}
@@ -1053,26 +1062,14 @@ export function Series({
                   value={Number(entry.meterMtp)}
                   onChange={(v) => update('meterMtp', String(v))}
                 />
-                {entry.actualMtp !== entry.meterMtp && (
+                {entry.actualMtp !== '' && entry.actualMtp !== entry.meterMtp && (
                   <MtpCoefficient
                     primary={Number(entry.actualMtp)}
                     meter={Number(entry.meterMtp)}
                   />
                 )}
               </div>
-              {referenceMatch?.status === 'ambiguous' && (
-                <p aria-live="polite" className="notice">
-                  Nejednoznačná vazba v referenční tabulce – údaje doplňte ručně.
-                </p>
-              )}
-              {referenceMatch?.status === 'matched' && (
-                <p aria-live="polite" className="hint">
-                  Referenční tabulka: {referenceMatch.record.cell}.
-                  {referenceMatch.record.unverified.length > 0 &&
-                    ' Neúplný záznam – neověřené údaje nebyly doplněny.'}{' '}
-                  Předvyplněné údaje lze ručně upravit. MTP elektroměru zůstává nezávislé.
-                </p>
-              )}
+              <ReferenceBinding status={bindingStatus(entry, referenceState)} />
               <Info label="UZEL">
                 Nepovinné číslice, alespoň 15 číslic je podporováno. Slouží pro párování Energisu;
                 UZEL patří k vývodu a je nezávislý na výměně elektroměru.
@@ -1158,7 +1155,13 @@ export function Series({
                         }));
                         broadcast();
                         setEntry(resetEntry(entry));
-                        setReferenceMatch(null);
+                        setReferenceState({
+                          automatic: {
+                            location: referenceState.automatic.location,
+                            actualMtp: referenceState.automatic.actualMtp,
+                          },
+                          touched: false,
+                        });
                         setNotice('Dílčí odečet uložen. Připraveno pro další elektroměr.');
                       })
                     }

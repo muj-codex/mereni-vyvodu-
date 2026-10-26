@@ -320,3 +320,13 @@ ORLEN 2026 pro ČEZ Distribuce používá uživatelem ověřené hodnoty dodané
 Odhad / firmy porovnává cenu C01d/C02d/C03d a případné stávající dvoutarifní sazby při stejné spotřebě a jističi; používá stav „SAZBA ODPOVÍDÁ“ nebo cenové doporučení. Nová dvoutarifní sazba se nenavrhuje bez znalosti jejích technických podmínek. Před změnou sazby je třeba ověřit podmínky u distributora. Loga dodavatelů nejsou podmínkou release; existující textové značky zůstávají.
 
 `npm run build` vytváří produkční aplikaci včetně service workeru a offline precache. `npm run build:pwa` je výslovný alias stejného úplného PWA buildu. Obě varianty obsahují dataset pro offline použití.
+
+## Verze 1.4.5 – ověření a čištění referenční vazby
+
+První stránka hlavního Měření nově obsahuje nepovinný, ručně editovatelný UZEL přímo v existující Identifikaci měření vedle TS/rozvodny a pole. Hlavní Měření, Jednotlivý odečet a Série odečtů používají společný `editReference` nad stejným datasetem 1.4.4. Nejde o novou databázi ani novou obrazovku.
+
+Jednoznačný UZEL doplní ověřené umístění a MTP primární; jednoznačná dvojice TS/R + pole doplní UZEL a MTP primární. Formulář sleduje původ a původní hodnotu automatických údajů. Rozpoznaný UZEL je identifikátor ověřené vazby: pokud uživatel přepíše pole nebo TS a vazba přestane platit, automatický UZEL a MTP se vyčistí. Při změně na neznámý UZEL zmizí staré automatické umístění a MTP. Ručně zadané či upravené hodnoty se zachovají. Ručně zadaný neznámý UZEL se automaticky nemaže. Záznamy bez údajů o původu se bezpečně považují za ruční.
+
+Pod identifikací se zobrazuje „Vazba ověřena podle referenčních dat.“ nebo malé červené „Vazba UZEL ↔ TS/R ↔ pole ↔ MTP není ověřena. Zkontrolujte zadané hodnoty.“ Stav vychází ze současných hodnot všech čtyř polí, nikoli z posledního úspěšného hledání. Nejednoznačné a neúplné zdroje nemají ověřený stav. Prázdný formulář nevaruje. Hláška neblokuje měření; UZEL není povinný a ruční TS/pole/MTP zůstávají použitelné.
+
+Vyčištěné MTP je skutečně prázdné, bez skrytého náhradního převodu. MTP elektroměru zůstává nezávislé. Původ hodnot hlavního formuláře se zachovává v existujícím pracovním draftu i po reloadu. Úprava dalšího vývodu série nemění již uložený vývod. Výpočty Měření, ORLEN 1.4.4, datový model IndexedDB a backup/restore se nemění; jejich soubory a původní dataset chrání i přesné SHA-256 regression testy proti 1.4.4.

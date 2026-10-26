@@ -11,9 +11,11 @@ async function first(page: Page, serial = '12345678', node = '21208142') {
   await s.getByLabel('Číslo elektroměru', { exact: true }).fill(serial);
   await s.getByLabel('UZEL (nepovinný)', { exact: true }).fill(node);
   // Reference prefill supplies the physical CT; this legacy workflow explicitly uses a matching meter CT.
-  await s
-    .getByLabel('MTP elektroměr', { exact: true })
-    .selectOption(await s.getByLabel('MTP primár', { exact: true }).inputValue());
+  const primary = s.getByLabel('MTP primár', { exact: true });
+  // Unknown UZEL intentionally clears stale automatic CT data in 1.4.5.
+  // This Energis-import fixture explicitly supplies its own matching manual CTs.
+  if ((await primary.inputValue()) === '') await primary.selectOption('100');
+  await s.getByLabel('MTP elektroměr', { exact: true }).selectOption(await primary.inputValue());
   await s.getByLabel('Datum odečtu', { exact: true }).fill('2026-10-22');
   await s.getByLabel('Čas odečtu (HH:MM)', { exact: true }).fill('08:37');
   await s

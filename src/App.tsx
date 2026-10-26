@@ -1,3 +1,5 @@
+import { bindingStatus, type ReferenceKey } from './series/reference/directory';
+import { draftReference, editDraftReference } from './ui/referenceDraft';
 import { TariffCalculator } from './tariffs/TariffCalculator';
 import { ReadingNavigation } from './ui/ReadingNavigation';
 import { BackButton } from './ui/BackButton';
@@ -57,6 +59,7 @@ export default function App() {
       d.intervalEnabled,
       d.interval,
     ]);
+  const [referenceRevision, setReferenceRevision] = useState(0);
   const [readingMode, setReadingMode] = useState<'single' | 'series' | 'stylus' | 'history'>(
     'series',
   );
@@ -143,8 +146,16 @@ export default function App() {
     setDraft(next);
     setError('');
   };
-  const config = (key: keyof MeterConfig, value: number | 'X') =>
-    change({ ...draft, config: { ...draft.config, [key]: value } });
+  const reference = draftReference(draft);
+  const changeReference = (key: ReferenceKey, value: string) => {
+    change(editDraftReference(draft, key, value));
+    if (key !== 'actualMtp') setReferenceRevision((v) => v + 1);
+  };
+  const config = (key: keyof MeterConfig, value: number | 'X') => {
+    if (step === 0 && key === 'actualMtp')
+      changeReference('actualMtp', Number.isFinite(value) ? String(value) : '');
+    else change({ ...draft, config: { ...draft.config, [key]: value } });
+  };
   const phase = (index: Phase, key: 'u' | 'i' | 'pf' | 'p', value: string) =>
     change({
       ...draft,
@@ -429,7 +440,18 @@ export default function App() {
                       serial={draft.serial}
                       value={draft.identification ?? emptyIdentification()}
                       onSerial={(serial) => change({ ...draft, serial })}
-                      onChange={(identification) => change({ ...draft, identification })}
+                      onChange={(identification) => {
+                        if (identification.location !== reference.values.location)
+                          changeReference('location', identification.location);
+                        else if (identification.placement !== reference.values.placement)
+                          changeReference('placement', identification.placement);
+                        else change({ ...draft, identification });
+                      }}
+                      reference={{
+                        node: reference.values.node,
+                        status: bindingStatus(reference.values, reference.state),
+                        onNode: (v) => changeReference('node', v),
+                      }}
                     />
                     <div className="card">
                       <label className="check-label">
@@ -454,17 +476,25 @@ export default function App() {
                         onChange={(v) => {
                           const voltage = Number(v);
                           const vn = voltage > 500;
+                          const location = locations(vn).includes(
+                            draft.identification?.location ?? '',
+                          )
+                            ? draft.identification!.location
+                            : locations(vn)[0];
+                          const next =
+                            location === reference.values.location
+                              ? draft
+                              : editDraftReference(draft, 'location', location);
                           change({
-                            ...draft,
-                            config: { ...draft.config, voltage },
+                            ...next,
+                            config: { ...next.config, voltage },
                             identification: {
-                              ...(draft.identification ?? emptyIdentification()),
+                              ...(next.identification ?? emptyIdentification()),
                               networkVoltage: voltage,
-                              location: locations(vn).includes(draft.identification?.location ?? '')
-                                ? draft.identification!.location
-                                : locations(vn)[0],
                             },
                           });
+                          if (location !== reference.values.location)
+                            setReferenceRevision((v) => v + 1);
                         }}
                       >
                         <option value={400}>NN 400 V</option>
@@ -480,6 +510,8 @@ export default function App() {
                         <h3>Převody MTP</h3>
                         <div className="field-grid">
                           <MtpSelect
+                            key={`reference-primary-${referenceRevision}`}
+                            empty={!Number.isFinite(draft.config.actualMtp)}
                             label="MTP primár"
                             secondary={draft.config.voltage > 500 ? 1 : 5}
                             value={draft.config.actualMtp}
@@ -491,10 +523,12 @@ export default function App() {
                             value={draft.config.meterMtp}
                             onChange={(v) => config('meterMtp', v)}
                           />
-                          <MtpCoefficient
-                            primary={draft.config.actualMtp}
-                            meter={draft.config.meterMtp}
-                          />
+                          {Number.isFinite(draft.config.actualMtp) && (
+                            <MtpCoefficient
+                              primary={draft.config.actualMtp}
+                              meter={draft.config.meterMtp}
+                            />
+                          )}
                         </div>
                       </section>
                       <label className="optional-toggle card">

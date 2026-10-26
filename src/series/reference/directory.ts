@@ -69,28 +69,104 @@ export function findByLocation(
     return { status: 'ambiguous', records: matches };
   return match;
 }
+export type ReferenceValues = Pick<Entry, 'node' | 'location' | 'placement' | 'actualMtp'>;
+export type ReferenceKey = keyof ReferenceValues;
+export interface ReferenceState {
+  automatic: Partial<Record<ReferenceKey, string>>;
+  touched: boolean;
+}
+export const emptyReferenceState = (): ReferenceState => ({ automatic: {}, touched: false });
+export type BindingStatus = 'empty' | 'verified' | 'unverified';
+export function bindingStatus(
+  values: ReferenceValues,
+  state = emptyReferenceState(),
+  directory = uzelDirectory,
+): BindingStatus {
+  if (!values.node && !values.placement && !(state?.touched && values.location)) return 'empty';
+  const match = findByNode(values.node, directory);
+  if (match.status !== 'matched') return 'unverified';
+  const r = match.record;
+  return r.location !== null &&
+    r.placement !== null &&
+    r.mtpPrimary !== null &&
+    r.mtpSecondary !== null &&
+    locationKey(r.location) === locationKey(values.location) &&
+    placementKey(r.placement) === placementKey(values.placement) &&
+    values.actualMtp.trim() !== '' &&
+    Number(values.actualMtp.replace(',', '.')) === r.mtpPrimary
+    ? 'verified'
+    : 'unverified';
+}
+/** Shared form transition. Stored values with no provenance are always treated as manual. */
+export function editReference(
+  values: ReferenceValues,
+  state: ReferenceState | undefined,
+  changed: ReferenceKey,
+  value: string,
+  directory = uzelDirectory,
+) {
+  const next = { ...values, [changed]: value };
+  const automatic: ReferenceState['automatic'] = {};
+  for (const key of ['node', 'location', 'placement', 'actualMtp'] as const)
+    if (state?.automatic?.[key] === values[key]) automatic[key] = values[key];
+  delete automatic[changed];
+  const clear = (...keys: ReferenceKey[]) => {
+    for (const key of keys) {
+      if (automatic[key] !== undefined) next[key] = '';
+      delete automatic[key];
+    }
+  };
+  let match: ReferenceMatch | null = null;
+  if (changed === 'node') {
+    clear('location', 'placement', 'actualMtp');
+    match = findByNode(value, directory);
+    if (match.status === 'matched') {
+      const r = match.record;
+      for (const [key, field] of [
+        ['location', r.location === null ? null : displayLocation(r.location)],
+        ['placement', r.placement],
+        ['actualMtp', r.mtpPrimary === null ? null : String(r.mtpPrimary)],
+      ] as const)
+        if (field !== null) {
+          next[key] = field;
+          automatic[key] = field;
+        }
+      // A resolved identifier belongs to this confirmed reference binding. An unknown,
+      // explicitly entered identifier remains manual and is never silently discarded.
+      automatic.node = next.node;
+    }
+  } else if (changed === 'location' || changed === 'placement') {
+    match = findByLocation(next.location, next.placement, directory);
+    clear('node', 'actualMtp');
+    if (match.status === 'matched') {
+      if (match.record.node !== null) next.node = automatic.node = match.record.node;
+      if (match.record.mtpPrimary !== null)
+        next.actualMtp = automatic.actualMtp = String(match.record.mtpPrimary);
+    } else if (changed === 'location') clear('placement');
+  }
+  const provenance: ReferenceState = {
+    automatic,
+    touched:
+      !!state?.touched || ((changed === 'node' || changed === 'placement') && value.trim() !== ''),
+  };
+  return {
+    values: next,
+    state: provenance,
+    match,
+    status: bindingStatus(next, provenance, directory),
+  };
+}
+/** Compatibility adapter; all lookup and clearing rules live in editReference. */
 export function prefillReading(
   entry: Entry,
   changed: keyof Entry,
   value: string,
   directory = uzelDirectory,
 ) {
-  const next = { ...entry, [changed]: value };
-  const match =
-    changed === 'node'
-      ? findByNode(value, directory)
-      : changed === 'location' || changed === 'placement'
-        ? findByLocation(next.location, next.placement, directory)
-        : null;
-  if (match?.status !== 'matched') return { entry: next, match };
-  const r = match.record;
-  if (changed === 'node') {
-    if (r.location !== null) next.location = displayLocation(r.location);
-    if (r.placement !== null) next.placement = r.placement;
-  } else if (r.node !== null) next.node = r.node;
-  // No meter, serial, reading, voltage or calculation data is taken from this directory.
-  if (r.mtpPrimary !== null) next.actualMtp = String(r.mtpPrimary);
-  return { entry: next, match };
+  if (!['node', 'location', 'placement', 'actualMtp'].includes(changed))
+    return { entry: { ...entry, [changed]: value }, match: null };
+  const result = editReference(entry, undefined, changed as ReferenceKey, value, directory);
+  return { entry: { ...entry, ...result.values }, match: result.match };
 }
 export const referenceLocations = [
   ...new Set(uzelDirectory.flatMap((r) => (r.location ? [displayLocation(r.location)] : []))),

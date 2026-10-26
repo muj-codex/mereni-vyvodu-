@@ -1,3 +1,5 @@
+import { referenceLocations, type BindingStatus } from '../series/reference/directory';
+import { ReferenceBinding } from './ReferenceBinding';
 import type { Identification } from '../core/types';
 import { locations } from '../core/current';
 export function IdentificationFields({
@@ -6,10 +8,12 @@ export function IdentificationFields({
   vn = false,
   onSerial,
   onChange,
+  reference,
 }: {
   serial: string;
   value: Identification;
   vn?: boolean;
+  reference?: { node: string; status: BindingStatus; onNode: (value: string) => void };
   onSerial: (s: string) => void;
   onChange: (v: Identification) => void;
 }) {
@@ -35,6 +39,19 @@ export function IdentificationFields({
             onChange={(e) => onChange({ ...value, date: e.target.value })}
           />
         </label>
+        {reference && (
+          <label className="field">
+            <span>UZEL</span>
+            <input
+              aria-label="UZEL"
+              type="text"
+              inputMode="numeric"
+              autoComplete="off"
+              value={reference.node}
+              onChange={(e) => reference.onNode(e.target.value.replace(/\D/g, ''))}
+            />
+          </label>
+        )}
         <label className="field">
           <span>{vn ? 'ROZVODNA' : 'TRAFOSTANICE'}</span>
           <select
@@ -42,7 +59,12 @@ export function IdentificationFields({
             value={value.location}
             onChange={(e) => onChange({ ...value, location: e.target.value })}
           >
-            {locations(vn).map((v) => (
+            {reference && <option value="">Vyberte TS / rozvodnu</option>}
+            {reference &&
+              value.location &&
+              !locations(vn).includes(value.location) &&
+              !referenceLocations.includes(value.location) && <option>{value.location}</option>}
+            {[...new Set([...locations(vn), ...(reference ? referenceLocations : [])])].map((v) => (
               <option key={v}>{v}</option>
             ))}
           </select>
@@ -55,6 +77,7 @@ export function IdentificationFields({
           />
         </label>
       </div>
+      {reference && <ReferenceBinding status={reference.status} />}
       <p className="hint">
         Čas vyhodnocení se zaznamená automaticky na sekundy. Počáteční nuly čísla elektroměru
         zůstávají zachovány.
