@@ -37,7 +37,7 @@ test('company workflow keeps the complete C catalog and single/dual tariff infor
   );
   await expect(s.locator('.tariff-supplier')).toHaveCount(1);
 });
-test('D flat connection has verified ČEZ plus six unloaded suppliers, disabled update buttons and no ORLEN', async ({
+test('D flat connection has verified ČEZ plus five unloaded suppliers, disabled update buttons and no ORLEN', async ({
   page,
   context,
 }) => {
@@ -48,8 +48,10 @@ test('D flat connection has verified ČEZ plus six unloaded suppliers, disabled 
   const cards = s.locator('.tariff-supplier');
   expect(
     await cards.evaluateAll((nodes) => nodes.map((n) => n.getAttribute('data-supplier-id'))),
-  ).toEqual(['eon', 'pre', 'innogy', 'mnd', 'centropol', 'epet']);
-  await expect(s.getByRole('region', { name: 'ČEZ domácnosti', exact: true })).toContainText('Elektřina na dobu neurčitou');
+  ).toEqual(['pre', 'innogy', 'mnd', 'centropol', 'epet']);
+  await expect(s.getByRole('region', { name: 'ČEZ domácnosti', exact: true })).toContainText(
+    'Elektřina na dobu neurčitou',
+  );
   await expect(page.getByText(/ORLEN/i)).toHaveCount(0);
   await context.setOffline(true);
   const requests: string[] = [];

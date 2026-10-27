@@ -15,7 +15,8 @@
     "coverage": "nationwide",
     "referenceMonth": "2026-09",
     "refreshAfterDays": 20,
-    "nextRecommendedCheckAt": "2026-11-16"
+    "nextRecommendedCheckAt": "2026-11-16",
+    "effectiveFrom": "2026-01-01"
   },
   "monthlyPricesWithoutVatPerMwh": {
     "2026-01": {

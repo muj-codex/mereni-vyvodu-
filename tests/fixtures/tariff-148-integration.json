@@ -1,0 +1,54 @@
+{
+  "src/tariffs/TariffCalculator.tsx": [
+    {
+      "before": "import { CezPrices } from './CezPrices';",
+      "after": "import { CezPrices } from './CezPrices';\nimport { EonBusinessPrices } from './EonPrices';"
+    },
+    {
+      "before": "filter((s) => s.id !== 'cez')",
+      "after": "filter((s) => s.id !== 'cez' && s.id !== 'eon')"
+    },
+    {
+      "before": "<CezPrices context={context} />",
+      "after": "<CezPrices context={context} />\n      <EonBusinessPrices context={context} />"
+    }
+  ],
+  "src/tariffs/CezPrices.tsx": [
+    {
+      "before": "import { useState } from 'react';",
+      "after": "import { useState } from 'react';\nimport { EonHouseholdComparison } from './EonPrices';"
+    },
+    {
+      "before": "Doporučena aktualizace ceníku. Používáme poslední známá ověřená data.",
+      "after": "Doporučena kontrola ceníku. Používáme poslední známá ověřená data."
+    },
+    {
+      "before": "<p>Distribuční oblast: {context.distributionArea}</p>",
+      "after": "<p>Distribuční oblast: {context.distributionArea}</p>\n      <p className=\"hint\">Vstupy sazby, jističe a spotřeby níže platí společně pro ČEZ i E.ON.</p>"
+    },
+    {
+      "before": "      <p className=\"hint\">\n        Zdroj: {metadata.sourceFile}",
+      "after": "      <EonHouseholdComparison code={code} area={context.distributionArea} amps={amps.trim() === '' ? NaN : Number(amps.replace(',', '.'))} phases={phases} vt={annualVT} nt={annualNT} cezResult={result} />\n      <p className=\"hint\">\n        Zdroj: {metadata.sourceFile}"
+    },
+    {
+      "before": "<p className=\"hint\">Zdroj: {escoSource.metadata.sourceFile} · účinnost od 1. 1. 2026.</p>",
+      "after": "<p className=\"hint\">Zdroj: {escoSource.metadata.sourceFile} · účinnost od 1. 1. 2026.</p>\n      <p className=\"hint\">Regulované ceny ČEZ Distribuce: ověřený E.ON SPOT ceník pro rok 2026; pro původní ověřené kombinace zůstávají dostupné také interní regulované podklady.</p>"
+    }
+  ],
+  "src/tariffs/cezCosts.ts": [
+    {
+      "before": "import cez from './data/cez-household-2026.json';",
+      "after": "import cez from './data/cez-household-2026.json';\nimport { assessBusinessRegulated } from './eonCosts';"
+    },
+    {
+      "before": "  if (complete) {",
+      "after": "  const expandedRegulated = assessBusinessRegulated(code, area, amps, annualKwh, split);\n  if (expandedRegulated) {\n    const expanded = total([...lines, ...expandedRegulated.lines]);\n    return { ...expanded, commercial, complete: true };\n  }\n  if (complete) {"
+    }
+  ],
+  "src/tariffs/data/esco-spot-2026.json": [
+    {
+      "before": "\"nextRecommendedCheckAt\": \"2026-11-16\"",
+      "after": "\"nextRecommendedCheckAt\": \"2026-11-16\",\n    \"effectiveFrom\": \"2026-01-01\""
+    }
+  ]
+}

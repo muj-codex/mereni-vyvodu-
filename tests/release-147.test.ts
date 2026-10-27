@@ -84,8 +84,7 @@ describe('1.4.7 exact source data and isolation', () => {
     for (const [code, area, split] of [
       ['C02d', 'EG.D', null],
       ['C02d', 'PREdistribuce', null],
-      ['C26d', 'ČEZ Distribuce', { annualVT: 4000, annualNT: 8000 }],
-      ['C62d', 'ČEZ Distribuce', null],
+
       ['C25d', 'ČEZ Distribuce', null],
     ] as const) {
       const partial = assessEsco(code, area, 40, 12000, split)!;
@@ -162,11 +161,12 @@ describe.each(cases)(
           expect(householdBreaker(area, code, amps, 3)).not.toBeNull();
       }
     });
-    it('renders only household ČEZ with its exact area and no ORLEN or SPOT', () => {
+    it('renders household ČEZ and E.ON with their exact area and no ORLEN or SPOT', () => {
       const html = renderToStaticMarkup(
         createElement(CezPrices, { context: comparisonContext('D', 'flat', area, 12000, 40) }),
       );
       expect(html).toContain('Domácnosti / sazby D – ČEZ');
+      expect(html).toContain('E.ON – domácnosti');
       expect(html).toContain(area);
       expect(html).not.toMatch(/(?<!\p{L})(?:ORLEN|ESCO|SPOT)(?!\p{L})/iu);
     });

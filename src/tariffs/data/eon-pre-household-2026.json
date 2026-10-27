@@ -1,0 +1,735 @@
+{
+  "metadata": {
+    "supplier": "E.ON",
+    "productName": "Komplet elektřina MAX PRO s úsporou 3 roky 10/26",
+    "customerType": "D",
+    "distributionArea": "PREdistribuce",
+    "validFrom": "2026-10-01",
+    "effectiveFrom": "2026-10-01",
+    "regulatedValidFrom": "2026-01-01",
+    "lastVerifiedAt": "2026-10-27",
+    "sourceFile": "cenik--komplet--elektrina--max--pro--s--usporou--3--roky--10_26-----distribucni--uzemi--pre.pdf",
+    "sourceType": "pdf",
+    "sourcePage": 2,
+    "sha256": "1ab6e4aa30492a42e7c6854e676da43296b6a7e1158f409ac0e1e7e3f8165b45",
+    "vatConvention": "bold-with-vat; below-without-vat",
+    "contract": "3 roky s fixací ceny",
+    "priceYear": 2026
+  },
+  "tariffCodes": [
+    "D01d",
+    "D02d",
+    "D25d",
+    "D26d",
+    "D27d",
+    "D35d",
+    "D45d",
+    "D56d",
+    "D57d",
+    "D61d"
+  ],
+  "rows": {
+    "1": [
+      {
+        "priceWithoutVat": 2899.0,
+        "priceWithVat": 3507.79
+      },
+      {
+        "priceWithoutVat": 2899.0,
+        "priceWithVat": 3507.79
+      },
+      {
+        "priceWithoutVat": 3029.0,
+        "priceWithVat": 3665.09
+      },
+      {
+        "priceWithoutVat": 3029.0,
+        "priceWithVat": 3665.09
+      },
+      {
+        "priceWithoutVat": 3029.0,
+        "priceWithVat": 3665.09
+      },
+      {
+        "priceWithoutVat": 3050.0,
+        "priceWithVat": 3690.5
+      },
+      {
+        "priceWithoutVat": 3045.0,
+        "priceWithVat": 3684.45
+      },
+      {
+        "priceWithoutVat": 3045.0,
+        "priceWithVat": 3684.45
+      },
+      {
+        "priceWithoutVat": 3045.0,
+        "priceWithVat": 3684.45
+      },
+      {
+        "priceWithoutVat": 3038.0,
+        "priceWithVat": 3675.98
+      }
+    ],
+    "2": [
+      null,
+      null,
+      {
+        "priceWithoutVat": 2726.0,
+        "priceWithVat": 3298.46
+      },
+      {
+        "priceWithoutVat": 2726.0,
+        "priceWithVat": 3298.46
+      },
+      {
+        "priceWithoutVat": 2726.0,
+        "priceWithVat": 3298.46
+      },
+      {
+        "priceWithoutVat": 2827.0,
+        "priceWithVat": 3420.67
+      },
+      {
+        "priceWithoutVat": 2884.0,
+        "priceWithVat": 3489.64
+      },
+      {
+        "priceWithoutVat": 2884.0,
+        "priceWithVat": 3489.64
+      },
+      {
+        "priceWithoutVat": 2884.0,
+        "priceWithVat": 3489.64
+      },
+      {
+        "priceWithoutVat": 2725.0,
+        "priceWithVat": 3297.25
+      }
+    ],
+    "3": [
+      {
+        "priceWithoutVat": 160.0,
+        "priceWithVat": 193.6
+      },
+      {
+        "priceWithoutVat": 160.0,
+        "priceWithVat": 193.6
+      },
+      {
+        "priceWithoutVat": 160.0,
+        "priceWithVat": 193.6
+      },
+      {
+        "priceWithoutVat": 160.0,
+        "priceWithVat": 193.6
+      },
+      {
+        "priceWithoutVat": 160.0,
+        "priceWithVat": 193.6
+      },
+      {
+        "priceWithoutVat": 160.0,
+        "priceWithVat": 193.6
+      },
+      {
+        "priceWithoutVat": 160.0,
+        "priceWithVat": 193.6
+      },
+      {
+        "priceWithoutVat": 160.0,
+        "priceWithVat": 193.6
+      },
+      {
+        "priceWithoutVat": 160.0,
+        "priceWithVat": 193.6
+      },
+      {
+        "priceWithoutVat": 160.0,
+        "priceWithVat": 193.6
+      }
+    ],
+    "4": [
+      {
+        "priceWithoutVat": 1854.71,
+        "priceWithVat": 2244.2
+      },
+      {
+        "priceWithoutVat": 1516.53,
+        "priceWithVat": 1835.0
+      },
+      {
+        "priceWithoutVat": 1656.49,
+        "priceWithVat": 2004.35
+      },
+      {
+        "priceWithoutVat": 1009.35,
+        "priceWithVat": 1221.31
+      },
+      {
+        "priceWithoutVat": 1656.49,
+        "priceWithVat": 2004.35
+      },
+      {
+        "priceWithoutVat": 421.52,
+        "priceWithVat": 510.04
+      },
+      {
+        "priceWithoutVat": 421.52,
+        "priceWithVat": 510.04
+      },
+      {
+        "priceWithoutVat": 421.52,
+        "priceWithVat": 510.04
+      },
+      {
+        "priceWithoutVat": 421.52,
+        "priceWithVat": 510.04
+      },
+      {
+        "priceWithoutVat": 2343.05,
+        "priceWithVat": 2835.09
+      }
+    ],
+    "5": [
+      null,
+      null,
+      {
+        "priceWithoutVat": 175.2,
+        "priceWithVat": 211.99
+      },
+      {
+        "priceWithoutVat": 175.2,
+        "priceWithVat": 211.99
+      },
+      {
+        "priceWithoutVat": 175.2,
+        "priceWithVat": 211.99
+      },
+      {
+        "priceWithoutVat": 175.2,
+        "priceWithVat": 211.99
+      },
+      {
+        "priceWithoutVat": 175.2,
+        "priceWithVat": 211.99
+      },
+      {
+        "priceWithoutVat": 175.2,
+        "priceWithVat": 211.99
+      },
+      {
+        "priceWithoutVat": 175.2,
+        "priceWithVat": 211.99
+      },
+      {
+        "priceWithoutVat": 175.2,
+        "priceWithVat": 211.99
+      }
+    ],
+    "6": [
+      {
+        "priceWithoutVat": 44.0,
+        "priceWithVat": 53.0
+      },
+      {
+        "priceWithoutVat": 87.0,
+        "priceWithVat": 105.0
+      },
+      {
+        "priceWithoutVat": 80.0,
+        "priceWithVat": 97.0
+      },
+      {
+        "priceWithoutVat": 110.0,
+        "priceWithVat": 133.0
+      },
+      {
+        "priceWithoutVat": 76.0,
+        "priceWithVat": 92.0
+      },
+      {
+        "priceWithoutVat": 154.0,
+        "priceWithVat": 186.0
+      },
+      {
+        "priceWithoutVat": 154.0,
+        "priceWithVat": 186.0
+      },
+      {
+        "priceWithoutVat": 154.0,
+        "priceWithVat": 186.0
+      },
+      {
+        "priceWithoutVat": 154.0,
+        "priceWithVat": 186.0
+      },
+      {
+        "priceWithoutVat": 64.0,
+        "priceWithVat": 77.0
+      }
+    ],
+    "7": [
+      {
+        "priceWithoutVat": 70.0,
+        "priceWithVat": 85.0
+      },
+      {
+        "priceWithoutVat": 139.0,
+        "priceWithVat": 168.0
+      },
+      {
+        "priceWithoutVat": 128.0,
+        "priceWithVat": 155.0
+      },
+      {
+        "priceWithoutVat": 175.0,
+        "priceWithVat": 212.0
+      },
+      {
+        "priceWithoutVat": 122.0,
+        "priceWithVat": 148.0
+      },
+      {
+        "priceWithoutVat": 246.0,
+        "priceWithVat": 298.0
+      },
+      {
+        "priceWithoutVat": 246.0,
+        "priceWithVat": 298.0
+      },
+      {
+        "priceWithoutVat": 246.0,
+        "priceWithVat": 298.0
+      },
+      {
+        "priceWithoutVat": 246.0,
+        "priceWithVat": 298.0
+      },
+      {
+        "priceWithoutVat": 103.0,
+        "priceWithVat": 125.0
+      }
+    ],
+    "8": [
+      {
+        "priceWithoutVat": 88.0,
+        "priceWithVat": 106.0
+      },
+      {
+        "priceWithoutVat": 173.0,
+        "priceWithVat": 209.0
+      },
+      {
+        "priceWithoutVat": 160.0,
+        "priceWithVat": 194.0
+      },
+      {
+        "priceWithoutVat": 219.0,
+        "priceWithVat": 265.0
+      },
+      {
+        "priceWithoutVat": 152.0,
+        "priceWithVat": 184.0
+      },
+      {
+        "priceWithoutVat": 308.0,
+        "priceWithVat": 373.0
+      },
+      {
+        "priceWithoutVat": 308.0,
+        "priceWithVat": 373.0
+      },
+      {
+        "priceWithoutVat": 308.0,
+        "priceWithVat": 373.0
+      },
+      {
+        "priceWithoutVat": 308.0,
+        "priceWithVat": 373.0
+      },
+      {
+        "priceWithoutVat": 128.0,
+        "priceWithVat": 155.0
+      }
+    ],
+    "9": [
+      {
+        "priceWithoutVat": 110.0,
+        "priceWithVat": 133.0
+      },
+      {
+        "priceWithoutVat": 217.0,
+        "priceWithVat": 263.0
+      },
+      {
+        "priceWithoutVat": 200.0,
+        "priceWithVat": 242.0
+      },
+      {
+        "priceWithoutVat": 274.0,
+        "priceWithVat": 332.0
+      },
+      {
+        "priceWithoutVat": 191.0,
+        "priceWithVat": 231.0
+      },
+      {
+        "priceWithoutVat": 385.0,
+        "priceWithVat": 466.0
+      },
+      {
+        "priceWithoutVat": 385.0,
+        "priceWithVat": 466.0
+      },
+      {
+        "priceWithoutVat": 385.0,
+        "priceWithVat": 466.0
+      },
+      {
+        "priceWithoutVat": 385.0,
+        "priceWithVat": 466.0
+      },
+      {
+        "priceWithoutVat": 161.0,
+        "priceWithVat": 195.0
+      }
+    ],
+    "10": [
+      {
+        "priceWithoutVat": 140.0,
+        "priceWithVat": 169.0
+      },
+      {
+        "priceWithoutVat": 277.0,
+        "priceWithVat": 335.0
+      },
+      {
+        "priceWithoutVat": 256.0,
+        "priceWithVat": 310.0
+      },
+      {
+        "priceWithoutVat": 350.0,
+        "priceWithVat": 424.0
+      },
+      {
+        "priceWithoutVat": 244.0,
+        "priceWithVat": 295.0
+      },
+      {
+        "priceWithoutVat": 492.0,
+        "priceWithVat": 595.0
+      },
+      {
+        "priceWithoutVat": 492.0,
+        "priceWithVat": 595.0
+      },
+      {
+        "priceWithoutVat": 492.0,
+        "priceWithVat": 595.0
+      },
+      {
+        "priceWithoutVat": 492.0,
+        "priceWithVat": 595.0
+      },
+      {
+        "priceWithoutVat": 205.0,
+        "priceWithVat": 248.0
+      }
+    ],
+    "11": [
+      {
+        "priceWithoutVat": 175.0,
+        "priceWithVat": 212.0
+      },
+      {
+        "priceWithoutVat": 347.0,
+        "priceWithVat": 420.0
+      },
+      {
+        "priceWithoutVat": 320.0,
+        "priceWithVat": 387.0
+      },
+      {
+        "priceWithoutVat": 438.0,
+        "priceWithVat": 530.0
+      },
+      {
+        "priceWithoutVat": 305.0,
+        "priceWithVat": 369.0
+      },
+      {
+        "priceWithoutVat": 616.0,
+        "priceWithVat": 745.0
+      },
+      {
+        "priceWithoutVat": 616.0,
+        "priceWithVat": 745.0
+      },
+      {
+        "priceWithoutVat": 616.0,
+        "priceWithVat": 745.0
+      },
+      {
+        "priceWithoutVat": 622.0,
+        "priceWithVat": 753.0
+      },
+      {
+        "priceWithoutVat": 257.0,
+        "priceWithVat": 311.0
+      }
+    ],
+    "12": [
+      {
+        "priceWithoutVat": 219.0,
+        "priceWithVat": 265.0
+      },
+      {
+        "priceWithoutVat": 434.0,
+        "priceWithVat": 525.0
+      },
+      {
+        "priceWithoutVat": 401.0,
+        "priceWithVat": 485.0
+      },
+      {
+        "priceWithoutVat": 548.0,
+        "priceWithVat": 663.0
+      },
+      {
+        "priceWithoutVat": 381.0,
+        "priceWithVat": 461.0
+      },
+      {
+        "priceWithoutVat": 770.0,
+        "priceWithVat": 932.0
+      },
+      {
+        "priceWithoutVat": 770.0,
+        "priceWithVat": 932.0
+      },
+      {
+        "priceWithoutVat": 770.0,
+        "priceWithVat": 932.0
+      },
+      {
+        "priceWithoutVat": 933.0,
+        "priceWithVat": 1129.0
+      },
+      {
+        "priceWithoutVat": 321.0,
+        "priceWithVat": 388.0
+      }
+    ],
+    "13": [
+      {
+        "priceWithoutVat": 276.0,
+        "priceWithVat": 334.0
+      },
+      {
+        "priceWithoutVat": 546.0,
+        "priceWithVat": 661.0
+      },
+      {
+        "priceWithoutVat": 505.0,
+        "priceWithVat": 611.0
+      },
+      {
+        "priceWithoutVat": 690.0,
+        "priceWithVat": 835.0
+      },
+      {
+        "priceWithoutVat": 480.0,
+        "priceWithVat": 581.0
+      },
+      {
+        "priceWithoutVat": 970.0,
+        "priceWithVat": 1174.0
+      },
+      {
+        "priceWithoutVat": 970.0,
+        "priceWithVat": 1174.0
+      },
+      {
+        "priceWithoutVat": 970.0,
+        "priceWithVat": 1174.0
+      },
+      {
+        "priceWithoutVat": 1433.0,
+        "priceWithVat": 1734.0
+      },
+      {
+        "priceWithoutVat": 404.0,
+        "priceWithVat": 489.0
+      }
+    ],
+    "14": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      {
+        "priceWithoutVat": 2494.0,
+        "priceWithVat": 3018.0
+      },
+      null
+    ],
+    "15": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      {
+        "priceWithoutVat": 4801.0,
+        "priceWithVat": 5809.0
+      },
+      null
+    ],
+    "16": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      {
+        "priceWithoutVat": 9841.0,
+        "priceWithVat": 11908.0
+      },
+      null
+    ],
+    "17": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      {
+        "priceWithoutVat": 20779.0,
+        "priceWithVat": 25143.0
+      },
+      null
+    ],
+    "18": [
+      {
+        "priceWithoutVat": 4.38,
+        "priceWithVat": 5.3
+      },
+      {
+        "priceWithoutVat": 8.67,
+        "priceWithVat": 10.49
+      },
+      {
+        "priceWithoutVat": 8.01,
+        "priceWithVat": 9.69
+      },
+      {
+        "priceWithoutVat": 10.95,
+        "priceWithVat": 13.25
+      },
+      {
+        "priceWithoutVat": 7.62,
+        "priceWithVat": 9.22
+      },
+      {
+        "priceWithoutVat": 15.39,
+        "priceWithVat": 18.62
+      },
+      {
+        "priceWithoutVat": 15.39,
+        "priceWithVat": 18.62
+      },
+      {
+        "priceWithoutVat": 15.39,
+        "priceWithVat": 18.62
+      },
+      {
+        "priceWithoutVat": 129.87,
+        "priceWithVat": 157.14
+      },
+      {
+        "priceWithoutVat": 6.42,
+        "priceWithVat": 7.77
+      }
+    ],
+    "19": [
+      {
+        "priceWithoutVat": 1.46,
+        "priceWithVat": 1.77
+      },
+      {
+        "priceWithoutVat": 2.89,
+        "priceWithVat": 3.5
+      },
+      {
+        "priceWithoutVat": 2.67,
+        "priceWithVat": 3.23
+      },
+      {
+        "priceWithoutVat": 3.65,
+        "priceWithVat": 4.42
+      },
+      {
+        "priceWithoutVat": 2.54,
+        "priceWithVat": 3.07
+      },
+      {
+        "priceWithoutVat": 5.13,
+        "priceWithVat": 6.21
+      },
+      {
+        "priceWithoutVat": 5.13,
+        "priceWithVat": 6.21
+      },
+      {
+        "priceWithoutVat": 5.13,
+        "priceWithVat": 6.21
+      },
+      {
+        "priceWithoutVat": 43.29,
+        "priceWithVat": 52.38
+      },
+      {
+        "priceWithoutVat": 2.14,
+        "priceWithVat": 2.59
+      }
+    ]
+  },
+  "common": {
+    "tax": {
+      "priceWithoutVat": 28.3,
+      "priceWithVat": 34.24
+    },
+    "system": {
+      "priceWithoutVat": 164.24,
+      "priceWithVat": 198.73
+    },
+    "infrastructure": {
+      "priceWithoutVat": 12.87,
+      "priceWithVat": 15.57
+    },
+    "pozePerA": {
+      "priceWithoutVat": 0.0,
+      "priceWithVat": 0.0
+    },
+    "pozePerMwh": null,
+    "pozeAnnual": {
+      "priceWithoutVat": 0,
+      "priceWithVat": 0
+    }
+  },
+  "unimported": []
+}

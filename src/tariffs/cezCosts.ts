@@ -1,4 +1,5 @@
 import cez from './data/cez-household-2026.json';
+import { assessBusinessRegulated } from './eonCosts';
 import egd from './data/egd-household-2026.json';
 import pre from './data/pre-household-2026.json';
 import spot from './data/esco-spot-2026.json';
@@ -142,6 +143,11 @@ export function assessEsco(
     { label: 'Dodávka elektřiny (VT = NT)', priceWithoutVat: (annualKwh / 1000) * price },
     { label: 'Stálá obchodní platba', priceWithoutVat: 12 * spot.supplierFixedMonthlyWithoutVat },
   ];
+  const expandedRegulated = assessBusinessRegulated(code, area, amps, annualKwh, split);
+  if (expandedRegulated) {
+    const expanded = total([...lines, ...expandedRegulated.lines]);
+    return { ...expanded, commercial, complete: true };
+  }
   if (complete) {
     const vt = dual ? split!.annualVT : annualKwh;
     const nt = dual ? split!.annualNT : 0;

@@ -240,3 +240,16 @@ Mobilní profily jsou emulace v Chromiu, nikoli fyzické iPadOS/Safari. Apple Pe
 - Dvě historické E2E očekávané sady prázdných dodavatelských karet byly přizpůsobeny náhradě prázdné ČEZ karty skutečnou cenovou kartou; žádný test nebyl vynechán. Beze změn závislostí.
 
 Detaily zdrojů a výpočtů: [ČEZ import 1.4.7](cez-import-1.4.7.md), [strojový report](cez-validation-1.4.7.json).
+
+## 1.4.8 – E.ON a společné srovnání domácností (27. 10. 2026)
+
+- Unit: **524/524**, 30 testovacích souborů.
+- Kompletní E2E nad aktuálním production buildem: **260/260** – iPhone **130/130**, iPad **130/130**, bez selhání. Cílená kombinace 1.4.7/1.4.8 před úplným během: **28/28**.
+- Production build a samostatný PWA build: úspěšné, bez změn závislostí. Zachována plná vnitřní přesnost výpočtů.
+- Regrese měření zahrnuje celé původní testy: Kontrolu stavů, 1f/3f, MTP, Kyoritsu, ARON/VN, fyzikální kontroly a tolerance, Energis, UZEL, jednotlivé odečty a série, Stylus, historii, migrace, backup, offline a PWA aktualizaci.
+- `python scripts/validate-eon-pdf.py`: shoda **1 290** datových čísel se čtyřmi originály E.ON včetně obou zdrojových DPH variant. Nečitelné číselné hodnoty **0**, neověřené pravidlo **1**: platnost firemní sazby za A nad explicitní tabulkou do 160 A; nepoužívá se bez ověření. POZE spotřební pomlčka zůstává null, konečná nula odpovídá výslovnému údaji zdroje.
+- `python scripts/validate-cez-pdf.py`: původní ČEZ ceníky nadále odpovídají zdrojům. Metadata ESCO doplněna o `effectiveFrom`, cenové hodnoty beze změny.
+- **63** existujících zdrojových souborů zůstává bajtově totožných s 1.4.7. Další čtyři obsahují pouze přesné auditované úpravy: vložení E.ON do tarifních obrazovek, sdílení ověřené C distribuce v ESCO, text kontroly stáří a metadata. Všechny původní soubory 1.4.7 jsou chráněny SHA kontrolou; historické baseline beze změny.
+- Historické testy změněny jen pro náhradu prázdné E.ON karty skutečnou nabídkou, rozšíření doloženého C pokrytí a přesné nové znění upozornění. Žádný test nebyl vynechán. ORLEN zdroje, matematika a UI jsou beze změny.
+
+Detaily zdrojů, pravidel a omezení: [E.ON import 1.4.8](eon-import-1.4.8.md), [strojový report](eon-validation-1.4.8.json).

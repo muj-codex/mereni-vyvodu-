@@ -1,0 +1,37 @@
+{
+  "version": "1.4.8",
+  "sources": [
+    {
+      "sourceFile": "cenik--komplet--elektrina--max--pro--s--usporou--3--roky--10_26-----distribucni--uzemi--cez.pdf",
+      "tariffs": 10,
+      "verifiedSourceNumbers": 310,
+      "unverifiedRules": []
+    },
+    {
+      "sourceFile": "cenik--komplet--elektrina--max--pro--s--usporou--3--roky--10_26-----distribucni--uzemi--eg.d.pdf",
+      "tariffs": 10,
+      "verifiedSourceNumbers": 310,
+      "unverifiedRules": []
+    },
+    {
+      "sourceFile": "cenik--komplet--elektrina--max--pro--s--usporou--3--roky--10_26-----distribucni--uzemi--pre.pdf",
+      "tariffs": 10,
+      "verifiedSourceNumbers": 310,
+      "unverifiedRules": []
+    },
+    {
+      "sourceFile": "cenik--elektrina--spot--k--1.7.2024-----distribucni--uzemi--cez_c.pdf",
+      "tariffs": 11,
+      "verifiedSourceNumbers": 360,
+      "unverifiedRules": [
+        {
+          "field": "breakerPerAAboveTableApplicability",
+          "reason": "Řádek 17 uvádí nad 3×63 A / D57d, ale C tabulka má samostatné intervaly až 3×160 A. Hodnoty jsou přepsány, použití sazby nad rozsahem explicitních intervalů není ověřeno."
+        }
+      ]
+    }
+  ],
+  "unreadableNumericValues": 0,
+  "verifiedSourceNumbers": 1290,
+  "unverifiedRuleCount": 1
+}

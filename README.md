@@ -347,3 +347,9 @@ Paušální připojení zobrazuje `C25d · 2T` a `C45d · 2T`. Interní hodnoty 
 - Domácnosti: ČEZ Elektřina na dobu neurčitou pro 10 D sazeb na územích ČEZ Distribuce, EG.D a PREdistribuce, včetně 1f/3f jističových tabulek, VT/NT, DPH a obou variant POZE. ORLEN se v domácnostech nenabízí.
 - Po 20 dnech doporučení kontroly SPOT; poslední ověřené ceny zůstávají dostupné. Bez automatického scraperu a vzdálených log.
 - Originální čtyři PDF, zdrojová metadata a kontrola importu jsou v [dokumentaci importu](docs/cez-import-1.4.7.md). Měřicí část, UZEL, uložená data i ORLEN zůstávají nezměněné; kontrolují je SHA a regresní testy.
+
+### 1.4.8 – E.ON a společné porovnání domácností
+
+- E.ON SPOT pro firmy: skutečné zdrojové poplatky a regulovaná tabulka ČEZ Distribuce, bez vymyšlené obchodní nebo celkové roční ceny při chybějících intervalových OTE datech. Ověřená C distribuce rozšiřuje i ČEZ ESCO; ORLEN je beze změny.
+- E.ON domácnosti pro všech 10 D sazeb ve třech distribučních oblastech. ČEZ × E.ON sdílejí sazbu, jistič i VT/NT; porovnání ukazuje levnější nabídku a rozdíl Kč/rok. Bez ORLEN a bez automatického potvrzení technického nároku na sazbu.
+- Obě zdrojové varianty DPH jsou uchovány, POZE podle PDF; po 20 dnech pouze doporučení kontroly SPOT. [Zdrojová dokumentace a omezení](docs/eon-import-1.4.8.md).

@@ -1,0 +1,6 @@
+{
+  "src/tariffs/TariffCalculator.tsx": "3ee7ed8a641f2ff11263fdd31214bcecb34cc494131513f7153a8208a87d406c",
+  "src/tariffs/CezPrices.tsx": "d58a56a89eda65af981e8bedeab4a5be2719f082f41c676244c8f0d79a34c2fb",
+  "src/tariffs/cezCosts.ts": "3adeb2ec4401e16dfeb1897373d8de8442ba8bbe07da2b12ccb538073c9b1d61",
+  "src/tariffs/data/esco-spot-2026.json": "b1cf3b194f832f8d5210ab511c41fe5528c4de44d945d9a9a30a5994b689b7a1"
+}

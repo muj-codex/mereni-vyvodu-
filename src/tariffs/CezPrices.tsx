@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { EonHouseholdComparison } from './EonPrices';
 import type { ComparisonContext } from './calculations';
 import { companyTariffCodes, householdTariffCodes } from './catalog';
 import {
@@ -130,10 +131,11 @@ function EscoPrices({ context }: { context: ComparisonContext }) {
       </p>
       {refresh.recommended && (
         <p className="notice">
-          Doporučena aktualizace ceníku. Používáme poslední známá ověřená data.
+          Doporučena kontrola ceníku. Používáme poslední známá ověřená data.
         </p>
       )}
       <p className="hint">Zdroj: {escoSource.metadata.sourceFile} · účinnost od 1. 1. 2026.</p>
+      <p className="hint">Regulované ceny ČEZ Distribuce: ověřený E.ON SPOT ceník pro rok 2026; pro původní ověřené kombinace zůstávají dostupné také interní regulované podklady.</p>
     </section>
   );
 }
@@ -165,6 +167,7 @@ function HouseholdPrices({ context }: { context: ComparisonContext }) {
       <h2>Domácnosti / sazby D – ČEZ</h2>
       <p>Elektřina na dobu neurčitou · účinnost od 1. 1. 2026</p>
       <p>Distribuční oblast: {context.distributionArea}</p>
+      <p className="hint">Vstupy sazby, jističe a spotřeby níže platí společně pro ČEZ i E.ON.</p>
       <div className="field-grid">
         <label className="field">
           <span>Sazba domácnosti ČEZ</span>
@@ -260,6 +263,7 @@ function HouseholdPrices({ context }: { context: ComparisonContext }) {
           <Breakdown {...result} />
         </>
       )}
+      <EonHouseholdComparison code={code} area={context.distributionArea} amps={amps.trim() === '' ? NaN : Number(amps.replace(',', '.'))} phases={phases} vt={annualVT} nt={annualNT} cezResult={result} />
       <p className="hint">
         Zdroj: {metadata.sourceFile} · ověřeno {metadata.lastVerifiedAt}. Ceny v závorkách zdroje
         jsou bez DPH; DPH se přičítá jednou.

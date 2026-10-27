@@ -1,5 +1,6 @@
 import { OrlenPrices } from './OrlenPrices';
 import { CezPrices } from './CezPrices';
+import { EonBusinessPrices } from './EonPrices';
 import { useState } from 'react';
 import { BackButton } from '../ui/BackButton';
 import { SelectField } from '../ui/Fields';
@@ -249,7 +250,7 @@ function Suppliers({ context }: { context: ComparisonContext }) {
         className="tariff-suppliers"
         key={`${context.customer}:${context.method}:${context.distributionArea}`}
       >
-        {suppliersFor(context.customer, context.method).filter((s) => s.id !== 'cez').map((s) => (
+        {suppliersFor(context.customer, context.method).filter((s) => s.id !== 'cez' && s.id !== 'eon').map((s) => (
           <SupplierCard supplier={s} key={s.id} />
         ))}
       </div>
@@ -417,6 +418,7 @@ function ResultView({ result, draft }: { result: Result; draft: TariffDraft }) {
       )}
       <OrlenPrices context={context} />
       <CezPrices context={context} />
+      <EonBusinessPrices context={context} />
       <Suppliers context={context} />
     </>
   );

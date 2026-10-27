@@ -82,7 +82,9 @@ test('business SPOT reference, complete control, supplier coverage and unknown a
   ]) {
     await card.getByLabel('Sazba ČEZ ESCO', { exact: true }).selectOption(code);
     await expect(card).toContainText(`${price} Kč/MWh bez DPH`);
-    await expect(card.getByLabel('Roční cena ČEZ', { exact: true })).toHaveCount(0);
+    if (code === 'C62d')
+      await expect(card.getByLabel('Roční cena ČEZ', { exact: true })).toBeVisible();
+    else await expect(card.getByLabel('Roční cena ČEZ', { exact: true })).toHaveCount(0);
   }
   await card.getByLabel('Sazba ČEZ ESCO', { exact: true }).selectOption('C60d');
   await expect(card).toContainText('Pro tuto sazbu nemáme ověřený cenový podklad.');
@@ -113,7 +115,7 @@ test('SPOT recommends refresh after 20 days and still uses last verified Septemb
   const s = rates(page);
   await s.getByRole('button', { name: 'POKRAČOVAT K POROVNÁNÍ', exact: true }).click();
   const card = s.getByRole('region', { name: 'ČEZ ESCO SPOT', exact: true });
-  await expect(card).toContainText('Doporučena aktualizace ceníku.');
+  await expect(card).toContainText('Doporučena kontrola ceníku.');
   await expect(card).toContainText('3 850 Kč/MWh bez DPH');
   await expect(card.getByLabel('Roční cena ČEZ', { exact: true })).toBeVisible();
 });
