@@ -340,3 +340,10 @@ Dodaných 28 UZLŮ R701/R702 doplňuje 28 již existujících neúplných řádk
 Paušální připojení zobrazuje `C25d · 2T` a `C45d · 2T`. Interní hodnoty voleb zůstávají `C25d` a `C45d`; seznam, ceny a výpočty se nemění. Elektrotechnické jádro, obecná logika vazeb, odečty, Energis, Stylus, historie a backup nejsou změněny. Kontrola SHA-256 zachovává původní baseline 1.4.4, ověřuje přesný rozsah schválených změn dat a textu a teprve tyto změny při porovnání vrací do původního tvaru.
 
 `npm run validate:uzel` vytváří report pro aktuální aplikační verzi; historické reporty zůstávají zachovány. [Validace 1.4.6](docs/uzel-validation-1.4.6.md): 994 referenčních řádků, 908 různých čitelných UZLŮ, 981 úplných a 13 neúplných záznamů. Původní duplicity a konflikt 21201042 jsou beze změn, nové konflikty nevznikají.
+
+### 1.4.7 – ČEZ / ČEZ ESCO 2026
+
+- Firmy: orientační ČEZ ESCO SPOT pro 11 doložených C sazeb. Referenční měsíc je poslední zveřejněný měsíc v importu (září 2026); přirážka se nepřičítá podruhé. Neověřená distribuční část blokuje pouze úplný výpočet příslušné kombinace.
+- Domácnosti: ČEZ Elektřina na dobu neurčitou pro 10 D sazeb na územích ČEZ Distribuce, EG.D a PREdistribuce, včetně 1f/3f jističových tabulek, VT/NT, DPH a obou variant POZE. ORLEN se v domácnostech nenabízí.
+- Po 20 dnech doporučení kontroly SPOT; poslední ověřené ceny zůstávají dostupné. Bez automatického scraperu a vzdálených log.
+- Originální čtyři PDF, zdrojová metadata a kontrola importu jsou v [dokumentaci importu](docs/cez-import-1.4.7.md). Měřicí část, UZEL, uložená data i ORLEN zůstávají nezměněné; kontrolují je SHA a regresní testy.

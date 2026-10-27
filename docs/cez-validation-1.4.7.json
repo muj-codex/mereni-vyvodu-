@@ -1,0 +1,31 @@
+{
+  "version": "1.4.7",
+  "households": [
+    {
+      "sourceFile": "moo_ele_cez_elektrina_na_dobu_neurcitou_01012026_01012026.pdf",
+      "tariffs": 10,
+      "verifiedNetValues": 218,
+      "unimported": []
+    },
+    {
+      "sourceFile": "moo_ele_egd_elektrina_na_dobu_neurcitou_01012026_01012026.pdf",
+      "tariffs": 10,
+      "verifiedNetValues": 218,
+      "unimported": []
+    },
+    {
+      "sourceFile": "moo_ele_pre_elektrina_na_dobu_neurcitou_01012026_01012026.pdf",
+      "tariffs": 10,
+      "verifiedNetValues": 218,
+      "unimported": []
+    }
+  ],
+  "business": {
+    "sourceFile": "202609-elektrina-na-dobu-neurcitou_spot_mo.pdf",
+    "tariffs": 11,
+    "publishedMonths": 9,
+    "referenceMonth": "2026-09",
+    "verifiedMonthlyPrices": 99,
+    "unimported": []
+  }
+}

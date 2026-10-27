@@ -228,3 +228,15 @@ Mobilní profily jsou emulace v Chromiu, nikoli fyzické iPadOS/Safari. Apple Pe
 - Cílený E2E suite 1.4.6: **12/12**. Kompletní závěrečný `npm run test:e2e -- --workers=2`: **232/232**, **116 iPhone + 116 iPad**, všechny původní i nové testy úspěšné, bez vypínání testů. Nové E2E skutečně proklikají všech 28 UZLŮ v obou směrech a tři case-sensitive páry CHEZA.
 - `npm run build` a `npm run build:pwa`: **úspěšné**, service worker a offline precache **8 souborů**. Kompletní E2E běžel proti aktuálnímu produkčnímu/PWA buildu; `npx tsc -b` ověřil i finální testovací soubory.
 - `git diff --check`: úspěšný. `package.json` i `package-lock.json` jsou shodně 1.4.6; závislosti a všechny ostatní položky lockfilu jsou stejné jako v 1.4.5.
+
+## 1.4.7 – ČEZ / ČEZ ESCO (27. 10. 2026)
+
+- Unit: **490/490**, 29 testovacích souborů.
+- Kompletní E2E nad aktuálním production buildem: **246/246** – iPhone **123/123**, iPad **123/123**, bez selhání. Zahrnuje kompletní regresi měřicí části, historie, migrací, backupu, UZEL, sérií, Kyoritsu, ARON/VN, kontrol stavů a offline/PWA aktualizace.
+- Production build: úspěšný; PWA build ověřen samostatně před commitem.
+- `npx tsc -b`: úspěšné včetně finálních E2E scénářů.
+- `python scripts/validate-cez-pdf.py`: úspěšné porovnání 654 domácích číselných hodnot a 99 měsíčních SPOT cen s přiloženými originály, plus obchodní stálá platba a zahrnutá přirážka. Požadované neimportované/nečitelné hodnoty: **0**. Strukturální pomlčky zůstávají null.
+- 60 existujících zdrojových souborů je bajtově totožných s 1.4.6. Jediný měněný původní zdroj je integrační obrazovka `TariffCalculator.tsx`: import/vložení nové karty, odebrání prázdné ČEZ karty a přesný stavový text. Žádná změna měřicích, datových ani ORLEN výpočtů. Historické SHA baseline zachovány; integrační výjimka je přesně auditována samostatným fixturem.
+- Dvě historické E2E očekávané sady prázdných dodavatelských karet byly přizpůsobeny náhradě prázdné ČEZ karty skutečnou cenovou kartou; žádný test nebyl vynechán. Beze změn závislostí.
+
+Detaily zdrojů a výpočtů: [ČEZ import 1.4.7](cez-import-1.4.7.md), [strojový report](cez-validation-1.4.7.json).

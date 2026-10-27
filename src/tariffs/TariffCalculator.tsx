@@ -1,4 +1,5 @@
 import { OrlenPrices } from './OrlenPrices';
+import { CezPrices } from './CezPrices';
 import { useState } from 'react';
 import { BackButton } from '../ui/BackButton';
 import { SelectField } from '../ui/Fields';
@@ -242,13 +243,13 @@ function Suppliers({ context }: { context: ComparisonContext }) {
         {context.distributionArea} ·{' '}
         {context.customer === 'C'
           ? 'ORLEN: částečně ověřený ceník 2026.'
-          : 'Ceníky zatím nejsou načteny.'}
+          : 'ČEZ: ověřené ceníky domácností 2026.'}
       </p>
       <div
         className="tariff-suppliers"
         key={`${context.customer}:${context.method}:${context.distributionArea}`}
       >
-        {suppliersFor(context.customer, context.method).map((s) => (
+        {suppliersFor(context.customer, context.method).filter((s) => s.id !== 'cez').map((s) => (
           <SupplierCard supplier={s} key={s.id} />
         ))}
       </div>
@@ -415,6 +416,7 @@ function ResultView({ result, draft }: { result: Result; draft: TariffDraft }) {
         </section>
       )}
       <OrlenPrices context={context} />
+      <CezPrices context={context} />
       <Suppliers context={context} />
     </>
   );

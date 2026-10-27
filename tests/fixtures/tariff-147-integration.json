@@ -1,0 +1,18 @@
+[
+  {
+    "before": "import { OrlenPrices } from './OrlenPrices';",
+    "after": "import { OrlenPrices } from './OrlenPrices';\nimport { CezPrices } from './CezPrices';"
+  },
+  {
+    "before": "suppliersFor(context.customer, context.method).map((s) => (",
+    "after": "suppliersFor(context.customer, context.method).filter((s) => s.id !== 'cez').map((s) => ("
+  },
+  {
+    "before": "'Ceníky zatím nejsou načteny.'",
+    "after": "'ČEZ: ověřené ceníky domácností 2026.'"
+  },
+  {
+    "before": "<OrlenPrices context={context} />",
+    "after": "<OrlenPrices context={context} />\n      <CezPrices context={context} />"
+  }
+]
