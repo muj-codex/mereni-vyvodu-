@@ -1,0 +1,12 @@
+{
+  "version": "1.4.9",
+  "sourceFile": "cenik--variant--na--2--roky--10_26--profi-----distribucni--uzemi--cez.pdf",
+  "tariffCount": 11,
+  "verifiedSourceNumbers": 448,
+  "unreadableNumericValues": 0,
+  "unverifiedRules": [],
+  "pozePerMwh": null,
+  "pozeAnnualWithoutVat": 0,
+  "breakerAbove160A": "explicitly verified by row 18",
+  "sourceTotalsReconciled": true
+}

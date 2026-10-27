@@ -253,3 +253,16 @@ Detaily zdrojů a výpočtů: [ČEZ import 1.4.7](cez-import-1.4.7.md), [strojov
 - Historické testy změněny jen pro náhradu prázdné E.ON karty skutečnou nabídkou, rozšíření doloženého C pokrytí a přesné nové znění upozornění. Žádný test nebyl vynechán. ORLEN zdroje, matematika a UI jsou beze změny.
 
 Detaily zdrojů, pravidel a omezení: [E.ON import 1.4.8](eon-import-1.4.8.md), [strojový report](eon-validation-1.4.8.json).
+
+## 1.4.9 – hlavní firemní E.ON Variant (27. 10. 2026)
+
+- Unit: **548/548**, 31 testovacích souborů.
+- Kompletní E2E nad aktuálním produkčním buildem: **272/272** – iPhone **136/136**, iPad **136/136**, bez selhání. Opravený cílený běh 1.4.8 + 1.4.9 před celou sadou: **26/26**. Žádný test nebyl vynechán.
+- Production build a samostatný PWA build: úspěšné. Závislosti beze změny.
+- Nové testy ověřují C02d, C25d, C45d a C62d: zdrojové VT/NT, stálý plat 139 Kč/měsíc, regulované položky a jističe, POZE, roční cenu, jednu DPH, rozdíly proti ostatním dodavatelům a pořadí úplných nabídek pro stejné parametry. Dále všechny podporované C sazby, C60d bez vymyšlené ceny, neznámé oblasti, chybějící VT/NT, explicitní 200A pravidlo a nepřítomnost hlavní E.ON SPOT karty.
+- Zachovány a prošly všechny původní regrese měření: Kontrola stavů, MTP, 1f/3f, Kyoritsu, U/I/PF, ARON, VN, tolerance, fáze, Energis, UZEL, jednotlivé odečty/série, Stylus, historie, migrace, backup i PWA aktualizace. Domácnosti ČEZ/E.ON ve třech oblastech včetně D02d/D25d/D57d a cenového porovnání nadále procházejí původními scénáři.
+- `python scripts/validate-eon-variant-pdf.py`: **448 ověřených číselných hodnot**, 11 sazeb; obě zdrojové DPH varianty a součty jednotkových cen vůči řádkům 25/26 souhlasí. **0 nečitelných hodnot, 0 neověřených pravidel** v novém zdroji. POZE spotřební pomlčka zůstává null; výsledná platba 0 Kč je přímo uvedena.
+- Historické `validate-cez-pdf.py` i `validate-eon-pdf.py` nadále procházejí. Původní SPOT data zůstávají zachována jako neaktivní podklad, jejich nejistota nad 160 A neblokuje doložené ceny Variant.
+- Celých **73** původních zdrojových souborů 1.4.8 je chráněno SHA; **70** je bajtově totožných a pouze tři tarifní soubory mají přesné auditované integrační změny. ORLEN i všechny domácí a měřicí výpočty jsou beze změny. Historické SHA baseline se nepřegenerovávají.
+
+[Dokumentace importu a omezení](eon-variant-1.4.9.md), [strojový report](eon-variant-validation-1.4.9.json).

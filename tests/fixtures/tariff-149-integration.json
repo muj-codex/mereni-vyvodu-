@@ -1,0 +1,20 @@
+{
+  "src/tariffs/TariffCalculator.tsx": [
+    {
+      "before": "import { EonBusinessPrices } from './EonPrices';",
+      "after": "import { EonVariantPrices as EonBusinessPrices } from './EonVariantPrices';"
+    }
+  ],
+  "src/tariffs/cezCosts.ts": [
+    {
+      "before": "import { assessBusinessRegulated } from './eonCosts';",
+      "after": "import { assessVariantRegulated as assessBusinessRegulated } from './eonVariantCosts';"
+    }
+  ],
+  "src/tariffs/CezPrices.tsx": [
+    {
+      "before": "Regulované ceny ČEZ Distribuce: ověřený E.ON SPOT ceník pro rok 2026; pro původní ověřené kombinace zůstávají dostupné také interní regulované podklady.",
+      "after": "Regulované ceny ČEZ Distribuce: ověřený ceník E.ON Variant pro rok 2026; pro původní ověřené kombinace zůstávají dostupné také interní regulované podklady."
+    }
+  ]
+}

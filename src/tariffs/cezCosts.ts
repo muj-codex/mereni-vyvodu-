@@ -1,5 +1,5 @@
 import cez from './data/cez-household-2026.json';
-import { assessBusinessRegulated } from './eonCosts';
+import { assessVariantRegulated as assessBusinessRegulated } from './eonVariantCosts';
 import egd from './data/egd-household-2026.json';
 import pre from './data/pre-household-2026.json';
 import spot from './data/esco-spot-2026.json';

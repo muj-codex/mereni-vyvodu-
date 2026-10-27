@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { frozen148Content } from './frozen-reference149';
 import assert from 'node:assert/strict';
 import corrections from './fixtures/reference-146-changes.json';
 import integration from './fixtures/tariff-147-integration.json';
@@ -8,7 +8,7 @@ import integration148 from './fixtures/tariff-148-integration.json';
 // data corrections and visible option labels may differ; validate them first,
 // then undo exactly those changes for the existing whole-file hash assertion.
 export function frozen144Content(path: string) {
-  let content = readFileSync(path, 'utf8');
+  let content = frozen148Content(path);
   const patches148 = (integration148 as Record<string, { before: string; after: string }[]>)[path] ?? [];
   for (const patch of [...patches148].reverse()) {
     assert.equal(content.split(patch.after).length, 2);

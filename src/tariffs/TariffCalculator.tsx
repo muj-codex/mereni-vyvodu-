@@ -1,6 +1,6 @@
 import { OrlenPrices } from './OrlenPrices';
 import { CezPrices } from './CezPrices';
-import { EonBusinessPrices } from './EonPrices';
+import { EonVariantPrices as EonBusinessPrices } from './EonVariantPrices';
 import { useState } from 'react';
 import { BackButton } from '../ui/BackButton';
 import { SelectField } from '../ui/Fields';

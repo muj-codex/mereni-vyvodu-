@@ -353,3 +353,9 @@ Paušální připojení zobrazuje `C25d · 2T` a `C45d · 2T`. Interní hodnoty 
 - E.ON SPOT pro firmy: skutečné zdrojové poplatky a regulovaná tabulka ČEZ Distribuce, bez vymyšlené obchodní nebo celkové roční ceny při chybějících intervalových OTE datech. Ověřená C distribuce rozšiřuje i ČEZ ESCO; ORLEN je beze změny.
 - E.ON domácnosti pro všech 10 D sazeb ve třech distribučních oblastech. ČEZ × E.ON sdílejí sazbu, jistič i VT/NT; porovnání ukazuje levnější nabídku a rozdíl Kč/rok. Bez ORLEN a bez automatického potvrzení technického nároku na sazbu.
 - Obě zdrojové varianty DPH jsou uchovány, POZE podle PDF; po 20 dnech pouze doporučení kontroly SPOT. [Zdrojová dokumentace a omezení](docs/eon-import-1.4.8.md).
+
+### 1.4.9 – fixovaný E.ON Variant pro firmy
+
+- Hlavní E.ON firemní produkt je Variant na 2 roky 10/26 Profi, fixace 2 roky, účinnost od 1. 10. 2026. Úplná roční cena pro ověřené C sazby a ČEZ Distribuce, včetně skutečných jističových pásem nad 160 A.
+- Pořadí úplných nabídek ORLEN / E.ON Variant / ČEZ ESCO při stejných vstupech a rozdíly Kč/rok. ESCO zůstává označen jako orientační zářijový SPOT scénář; starý E.ON SPOT není hlavní karta.
+- Měření, ORLEN a domácnosti beze změny. [Zdrojová dokumentace, výpočet a omezení](docs/eon-variant-1.4.9.md).

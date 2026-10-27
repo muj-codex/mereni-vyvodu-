@@ -135,7 +135,7 @@ function EscoPrices({ context }: { context: ComparisonContext }) {
         </p>
       )}
       <p className="hint">Zdroj: {escoSource.metadata.sourceFile} · účinnost od 1. 1. 2026.</p>
-      <p className="hint">Regulované ceny ČEZ Distribuce: ověřený E.ON SPOT ceník pro rok 2026; pro původní ověřené kombinace zůstávají dostupné také interní regulované podklady.</p>
+      <p className="hint">Regulované ceny ČEZ Distribuce: ověřený ceník E.ON Variant pro rok 2026; pro původní ověřené kombinace zůstávají dostupné také interní regulované podklady.</p>
     </section>
   );
 }

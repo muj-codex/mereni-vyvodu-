@@ -70,7 +70,7 @@ test('low consumption can make ČEZ cheaper; comparison follows the common input
     s.getByRole('region', { name: 'Porovnání domácností ČEZ a E.ON', exact: true }),
   ).toContainText('Levnější nabídka: ČEZ. Rozdíl 10,79 Kč/rok');
 });
-test('E.ON company SPOT shows real fees and C coverage without creating a commodity or full annual price', async ({
+test('E.ON company Variant shows fixed prices and C coverage while the historical SPOT card is inactive', async ({
   page,
 }) => {
   await page.goto('/');
@@ -78,15 +78,16 @@ test('E.ON company SPOT shows real fees and C coverage without creating a commod
   const s = rates(page);
   await s.getByLabel('Použitý jistič', { exact: true }).selectOption('3×40 A');
   await s.getByRole('button', { name: 'POKRAČOVAT K POROVNÁNÍ', exact: true }).click();
-  const card = s.getByRole('region', { name: 'E.ON firmy SPOT', exact: true });
-  await expect(card).toContainText('OTE + 350 Kč/MWh bez DPH');
-  await expect(card).toContainText('Stálý plat 160 Kč/měsíc bez DPH');
-  await expect(card).toContainText('0,25 Kč/MWh bez DPH');
-  await expect(card).toContainText('Přesné porovnání vyžaduje průběhová SPOT data.');
-  await expect(card.getByLabel('Roční cena E.ON', { exact: true })).toHaveCount(0);
-  await expect(card.getByLabel('Regulovaná část E.ON firmy', { exact: true })).toContainText(
-    '6 924 Kč/rok',
+  const card = s.getByRole('region', { name: 'E.ON firmy Variant', exact: true });
+  await expect(card).toContainText('Variant na 2 roky 10/26 Profi');
+  await expect(card).toContainText('Fixace 2 roky');
+  await expect(card.getByLabel('Jednotkové ceny E.ON Variant', { exact: true })).toContainText(
+    '139 Kč/měsíc bez DPH',
   );
+  await expect(card.getByLabel('Roční cena E.ON Variant', { exact: true })).toContainText(
+    '89 785,87 Kč/rok',
+  );
+  await expect(s.getByRole('region', { name: 'E.ON firmy SPOT', exact: true })).toHaveCount(0);
   for (const code of [
     'C01d',
     'C02d',
@@ -100,13 +101,16 @@ test('E.ON company SPOT shows real fees and C coverage without creating a commod
     'C56d',
     'C62d',
   ]) {
-    await card.getByLabel('Sazba E.ON firmy', { exact: true }).selectOption(code);
-    await expect(card).toContainText('OTE + 350 Kč/MWh bez DPH');
+    await card
+      .getByLabel('Sazba E.ON Variant a společného porovnání', { exact: true })
+      .selectOption(code);
     await expect(card).not.toContainText('Pro tuto sazbu nemáme ověřený cenový podklad.');
   }
-  await card.getByLabel('Sazba E.ON firmy', { exact: true }).selectOption('C60d');
+  await card
+    .getByLabel('Sazba E.ON Variant a společného porovnání', { exact: true })
+    .selectOption('C60d');
   await expect(card).toContainText('Pro tuto sazbu nemáme ověřený cenový podklad.');
-  await expect(card.getByLabel('Regulovaná část E.ON firmy', { exact: true })).toHaveCount(0);
+  await expect(card.getByLabel('Roční cena E.ON Variant', { exact: true })).toHaveCount(0);
   await expect(s.getByLabel('Konečná roční cena ORLEN', { exact: true })).toContainText(
     '81 959,59 Kč/rok',
   );
@@ -127,24 +131,24 @@ test('expanded C46d distribution is shared with ESCO only for the verified area 
   await s.getByRole('button', { name: 'POKRAČOVAT K OBLASTI', exact: true }).click();
   await s.getByLabel('Distribuční oblast', { exact: true }).selectOption('ČEZ Distribuce');
   await s.getByRole('button', { name: 'VYHODNOTIT', exact: true }).click();
-  const eon = s.getByRole('region', { name: 'E.ON firmy SPOT', exact: true });
+  const eon = s.getByRole('region', { name: 'E.ON firmy Variant', exact: true });
   const esco = s.getByRole('region', { name: 'ČEZ ESCO SPOT', exact: true });
   const net =
     10.95 * (3863 + 28.3 + 164.24) + 3.65 * 3124.85 + 7.3 * 116.5 + 12 * (95 + 2368 + 12.87);
   await expect(esco.getByLabel('Roční cena ČEZ', { exact: true })).toContainText(
     `${fmt(net * 1.21)} Kč/rok`,
   );
-  await expect(eon.getByLabel('Regulovaná část E.ON firmy', { exact: true })).toContainText(
+  await expect(eon.getByLabel('Roční položky E.ON Variant', { exact: true })).toContainText(
     '28 416 Kč/rok',
   );
-  await expect(eon.getByLabel('Roční cena E.ON', { exact: true })).toHaveCount(0);
+  await expect(eon.getByLabel('Roční cena E.ON Variant', { exact: true })).toBeVisible();
   await s.getByRole('button', { name: '← Zpět', exact: true }).click();
   await s.getByLabel('Distribuční oblast', { exact: true }).selectOption('EG.D');
   await s.getByRole('button', { name: 'VYHODNOTIT', exact: true }).click();
   await expect(esco.getByLabel('Roční cena ČEZ', { exact: true })).toHaveCount(0);
-  await expect(eon.getByLabel('Regulovaná část E.ON firmy', { exact: true })).toHaveCount(0);
+  await expect(eon.getByLabel('Roční cena E.ON Variant', { exact: true })).toHaveCount(0);
 });
-test('both SPOT suppliers recommend a check after 20 days while keeping verified data and no active updater', async ({
+test('ESCO keeps its 20-day check while fixed E.ON Variant has no SPOT refresh requirement', async ({
   page,
 }) => {
   await page.clock.setFixedTime(new Date('2026-11-16T12:00:00Z'));
@@ -152,18 +156,16 @@ test('both SPOT suppliers recommend a check after 20 days while keeping verified
   await fillFlat(page);
   const s = rates(page);
   await s.getByRole('button', { name: 'POKRAČOVAT K POROVNÁNÍ', exact: true }).click();
-  for (const name of ['ČEZ ESCO SPOT', 'E.ON firmy SPOT']) {
-    const card = s.getByRole('region', { name, exact: true });
-    await expect(card).toContainText('Doporučena kontrola ceníku.');
-    await expect(card).toContainText('2026-11-16');
-    await expect(card.getByRole('button', { name: 'AKTUALIZOVAT CENÍK', exact: true })).toHaveCount(
-      0,
-    );
-  }
-  await expect(s.getByRole('region', { name: 'E.ON firmy SPOT', exact: true })).toContainText(
-    'OTE + 350',
-  );
-  await expect(s.getByRole('region', { name: 'ČEZ ESCO SPOT', exact: true })).toContainText(
-    '3 850 Kč/MWh',
-  );
+  const esco = s.getByRole('region', { name: 'ČEZ ESCO SPOT', exact: true });
+  await expect(esco).toContainText('Doporučena kontrola ceníku.');
+  await expect(esco).toContainText('2026-11-16');
+  await expect(esco).toContainText('3 850 Kč/MWh');
+  const variant = s.getByRole('region', { name: 'E.ON firmy Variant', exact: true });
+  await expect(variant).toContainText('Fixace 2 roky');
+  await expect(variant).not.toContainText('Doporučena kontrola ceníku.');
+  await expect(variant.getByLabel('Roční cena E.ON Variant', { exact: true })).toBeVisible();
+  await expect(s.getByRole('region', { name: 'E.ON firmy SPOT', exact: true })).toHaveCount(0);
+  await expect(
+    variant.getByRole('button', { name: 'AKTUALIZOVAT CENÍK', exact: true }),
+  ).toHaveCount(0);
 });
