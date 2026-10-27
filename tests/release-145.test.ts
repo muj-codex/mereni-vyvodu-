@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { createHash } from 'node:crypto';
-import { readFileSync } from 'node:fs';
+import { frozen144Content } from './frozen-reference146';
 import baseline from './frozen-144.json';
 import {
   editReference,
@@ -154,8 +154,10 @@ describe('1.4.5 reference binding provenance and clearing', () => {
       '175',
     );
   });
-  it('keeps all 1.4.4 calculation, storage, Energis, ORLEN and source-data files byte-for-byte unchanged', () => {
+  it('keeps 1.4.4 calculations and storage unchanged, allowing only the audited 1.4.6 data and display-label patches', () => {
     for (const [path, expected] of Object.entries(baseline))
-      expect(createHash('sha256').update(readFileSync(path)).digest('hex'), path).toBe(expected);
+      expect(createHash('sha256').update(frozen144Content(path)).digest('hex'), path).toBe(
+        expected,
+      );
   });
 });

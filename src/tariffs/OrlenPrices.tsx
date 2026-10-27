@@ -41,7 +41,9 @@ export function OrlenPrices({ context }: { context: ComparisonContext }) {
             onChange={(e) => setChoice(e.target.value)}
           >
             {ORLEN_2026_SOURCE.verifiedTariffs.map((code) => (
-              <option key={code}>{code}</option>
+              <option key={code} value={code}>
+                {code === 'C25d' || code === 'C45d' ? `${code} · 2T` : code}
+              </option>
             ))}
           </select>
         </label>

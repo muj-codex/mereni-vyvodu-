@@ -27,6 +27,11 @@
       "file": "IMG_3558.HEIC",
       "sha256": "a696b9fee4e0778ad4f0fd6d82da1dc35e252e4ac1765a463fd0558015ceb282",
       "bytes": 3705183
+    },
+    {
+      "file": "Uživatelem ověřené doplnění 1.4.6 (2026-10-27)",
+      "sha256": "922c51c9bb2701b4369421b46e17f179e7d21920cdcad4b064ad8bc6e070c8af",
+      "bytes": 6039
     }
   ],
   "records": [
@@ -8603,155 +8608,146 @@
     {
       "cell": "BM31",
       "node": "21207020",
-      "location": null,
+      "location": "1613/CHEZA",
       "placement": "3a",
       "sources": [
-        "IMG_3559.HEIC"
+        "IMG_3559.HEIC",
+        "Uživatelem ověřené doplnění 1.4.6 (2026-10-27)"
       ],
       "mtpPrimary": 300,
       "mtpSecondary": 5,
       "mtpSource": "300/5",
-      "unverified": [
-        "location"
-      ],
+      "unverified": [],
       "locationSource": "1613/CHEZA",
-      "note": "Část označení lokality je zakryta kurzorem nebo oříznuta hranicí sloupce; bez odhadu."
+      "note": "TS/R 1613/CHEZA potvrzena uživatelem pro verzi 1.4.6."
     },
     {
       "cell": "BM32",
       "node": "21207031",
-      "location": null,
+      "location": "1613/CHEZA",
       "placement": "3b",
       "sources": [
-        "IMG_3559.HEIC"
+        "IMG_3559.HEIC",
+        "Uživatelem ověřené doplnění 1.4.6 (2026-10-27)"
       ],
       "mtpPrimary": 300,
       "mtpSecondary": 5,
       "mtpSource": "300/5",
-      "unverified": [
-        "location"
-      ],
+      "unverified": [],
       "locationSource": "1613/CHEZA",
-      "note": "Část označení lokality je zakryta kurzorem nebo oříznuta hranicí sloupce; bez odhadu."
+      "note": "TS/R 1613/CHEZA potvrzena uživatelem pro verzi 1.4.6."
     },
     {
       "cell": "BM33",
       "node": "21207021",
-      "location": null,
+      "location": "1613/CHEZA",
       "placement": "4a",
       "sources": [
-        "IMG_3559.HEIC"
+        "IMG_3559.HEIC",
+        "Uživatelem ověřené doplnění 1.4.6 (2026-10-27)"
       ],
       "mtpPrimary": 300,
       "mtpSecondary": 5,
       "mtpSource": "300/5",
-      "unverified": [
-        "location"
-      ],
+      "unverified": [],
       "locationSource": "1613/CHEZA",
-      "note": "Část označení lokality je zakryta kurzorem nebo oříznuta hranicí sloupce; bez odhadu."
+      "note": "TS/R 1613/CHEZA potvrzena uživatelem pro verzi 1.4.6."
     },
     {
       "cell": "BM34",
       "node": "21207032",
-      "location": null,
+      "location": "1613/CHEZA",
       "placement": "4b",
       "sources": [
-        "IMG_3559.HEIC"
+        "IMG_3559.HEIC",
+        "Uživatelem ověřené doplnění 1.4.6 (2026-10-27)"
       ],
       "mtpPrimary": 300,
       "mtpSecondary": 5,
       "mtpSource": "300/5",
-      "unverified": [
-        "location"
-      ],
+      "unverified": [],
       "locationSource": "1613/CHEZA",
-      "note": "Část označení lokality je zakryta kurzorem nebo oříznuta hranicí sloupce; bez odhadu."
+      "note": "TS/R 1613/CHEZA potvrzena uživatelem pro verzi 1.4.6."
     },
     {
       "cell": "BM35",
       "node": "21207022",
-      "location": null,
+      "location": "1613/CHEZA",
       "placement": "5a",
       "sources": [
-        "IMG_3559.HEIC"
+        "IMG_3559.HEIC",
+        "Uživatelem ověřené doplnění 1.4.6 (2026-10-27)"
       ],
       "mtpPrimary": 300,
       "mtpSecondary": 5,
       "mtpSource": "300/5",
-      "unverified": [
-        "location"
-      ],
+      "unverified": [],
       "locationSource": "1613/CHEZA",
-      "note": "Část označení lokality je zakryta kurzorem nebo oříznuta hranicí sloupce; bez odhadu."
+      "note": "TS/R 1613/CHEZA potvrzena uživatelem pro verzi 1.4.6."
     },
     {
       "cell": "BM36",
       "node": "21207044",
-      "location": null,
+      "location": "1613/CHEZA",
       "placement": "5A",
       "sources": [
-        "IMG_3559.HEIC"
+        "IMG_3559.HEIC",
+        "Uživatelem ověřené doplnění 1.4.6 (2026-10-27)"
       ],
       "mtpPrimary": 300,
       "mtpSecondary": 5,
       "mtpSource": "300/5",
-      "unverified": [
-        "location"
-      ],
+      "unverified": [],
       "locationSource": "1613/CHEZA",
-      "note": "Část označení lokality je zakryta kurzorem nebo oříznuta hranicí sloupce; bez odhadu."
+      "note": "TS/R 1613/CHEZA potvrzena uživatelem pro verzi 1.4.6."
     },
     {
       "cell": "BM37",
       "node": "21207033",
-      "location": null,
+      "location": "1613/CHEZA",
       "placement": "5b",
       "sources": [
-        "IMG_3559.HEIC"
+        "IMG_3559.HEIC",
+        "Uživatelem ověřené doplnění 1.4.6 (2026-10-27)"
       ],
       "mtpPrimary": 300,
       "mtpSecondary": 5,
       "mtpSource": "300/5",
-      "unverified": [
-        "location"
-      ],
+      "unverified": [],
       "locationSource": "1613/CHEZA",
-      "note": "Část označení lokality je zakryta kurzorem nebo oříznuta hranicí sloupce; bez odhadu."
+      "note": "TS/R 1613/CHEZA potvrzena uživatelem pro verzi 1.4.6."
     },
     {
       "cell": "BM38",
       "node": "21207055",
-      "location": null,
+      "location": "1613/CHEZA",
       "placement": "5B",
       "sources": [
-        "IMG_3559.HEIC"
+        "IMG_3559.HEIC",
+        "Uživatelem ověřené doplnění 1.4.6 (2026-10-27)"
       ],
       "mtpPrimary": 300,
       "mtpSecondary": 5,
       "mtpSource": "300/5",
-      "unverified": [
-        "location"
-      ],
+      "unverified": [],
       "locationSource": "1613/CHEZA",
-      "note": "Část označení lokality je zakryta kurzorem nebo oříznuta hranicí sloupce; bez odhadu."
+      "note": "TS/R 1613/CHEZA potvrzena uživatelem pro verzi 1.4.6."
     },
     {
       "cell": "BM39",
       "node": "21207045",
-      "location": null,
+      "location": "1613/CHEZA",
       "placement": "6A",
       "sources": [
-        "IMG_3559.HEIC"
+        "IMG_3559.HEIC",
+        "Uživatelem ověřené doplnění 1.4.6 (2026-10-27)"
       ],
       "mtpPrimary": 300,
       "mtpSecondary": 5,
       "mtpSource": "300/5",
-      "unverified": [
-        "location"
-      ],
+      "unverified": [],
       "locationSource": "1613/CHEZA",
-      "note": "Část označení lokality je zakryta kurzorem nebo oříznuta hranicí sloupce; bez odhadu."
+      "note": "TS/R 1613/CHEZA potvrzena uživatelem pro verzi 1.4.6."
     },
     {
       "cell": "BQ1",
@@ -11507,156 +11503,165 @@
     },
     {
       "cell": "CK7",
-      "node": null,
-      "location": "R 701",
-      "placement": "RWA1.5",
+      "node": "80620101",
+      "location": "R701",
+      "placement": "RWA1.05",
       "sources": [
         "IMG_3560.HEIC",
-        "IMG_3561.HEIC"
+        "IMG_3561.HEIC",
+        "Uživatelem ověřené doplnění 1.4.6 (2026-10-27)"
       ],
       "mtpPrimary": 1000,
       "mtpSecondary": 1,
       "mtpSource": "1000/1",
-      "unverified": [
-        "node"
-      ],
-      "note": "Prázdný, nejednoznačný nebo neověřený údaj ve zdroji. Bez odhadu."
+      "unverified": [],
+      "note": "UZEL, označení pole a vazba TS/R ověřeny uživatelem pro verzi 1.4.6.",
+      "locationSource": "R 701",
+      "placementSource": "RWA1.5"
     },
     {
       "cell": "CK8",
-      "node": null,
-      "location": "R 701",
-      "placement": "RWA1 p.7",
+      "node": "80620201",
+      "location": "R701",
+      "placement": "RWA1.07",
       "sources": [
         "IMG_3560.HEIC",
-        "IMG_3561.HEIC"
+        "IMG_3561.HEIC",
+        "Uživatelem ověřené doplnění 1.4.6 (2026-10-27)"
       ],
       "mtpPrimary": 1000,
       "mtpSecondary": 1,
       "mtpSource": "1000/1",
-      "unverified": [
-        "node"
-      ],
-      "note": "Prázdný, nejednoznačný nebo neověřený údaj ve zdroji. Bez odhadu."
+      "unverified": [],
+      "note": "UZEL, označení pole a vazba TS/R ověřeny uživatelem pro verzi 1.4.6.",
+      "locationSource": "R 701",
+      "placementSource": "RWA1 p.7"
     },
     {
       "cell": "CK9",
-      "node": null,
-      "location": "R 701",
-      "placement": "RWA1 p.9",
+      "node": "80620301",
+      "location": "R701",
+      "placement": "RWA1.09",
       "sources": [
         "IMG_3560.HEIC",
-        "IMG_3561.HEIC"
+        "IMG_3561.HEIC",
+        "Uživatelem ověřené doplnění 1.4.6 (2026-10-27)"
       ],
       "mtpPrimary": 1000,
       "mtpSecondary": 1,
       "mtpSource": "1000/1",
-      "unverified": [
-        "node"
-      ],
-      "note": "Prázdný, nejednoznačný nebo neověřený údaj ve zdroji. Bez odhadu."
+      "unverified": [],
+      "note": "UZEL, označení pole a vazba TS/R ověřeny uživatelem pro verzi 1.4.6.",
+      "locationSource": "R 701",
+      "placementSource": "RWA1 p.9"
     },
     {
       "cell": "CK10",
-      "node": null,
-      "location": "R 701",
-      "placement": "RWA1 p.11",
+      "node": "80620401",
+      "location": "R701",
+      "placement": "RWA1.11",
       "sources": [
         "IMG_3560.HEIC",
-        "IMG_3561.HEIC"
+        "IMG_3561.HEIC",
+        "Uživatelem ověřené doplnění 1.4.6 (2026-10-27)"
       ],
       "mtpPrimary": 250,
       "mtpSecondary": 1,
       "mtpSource": "250/1",
-      "unverified": [
-        "node"
-      ],
-      "note": "Prázdný, nejednoznačný nebo neověřený údaj ve zdroji. Bez odhadu."
+      "unverified": [],
+      "note": "UZEL, označení pole a vazba TS/R ověřeny uživatelem pro verzi 1.4.6.",
+      "locationSource": "R 701",
+      "placementSource": "RWA1 p.11"
     },
     {
       "cell": "CK11",
-      "node": null,
-      "location": "R 701",
-      "placement": "RWA1 p.13",
+      "node": "80620501",
+      "location": "R701",
+      "placement": "RWA1.13",
       "sources": [
         "IMG_3560.HEIC",
-        "IMG_3561.HEIC"
+        "IMG_3561.HEIC",
+        "Uživatelem ověřené doplnění 1.4.6 (2026-10-27)"
       ],
       "mtpPrimary": 250,
       "mtpSecondary": 1,
       "mtpSource": "250/1",
-      "unverified": [
-        "node"
-      ],
-      "note": "Prázdný, nejednoznačný nebo neověřený údaj ve zdroji. Bez odhadu."
+      "unverified": [],
+      "note": "UZEL, označení pole a vazba TS/R ověřeny uživatelem pro verzi 1.4.6.",
+      "locationSource": "R 701",
+      "placementSource": "RWA1 p.13"
     },
     {
       "cell": "CK12",
-      "node": null,
-      "location": "R 701",
-      "placement": "RWA1 p.15",
+      "node": "80620601",
+      "location": "R701",
+      "placement": "RWA1.15",
       "sources": [
         "IMG_3560.HEIC",
-        "IMG_3561.HEIC"
+        "IMG_3561.HEIC",
+        "Uživatelem ověřené doplnění 1.4.6 (2026-10-27)"
       ],
       "mtpPrimary": 250,
       "mtpSecondary": 1,
       "mtpSource": "250/1",
-      "unverified": [
-        "node"
-      ],
-      "note": "Prázdný, nejednoznačný nebo neověřený údaj ve zdroji. Bez odhadu."
+      "unverified": [],
+      "note": "UZEL, označení pole a vazba TS/R ověřeny uživatelem pro verzi 1.4.6.",
+      "locationSource": "R 701",
+      "placementSource": "RWA1 p.15"
     },
     {
       "cell": "CK13",
-      "node": null,
-      "location": "R 701",
-      "placement": "RWA1 p.17",
+      "node": "80620701",
+      "location": "R701",
+      "placement": "RWA1.17",
       "sources": [
         "IMG_3560.HEIC",
-        "IMG_3561.HEIC"
+        "IMG_3561.HEIC",
+        "Uživatelem ověřené doplnění 1.4.6 (2026-10-27)"
       ],
       "mtpPrimary": 1000,
       "mtpSecondary": 1,
       "mtpSource": "1000/1",
-      "unverified": [
-        "node"
-      ],
-      "note": "Prázdný, nejednoznačný nebo neověřený údaj ve zdroji. Bez odhadu."
+      "unverified": [],
+      "note": "UZEL, označení pole a vazba TS/R ověřeny uživatelem pro verzi 1.4.6.",
+      "locationSource": "R 701",
+      "placementSource": "RWA1 p.17"
     },
     {
       "cell": "CK14",
-      "node": null,
-      "location": "R 701",
-      "placement": "RWA1 p.19",
+      "node": "80620801",
+      "location": "R701",
+      "placement": "RWA1.19",
       "sources": [
         "IMG_3560.HEIC",
-        "IMG_3561.HEIC"
+        "IMG_3561.HEIC",
+        "Uživatelem ověřené doplnění 1.4.6 (2026-10-27)"
       ],
       "mtpPrimary": 250,
       "mtpSecondary": 1,
       "mtpSource": "250/1",
-      "unverified": [
-        "node"
-      ],
-      "note": "Prázdný, nejednoznačný nebo neověřený údaj ve zdroji. Bez odhadu."
+      "unverified": [],
+      "note": "UZEL, označení pole a vazba TS/R ověřeny uživatelem pro verzi 1.4.6.",
+      "locationSource": "R 701",
+      "placementSource": "RWA1 p.19"
     },
     {
       "cell": "CK15",
-      "node": null,
-      "location": "R 701",
-      "placement": "RWA1 p.21",
+      "node": "80620901",
+      "location": "R701",
+      "placement": "RWA1.21",
       "sources": [
         "IMG_3560.HEIC",
-        "IMG_3561.HEIC"
+        "IMG_3561.HEIC",
+        "Uživatelem ověřené doplnění 1.4.6 (2026-10-27)"
       ],
       "mtpPrimary": 250,
       "mtpSecondary": 1,
       "mtpSource": "250/1",
-      "unverified": [
-        "node"
-      ],
-      "note": "Prázdný, nejednoznačný nebo neověřený údaj ve zdroji. Bez odhadu."
+      "unverified": [],
+      "note": "UZEL, označení pole a vazba TS/R ověřeny uživatelem pro verzi 1.4.6.",
+      "locationSource": "R 701",
+      "placementSource": "RWA1 p.21"
     },
     {
       "cell": "CK16",
@@ -11814,122 +11819,122 @@
     },
     {
       "cell": "CK27",
-      "node": null,
-      "location": "R 701",
+      "node": "80640101",
+      "location": "R701",
       "placement": "RWB1.29",
       "sources": [
         "IMG_3560.HEIC",
-        "IMG_3561.HEIC"
+        "IMG_3561.HEIC",
+        "Uživatelem ověřené doplnění 1.4.6 (2026-10-27)"
       ],
       "mtpPrimary": 1000,
       "mtpSecondary": 1,
       "mtpSource": "1000/1",
-      "unverified": [
-        "node"
-      ],
-      "note": "Prázdný, nejednoznačný nebo neověřený údaj ve zdroji. Bez odhadu."
+      "unverified": [],
+      "note": "UZEL, označení pole a vazba TS/R ověřeny uživatelem pro verzi 1.4.6.",
+      "locationSource": "R 701"
     },
     {
       "cell": "CK28",
-      "node": null,
-      "location": "R 701",
+      "node": "80640201",
+      "location": "R701",
       "placement": "RWB1.31",
       "sources": [
         "IMG_3560.HEIC",
-        "IMG_3561.HEIC"
+        "IMG_3561.HEIC",
+        "Uživatelem ověřené doplnění 1.4.6 (2026-10-27)"
       ],
       "mtpPrimary": 1000,
       "mtpSecondary": 1,
       "mtpSource": "1000/1",
-      "unverified": [
-        "node"
-      ],
-      "note": "Prázdný, nejednoznačný nebo neověřený údaj ve zdroji. Bez odhadu."
+      "unverified": [],
+      "note": "UZEL, označení pole a vazba TS/R ověřeny uživatelem pro verzi 1.4.6.",
+      "locationSource": "R 701"
     },
     {
       "cell": "CK29",
-      "node": null,
-      "location": "R 701",
+      "node": "80640301",
+      "location": "R701",
       "placement": "RWB1.33",
       "sources": [
         "IMG_3560.HEIC",
-        "IMG_3561.HEIC"
+        "IMG_3561.HEIC",
+        "Uživatelem ověřené doplnění 1.4.6 (2026-10-27)"
       ],
       "mtpPrimary": 600,
       "mtpSecondary": 1,
       "mtpSource": "600/1",
-      "unverified": [
-        "node"
-      ],
-      "note": "Prázdný, nejednoznačný nebo neověřený údaj ve zdroji. Bez odhadu."
+      "unverified": [],
+      "note": "UZEL, označení pole a vazba TS/R ověřeny uživatelem pro verzi 1.4.6.",
+      "locationSource": "R 701"
     },
     {
       "cell": "CK30",
-      "node": null,
-      "location": "R 701",
+      "node": "80640501",
+      "location": "R701",
       "placement": "RWB1.37",
       "sources": [
         "IMG_3560.HEIC",
-        "IMG_3561.HEIC"
+        "IMG_3561.HEIC",
+        "Uživatelem ověřené doplnění 1.4.6 (2026-10-27)"
       ],
       "mtpPrimary": 250,
       "mtpSecondary": 1,
       "mtpSource": "250/1",
-      "unverified": [
-        "node"
-      ],
-      "note": "Prázdný, nejednoznačný nebo neověřený údaj ve zdroji. Bez odhadu."
+      "unverified": [],
+      "note": "UZEL, označení pole a vazba TS/R ověřeny uživatelem pro verzi 1.4.6.",
+      "locationSource": "R 701"
     },
     {
       "cell": "CK31",
-      "node": null,
-      "location": "R 701",
+      "node": "80640601",
+      "location": "R701",
       "placement": "RWB1.39",
       "sources": [
         "IMG_3560.HEIC",
-        "IMG_3561.HEIC"
+        "IMG_3561.HEIC",
+        "Uživatelem ověřené doplnění 1.4.6 (2026-10-27)"
       ],
       "mtpPrimary": 250,
       "mtpSecondary": 1,
       "mtpSource": "250/1",
-      "unverified": [
-        "node"
-      ],
-      "note": "Prázdný, nejednoznačný nebo neověřený údaj ve zdroji. Bez odhadu."
+      "unverified": [],
+      "note": "UZEL, označení pole a vazba TS/R ověřeny uživatelem pro verzi 1.4.6.",
+      "locationSource": "R 701"
     },
     {
       "cell": "CK32",
-      "node": null,
-      "location": "R 701",
+      "node": "80640701",
+      "location": "R701",
       "placement": "RWB1.41",
       "sources": [
         "IMG_3560.HEIC",
-        "IMG_3561.HEIC"
+        "IMG_3561.HEIC",
+        "Uživatelem ověřené doplnění 1.4.6 (2026-10-27)"
       ],
       "mtpPrimary": 250,
       "mtpSecondary": 1,
       "mtpSource": "250/1",
-      "unverified": [
-        "node"
-      ],
-      "note": "Prázdný, nejednoznačný nebo neověřený údaj ve zdroji. Bez odhadu."
+      "unverified": [],
+      "note": "UZEL, označení pole a vazba TS/R ověřeny uživatelem pro verzi 1.4.6.",
+      "locationSource": "R 701"
     },
     {
       "cell": "CK33",
-      "node": null,
-      "location": "R 701",
+      "node": "80640801",
+      "location": "R701",
       "placement": "RWB1.43",
       "sources": [
         "IMG_3560.HEIC",
-        "IMG_3561.HEIC"
+        "IMG_3561.HEIC",
+        "Uživatelem ověřené doplnění 1.4.6 (2026-10-27)"
       ],
       "mtpPrimary": 1000,
       "mtpSecondary": 1,
       "mtpSource": "1000/1",
-      "unverified": [
-        "node"
-      ],
-      "note": "Prázdný, nejednoznačný nebo neověřený údaj ve zdroji. Bez odhadu."
+      "unverified": [],
+      "note": "UZEL, označení pole a vazba TS/R ověřeny uživatelem pro verzi 1.4.6.",
+      "locationSource": "R 701"
     },
     {
       "cell": "CK34",
@@ -12045,37 +12050,39 @@
     },
     {
       "cell": "CO3",
-      "node": null,
-      "location": "R 702",
-      "placement": "RWC p.1",
+      "node": "80610201",
+      "location": "R702",
+      "placement": "RWC.1 T108",
       "sources": [
         "IMG_3560.HEIC",
-        "IMG_3561.HEIC"
+        "IMG_3561.HEIC",
+        "Uživatelem ověřené doplnění 1.4.6 (2026-10-27)"
       ],
       "mtpPrimary": 4000,
       "mtpSecondary": 1,
       "mtpSource": "4000/1",
-      "unverified": [
-        "node"
-      ],
-      "note": "Prázdný, nejednoznačný nebo neověřený údaj ve zdroji. Bez odhadu."
+      "unverified": [],
+      "note": "UZEL, označení pole a vazba TS/R ověřeny uživatelem pro verzi 1.4.6.",
+      "locationSource": "R 702",
+      "placementSource": "RWC p.1"
     },
     {
       "cell": "CO4",
-      "node": null,
-      "location": "R 702",
-      "placement": "RWC p.4",
+      "node": "80610102",
+      "location": "R702",
+      "placement": "RWC.4 TG12",
       "sources": [
         "IMG_3560.HEIC",
-        "IMG_3561.HEIC"
+        "IMG_3561.HEIC",
+        "Uživatelem ověřené doplnění 1.4.6 (2026-10-27)"
       ],
       "mtpPrimary": 4000,
       "mtpSecondary": 1,
       "mtpSource": "4000/1",
-      "unverified": [
-        "node"
-      ],
-      "note": "Prázdný, nejednoznačný nebo neověřený údaj ve zdroji. Bez odhadu."
+      "unverified": [],
+      "note": "UZEL, označení pole a vazba TS/R ověřeny uživatelem pro verzi 1.4.6.",
+      "locationSource": "R 702",
+      "placementSource": "RWC p.4"
     },
     {
       "cell": "CO5",
@@ -12247,173 +12254,183 @@
     },
     {
       "cell": "CO17",
-      "node": null,
-      "location": "R 702",
-      "placement": "RWD1 p.31",
+      "node": "80680101",
+      "location": "R702",
+      "placement": "RWD1.31",
       "sources": [
         "IMG_3560.HEIC",
-        "IMG_3561.HEIC"
+        "IMG_3561.HEIC",
+        "Uživatelem ověřené doplnění 1.4.6 (2026-10-27)"
       ],
       "mtpPrimary": 1000,
       "mtpSecondary": 1,
       "mtpSource": "1000/1",
-      "unverified": [
-        "node"
-      ],
-      "note": "Prázdný, nejednoznačný nebo neověřený údaj ve zdroji. Bez odhadu."
+      "unverified": [],
+      "note": "UZEL, označení pole a vazba TS/R ověřeny uživatelem pro verzi 1.4.6.",
+      "locationSource": "R 702",
+      "placementSource": "RWD1 p.31"
     },
     {
       "cell": "CO18",
-      "node": null,
-      "location": "R 702",
-      "placement": "RWD1 p.33",
+      "node": "80680201",
+      "location": "R702",
+      "placement": "RWD1.33",
       "sources": [
         "IMG_3560.HEIC",
-        "IMG_3561.HEIC"
+        "IMG_3561.HEIC",
+        "Uživatelem ověřené doplnění 1.4.6 (2026-10-27)"
       ],
       "mtpPrimary": 1000,
       "mtpSecondary": 1,
       "mtpSource": "1000/1",
-      "unverified": [
-        "node"
-      ],
-      "note": "Prázdný, nejednoznačný nebo neověřený údaj ve zdroji. Bez odhadu."
+      "unverified": [],
+      "note": "UZEL, označení pole a vazba TS/R ověřeny uživatelem pro verzi 1.4.6.",
+      "locationSource": "R 702",
+      "placementSource": "RWD1 p.33"
     },
     {
       "cell": "CO19",
-      "node": null,
-      "location": "R 702",
-      "placement": "RWD1 p.35",
+      "node": "80680301",
+      "location": "R702",
+      "placement": "RWD1.35",
       "sources": [
         "IMG_3560.HEIC",
-        "IMG_3561.HEIC"
+        "IMG_3561.HEIC",
+        "Uživatelem ověřené doplnění 1.4.6 (2026-10-27)"
       ],
       "mtpPrimary": 1000,
       "mtpSecondary": 1,
       "mtpSource": "1000/1",
-      "unverified": [
-        "node"
-      ],
-      "note": "Prázdný, nejednoznačný nebo neověřený údaj ve zdroji. Bez odhadu."
+      "unverified": [],
+      "note": "UZEL, označení pole a vazba TS/R ověřeny uživatelem pro verzi 1.4.6.",
+      "locationSource": "R 702",
+      "placementSource": "RWD1 p.35"
     },
     {
       "cell": "CO20",
-      "node": null,
-      "location": "R 702",
-      "placement": "RWD1 p.37",
+      "node": "80680401",
+      "location": "R702",
+      "placement": "RWD1.37",
       "sources": [
         "IMG_3560.HEIC",
-        "IMG_3561.HEIC"
+        "IMG_3561.HEIC",
+        "Uživatelem ověřené doplnění 1.4.6 (2026-10-27)"
       ],
       "mtpPrimary": 250,
       "mtpSecondary": 1,
       "mtpSource": "250/1",
-      "unverified": [
-        "node"
-      ],
-      "note": "Prázdný, nejednoznačný nebo neověřený údaj ve zdroji. Bez odhadu."
+      "unverified": [],
+      "note": "UZEL, označení pole a vazba TS/R ověřeny uživatelem pro verzi 1.4.6.",
+      "locationSource": "R 702",
+      "placementSource": "RWD1 p.37"
     },
     {
       "cell": "CO21",
-      "node": null,
-      "location": "R 702",
-      "placement": "RWD1 p.39",
+      "node": "80680501",
+      "location": "R702",
+      "placement": "RWD1.39",
       "sources": [
         "IMG_3560.HEIC",
-        "IMG_3561.HEIC"
+        "IMG_3561.HEIC",
+        "Uživatelem ověřené doplnění 1.4.6 (2026-10-27)"
       ],
       "mtpPrimary": 250,
       "mtpSecondary": 1,
       "mtpSource": "250/1",
-      "unverified": [
-        "node"
-      ],
-      "note": "Prázdný, nejednoznačný nebo neověřený údaj ve zdroji. Bez odhadu."
+      "unverified": [],
+      "note": "UZEL, označení pole a vazba TS/R ověřeny uživatelem pro verzi 1.4.6.",
+      "locationSource": "R 702",
+      "placementSource": "RWD1 p.39"
     },
     {
       "cell": "CO22",
-      "node": null,
-      "location": "R 702",
-      "placement": "RWD1 p.41",
+      "node": "80680601",
+      "location": "R702",
+      "placement": "RWD1.41",
       "sources": [
         "IMG_3560.HEIC",
-        "IMG_3561.HEIC"
+        "IMG_3561.HEIC",
+        "Uživatelem ověřené doplnění 1.4.6 (2026-10-27)"
       ],
       "mtpPrimary": 250,
       "mtpSecondary": 1,
       "mtpSource": "250/1",
-      "unverified": [
-        "node"
-      ],
-      "note": "Prázdný, nejednoznačný nebo neověřený údaj ve zdroji. Bez odhadu."
+      "unverified": [],
+      "note": "UZEL, označení pole a vazba TS/R ověřeny uživatelem pro verzi 1.4.6.",
+      "locationSource": "R 702",
+      "placementSource": "RWD1 p.41"
     },
     {
       "cell": "CO23",
-      "node": null,
-      "location": "R 702",
-      "placement": "RWD1 p.43",
+      "node": "80680701",
+      "location": "R702",
+      "placement": "RWD1.43",
       "sources": [
         "IMG_3560.HEIC",
-        "IMG_3561.HEIC"
+        "IMG_3561.HEIC",
+        "Uživatelem ověřené doplnění 1.4.6 (2026-10-27)"
       ],
       "mtpPrimary": 250,
       "mtpSecondary": 1,
       "mtpSource": "250/1",
-      "unverified": [
-        "node"
-      ],
-      "note": "Prázdný, nejednoznačný nebo neověřený údaj ve zdroji. Bez odhadu."
+      "unverified": [],
+      "note": "UZEL, označení pole a vazba TS/R ověřeny uživatelem pro verzi 1.4.6.",
+      "locationSource": "R 702",
+      "placementSource": "RWD1 p.43"
     },
     {
       "cell": "CO24",
-      "node": null,
-      "location": "R 702",
-      "placement": "RWD1 p.45",
+      "node": "80680801",
+      "location": "R702",
+      "placement": "RWD1.45",
       "sources": [
         "IMG_3560.HEIC",
-        "IMG_3561.HEIC"
+        "IMG_3561.HEIC",
+        "Uživatelem ověřené doplnění 1.4.6 (2026-10-27)"
       ],
       "mtpPrimary": 250,
       "mtpSecondary": 1,
       "mtpSource": "250/1",
-      "unverified": [
-        "node"
-      ],
-      "note": "Prázdný, nejednoznačný nebo neověřený údaj ve zdroji. Bez odhadu."
+      "unverified": [],
+      "note": "UZEL, označení pole a vazba TS/R ověřeny uživatelem pro verzi 1.4.6.",
+      "locationSource": "R 702",
+      "placementSource": "RWD1 p.45"
     },
     {
       "cell": "CO25",
-      "node": null,
-      "location": "R 702",
-      "placement": "RWD1 p.47",
+      "node": "80680901",
+      "location": "R702",
+      "placement": "RWD1.47",
       "sources": [
         "IMG_3560.HEIC",
-        "IMG_3561.HEIC"
+        "IMG_3561.HEIC",
+        "Uživatelem ověřené doplnění 1.4.6 (2026-10-27)"
       ],
       "mtpPrimary": 250,
       "mtpSecondary": 1,
       "mtpSource": "250/1",
-      "unverified": [
-        "node"
-      ],
-      "note": "Prázdný, nejednoznačný nebo neověřený údaj ve zdroji. Bez odhadu."
+      "unverified": [],
+      "note": "UZEL, označení pole a vazba TS/R ověřeny uživatelem pro verzi 1.4.6.",
+      "locationSource": "R 702",
+      "placementSource": "RWD1 p.47"
     },
     {
       "cell": "CO26",
-      "node": null,
-      "location": "R 702",
-      "placement": "RWD1 p.49",
+      "node": "80681001",
+      "location": "R702",
+      "placement": "RWD1.49",
       "sources": [
         "IMG_3560.HEIC",
-        "IMG_3561.HEIC"
+        "IMG_3561.HEIC",
+        "Uživatelem ověřené doplnění 1.4.6 (2026-10-27)"
       ],
       "mtpPrimary": 750,
       "mtpSecondary": 1,
       "mtpSource": "750/1",
-      "unverified": [
-        "node"
-      ],
-      "note": "Prázdný, nejednoznačný nebo neověřený údaj ve zdroji. Bez odhadu."
+      "unverified": [],
+      "note": "UZEL, označení pole a vazba TS/R ověřeny uživatelem pro verzi 1.4.6.",
+      "locationSource": "R 702",
+      "placementSource": "RWD1 p.49"
     },
     {
       "cell": "CO27",

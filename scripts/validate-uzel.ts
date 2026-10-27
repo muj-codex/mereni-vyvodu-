@@ -1,12 +1,13 @@
+import { version } from '../package.json';
 import { writeFileSync } from 'node:fs';
 import { validateDirectory } from '../src/series/reference/directory';
 const r = validateDirectory();
-writeFileSync('docs/uzel-validation-1.4.4.json', JSON.stringify(r, null, 2) + '\n');
+writeFileSync(`docs/uzel-validation-${version}.json`, JSON.stringify(r, null, 2) + '\n');
 const list = (items: typeof r.duplicateNodes) =>
   items.map((g) => `| ${g.key} | ${g.cells.join(', ')} |`).join('\n');
-const text = `# Validace referenčního datasetu UZEL – 1.4.4
+const text = `# Validace referenčního datasetu UZEL – ${version}
 
-Zdroj: pět uživatelských fotografií IMG_3557–IMG_3561.HEIC, list List1. SHA-256 zdrojů a vazba každého záznamu na buňku původního listu jsou v src/series/reference/uzel.json. Přepis ručně ověřen proti fotografiím, bez dopočítávání identifikátorů. Překryvy stejné buňky na více fotografiích jsou sloučeny; opakované bloky Q/U/Y v původním listu zůstávají samostatnými záznamy.
+Zdroj: pět uživatelských fotografií IMG_3557–IMG_3561.HEIC, list List1. SHA-256 zdrojů a vazba každého záznamu na buňku původního listu jsou v src/series/reference/uzel.json. Původní přepis ručně ověřen proti fotografiím, bez dopočítávání identifikátorů. Verze 1.4.6 doplňuje uživatelem výslovně ověřených devět lokalit CHEZA a 28 UZLŮ R701/R702 podle zadání z 27. 10. 2026; původní zápis a oba zdroje jsou zachovány v metadatech. Překryvy stejné buňky na více fotografiích jsou sloučeny; opakované bloky Q/U/Y v původním listu zůstávají samostatnými záznamy.
 
 | Ukazatel | Počet |
 | --- | ---: |
@@ -45,9 +46,9 @@ ${r.incomplete.map((v) => `| ${v.cell} | ${v.node ?? 'null'} | ${v.unverified.jo
 
 Nečitelné, zakryté, oříznuté a prázdné buňky jsou null. Nestandardní MTP AC10, AC11, AC35, AG11, BU29 a BU33 zůstávají bez ověřeného převodu; původní viditelný text je zachován. MTP primární obsahuje jen ověřený čitatel převodu. Rozlišují se malá a velká písmena umístění (například 10a / 10A); nejde o jednu vazbu.
 
-Při konfliktní vazbě se nepředvyplní žádný odvozený údaj, ani při zpětném hledání. Shodné duplicity umožňují jednoznačnou vazbu. U neúplného jednoznačného řádku se předvyplní jen ověřené buňky. UZEL se neodvozuje ze sousedních řádků. Dataset se používá pouze při editaci stávajících polí prvního odečtu, bez změny uložených dat, importu Energisu, hlavní identifikace Měření nebo výpočetního jádra. MTP elektroměru se nepřepisuje.
+Při konfliktní vazbě se nepředvyplní žádný odvozený údaj, ani při zpětném hledání. Shodné duplicity umožňují jednoznačnou vazbu. U neúplného jednoznačného řádku se předvyplní jen ověřené buňky. UZEL se neodvozuje ze sousedních řádků. Dataset používá společná existující vrstva autofillu hlavní Identifikace měření a vstupních formulářů odečtů. Nemění se uložená měření, import Energisu ani výpočetní jádro. MTP elektroměru se nepřepisuje.
 `;
-writeFileSync('docs/uzel-validation-1.4.4.md', text);
+writeFileSync(`docs/uzel-validation-${version}.md`, text);
 console.log(
   JSON.stringify(
     {

@@ -330,3 +330,13 @@ Jednoznačný UZEL doplní ověřené umístění a MTP primární; jednoznačn�
 Pod identifikací se zobrazuje „Vazba ověřena podle referenčních dat.“ nebo malé červené „Vazba UZEL ↔ TS/R ↔ pole ↔ MTP není ověřena. Zkontrolujte zadané hodnoty.“ Stav vychází ze současných hodnot všech čtyř polí, nikoli z posledního úspěšného hledání. Nejednoznačné a neúplné zdroje nemají ověřený stav. Prázdný formulář nevaruje. Hláška neblokuje měření; UZEL není povinný a ruční TS/pole/MTP zůstávají použitelné.
 
 Vyčištěné MTP je skutečně prázdné, bez skrytého náhradního převodu. MTP elektroměru zůstává nezávislé. Původ hodnot hlavního formuláře se zachovává v existujícím pracovním draftu i po reloadu. Úprava dalšího vývodu série nemění již uložený vývod. Výpočty Měření, ORLEN 1.4.4, datový model IndexedDB a backup/restore se nemění; jejich soubory a původní dataset chrání i přesné SHA-256 regression testy proti 1.4.4.
+
+## Verze 1.4.6 – CHEZA, ověřené UZLY R701/R702 a označení 2T
+
+U devíti existujících řádků CHEZA (BM31–BM39, UZEL 21207020 / pole 3a až UZEL 21207045 / pole 6A) je doplněna uživatelem potvrzená lokalita `1613/CHEZA`. Jejich UZLY, pole a MTP zůstávají stejné. Celá skupina má 24 obousměrně dohledatelných vývodů; `5a/5A`, `5b/5B` a `10a/10A` zůstávají různé vývody.
+
+Dodaných 28 UZLŮ R701/R702 doplňuje 28 již existujících neúplných řádků bez UZLU. Nevznikají duplicitní řádky, které by zneplatnily zpětnou vazbu. Používají se výslovně dodaná označení RWA/RWB/RWC/RWD a původní ověřené MTP se sekundárem 1 A. Původní zápis z fotografií je zachován v metadatech spolu s novým uživatelským zdrojem. `80640401 / RWB1.35` se nevytváří. Příklad `80680701 ↔ R702 / RWD1.43 / 250/1` funguje společnou stávající logikou autofillu; MTP elektroměru zůstává nezávislé.
+
+Paušální připojení zobrazuje `C25d · 2T` a `C45d · 2T`. Interní hodnoty voleb zůstávají `C25d` a `C45d`; seznam, ceny a výpočty se nemění. Elektrotechnické jádro, obecná logika vazeb, odečty, Energis, Stylus, historie a backup nejsou změněny. Kontrola SHA-256 zachovává původní baseline 1.4.4, ověřuje přesný rozsah schválených změn dat a textu a teprve tyto změny při porovnání vrací do původního tvaru.
+
+`npm run validate:uzel` vytváří report pro aktuální aplikační verzi; historické reporty zůstávají zachovány. [Validace 1.4.6](docs/uzel-validation-1.4.6.md): 994 referenčních řádků, 908 různých čitelných UZLŮ, 981 úplných a 13 neúplných záznamů. Původní duplicity a konflikt 21201042 jsou beze změn, nové konflikty nevznikají.

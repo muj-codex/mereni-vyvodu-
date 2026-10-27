@@ -15,10 +15,10 @@ describe('photo-backed reference directory', () => {
     const r = validateDirectory();
     expect(r).toMatchObject({
       sheetRecords: 994,
-      recordsWithNode: 959,
-      distinctNodes: 880,
-      completeRecords: 944,
-      incompleteRecords: 50,
+      recordsWithNode: 987,
+      distinctNodes: 908,
+      completeRecords: 981,
+      incompleteRecords: 13,
     });
     expect(r.duplicateNodes).toHaveLength(40);
     expect(r.conflictingNodes.map((v) => v.key)).toEqual(['21201042']);
@@ -33,7 +33,7 @@ describe('photo-backed reference directory', () => {
     });
   });
   it('does not silently infer missing UZELs, clipped locations or unusual MTP notation', () => {
-    expect(uzelDirectory.find((r) => r.cell === 'CK7')!.node).toBeNull();
+    expect(uzelDirectory.find((r) => r.cell === 'CO27')!.node).toBeNull();
     expect(uzelDirectory.find((r) => r.cell === 'E30')!.location).toBeNull();
     expect(uzelDirectory.find((r) => r.cell === 'AC10')).toMatchObject({
       mtpPrimary: null,
