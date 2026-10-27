@@ -1,0 +1,190 @@
+{
+  "metadata": {
+    "supplier": "ČEZ ESCO",
+    "productName": "Elektřina 24",
+    "customerType": "C",
+    "pricingType": "fixed",
+    "fixationMonths": 24,
+    "coverage": "nationwide",
+    "distributionArea": "Všechna distribuční území",
+    "validFrom": "2026-06-01",
+    "deliveriesStartedFrom": "2026-06-01",
+    "lastVerifiedAt": "2026-10-27",
+    "sourceFile": "20260630-esco_cenik_elektrina_mop-12_24_36.pdf",
+    "sourceType": "pdf",
+    "sourcePage": 1,
+    "sha256": "bc3a476932c3a36e99f084db7831dec68df62a2a7c3010ea5152805316b3f604",
+    "vatConvention": "main-with-vat; parentheses-without-vat"
+  },
+  "tariffs": {
+    "C01d": {
+      "sourceTariffLabel": "C01d",
+      "vtPerMwh": {
+        "priceWithVat": 3460.6,
+        "priceWithoutVat": 2860.0
+      },
+      "ntPerMwh": null,
+      "supplierFixedMonthly": {
+        "priceWithVat": 114.95,
+        "priceWithoutVat": 95.0
+      }
+    },
+    "C02d": {
+      "sourceTariffLabel": "C02d",
+      "vtPerMwh": {
+        "priceWithVat": 3460.6,
+        "priceWithoutVat": 2860.0
+      },
+      "ntPerMwh": null,
+      "supplierFixedMonthly": {
+        "priceWithVat": 114.95,
+        "priceWithoutVat": 95.0
+      }
+    },
+    "C03d": {
+      "sourceTariffLabel": "C03d",
+      "vtPerMwh": {
+        "priceWithVat": 3460.6,
+        "priceWithoutVat": 2860.0
+      },
+      "ntPerMwh": null,
+      "supplierFixedMonthly": {
+        "priceWithVat": 114.95,
+        "priceWithoutVat": 95.0
+      }
+    },
+    "C25d": {
+      "sourceTariffLabel": "C25d",
+      "vtPerMwh": {
+        "priceWithVat": 3435.19,
+        "priceWithoutVat": 2839.0
+      },
+      "ntPerMwh": {
+        "priceWithVat": 3435.19,
+        "priceWithoutVat": 2839.0
+      },
+      "supplierFixedMonthly": {
+        "priceWithVat": 114.95,
+        "priceWithoutVat": 95.0
+      }
+    },
+    "C26d": {
+      "sourceTariffLabel": "C26d",
+      "vtPerMwh": {
+        "priceWithVat": 3435.19,
+        "priceWithoutVat": 2839.0
+      },
+      "ntPerMwh": {
+        "priceWithVat": 3435.19,
+        "priceWithoutVat": 2839.0
+      },
+      "supplierFixedMonthly": {
+        "priceWithVat": 114.95,
+        "priceWithoutVat": 95.0
+      }
+    },
+    "C27d": {
+      "sourceTariffLabel": "C27d",
+      "vtPerMwh": {
+        "priceWithVat": 3435.19,
+        "priceWithoutVat": 2839.0
+      },
+      "ntPerMwh": {
+        "priceWithVat": 3435.19,
+        "priceWithoutVat": 2839.0
+      },
+      "supplierFixedMonthly": {
+        "priceWithVat": 114.95,
+        "priceWithoutVat": 95.0
+      }
+    },
+    "C35d": {
+      "sourceTariffLabel": "C35d",
+      "vtPerMwh": {
+        "priceWithVat": 3435.19,
+        "priceWithoutVat": 2839.0
+      },
+      "ntPerMwh": {
+        "priceWithVat": 3435.19,
+        "priceWithoutVat": 2839.0
+      },
+      "supplierFixedMonthly": {
+        "priceWithVat": 114.95,
+        "priceWithoutVat": 95.0
+      }
+    },
+    "C45d": {
+      "sourceTariffLabel": "C45d*",
+      "vtPerMwh": {
+        "priceWithVat": 3493.27,
+        "priceWithoutVat": 2887.0
+      },
+      "ntPerMwh": {
+        "priceWithVat": 3493.27,
+        "priceWithoutVat": 2887.0
+      },
+      "supplierFixedMonthly": {
+        "priceWithVat": 114.95,
+        "priceWithoutVat": 95.0
+      }
+    },
+    "C46d": {
+      "sourceTariffLabel": "C46d",
+      "vtPerMwh": {
+        "priceWithVat": 3493.27,
+        "priceWithoutVat": 2887.0
+      },
+      "ntPerMwh": {
+        "priceWithVat": 3493.27,
+        "priceWithoutVat": 2887.0
+      },
+      "supplierFixedMonthly": {
+        "priceWithVat": 114.95,
+        "priceWithoutVat": 95.0
+      }
+    },
+    "C55d": {
+      "sourceTariffLabel": "C55d",
+      "vtPerMwh": {
+        "priceWithVat": 3493.27,
+        "priceWithoutVat": 2887.0
+      },
+      "ntPerMwh": {
+        "priceWithVat": 3493.27,
+        "priceWithoutVat": 2887.0
+      },
+      "supplierFixedMonthly": {
+        "priceWithVat": 114.95,
+        "priceWithoutVat": 95.0
+      }
+    },
+    "C56d": {
+      "sourceTariffLabel": "C56d",
+      "vtPerMwh": {
+        "priceWithVat": 3493.27,
+        "priceWithoutVat": 2887.0
+      },
+      "ntPerMwh": {
+        "priceWithVat": 3493.27,
+        "priceWithoutVat": 2887.0
+      },
+      "supplierFixedMonthly": {
+        "priceWithVat": 114.95,
+        "priceWithoutVat": 95.0
+      }
+    },
+    "C62d": {
+      "sourceTariffLabel": "C62d",
+      "vtPerMwh": {
+        "priceWithVat": 3460.6,
+        "priceWithoutVat": 2860.0
+      },
+      "ntPerMwh": null,
+      "supplierFixedMonthly": {
+        "priceWithVat": 114.95,
+        "priceWithoutVat": 95.0
+      }
+    }
+  },
+  "unimported": []
+}

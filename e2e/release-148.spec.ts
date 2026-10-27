@@ -132,10 +132,10 @@ test('expanded C46d distribution is shared with ESCO only for the verified area 
   await s.getByLabel('Distribuční oblast', { exact: true }).selectOption('ČEZ Distribuce');
   await s.getByRole('button', { name: 'VYHODNOTIT', exact: true }).click();
   const eon = s.getByRole('region', { name: 'E.ON firmy Variant', exact: true });
-  const esco = s.getByRole('region', { name: 'ČEZ ESCO SPOT', exact: true });
+  const esco = s.getByRole('region', { name: 'ČEZ ESCO Elektřina 24', exact: true });
   const net =
-    10.95 * (3863 + 28.3 + 164.24) + 3.65 * 3124.85 + 7.3 * 116.5 + 12 * (95 + 2368 + 12.87);
-  await expect(esco.getByLabel('Roční cena ČEZ', { exact: true })).toContainText(
+    10.95 * (2887 + 28.3 + 164.24) + 3.65 * 3124.85 + 7.3 * 116.5 + 12 * (95 + 2368 + 12.87);
+  await expect(esco.getByLabel('Roční cena Elektřina 24', { exact: true })).toContainText(
     `${fmt(net * 1.21)} Kč/rok`,
   );
   await expect(eon.getByLabel('Roční položky E.ON Variant', { exact: true })).toContainText(
@@ -145,10 +145,10 @@ test('expanded C46d distribution is shared with ESCO only for the verified area 
   await s.getByRole('button', { name: '← Zpět', exact: true }).click();
   await s.getByLabel('Distribuční oblast', { exact: true }).selectOption('EG.D');
   await s.getByRole('button', { name: 'VYHODNOTIT', exact: true }).click();
-  await expect(esco.getByLabel('Roční cena ČEZ', { exact: true })).toHaveCount(0);
+  await expect(esco.getByLabel('Roční cena Elektřina 24', { exact: true })).toHaveCount(0);
   await expect(eon.getByLabel('Roční cena E.ON Variant', { exact: true })).toHaveCount(0);
 });
-test('ESCO keeps its 20-day check while fixed E.ON Variant has no SPOT refresh requirement', async ({
+test('both main business alternatives remain fixed after the former SPOT review date', async ({
   page,
 }) => {
   await page.clock.setFixedTime(new Date('2026-11-16T12:00:00Z'));
@@ -156,15 +156,14 @@ test('ESCO keeps its 20-day check while fixed E.ON Variant has no SPOT refresh r
   await fillFlat(page);
   const s = rates(page);
   await s.getByRole('button', { name: 'POKRAČOVAT K POROVNÁNÍ', exact: true }).click();
-  const esco = s.getByRole('region', { name: 'ČEZ ESCO SPOT', exact: true });
-  await expect(esco).toContainText('Doporučena kontrola ceníku.');
-  await expect(esco).toContainText('2026-11-16');
-  await expect(esco).toContainText('3 850 Kč/MWh');
+  const esco = s.getByRole('region', { name: 'ČEZ ESCO Elektřina 24', exact: true });
+  await expect(esco).toContainText('Fixace 24 měsíců');
+  await expect(esco).toContainText('2 860 Kč/MWh');
+  await expect(esco).not.toContainText('Doporučena kontrola ceníku.');
   const variant = s.getByRole('region', { name: 'E.ON firmy Variant', exact: true });
   await expect(variant).toContainText('Fixace 2 roky');
-  await expect(variant).not.toContainText('Doporučena kontrola ceníku.');
   await expect(variant.getByLabel('Roční cena E.ON Variant', { exact: true })).toBeVisible();
-  await expect(s.getByRole('region', { name: 'E.ON firmy SPOT', exact: true })).toHaveCount(0);
+  await expect(s).not.toContainText(/SPOT(?![\p{L}])|září 2026/u);
   await expect(
     variant.getByRole('button', { name: 'AKTUALIZOVAT CENÍK', exact: true }),
   ).toHaveCount(0);

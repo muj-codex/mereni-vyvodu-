@@ -37,7 +37,7 @@ export function EonVariantPrices({ context }: { context: ComparisonContext }) {
             value={choice}
             onChange={(e) => setChoice(e.target.value)}
           >
-            {companyTariffCodes.map((c) => (
+            {companyTariffCodes.filter((c) => c !== 'C55d').map((c) => (
               <option key={c} value={c}>
                 {c}
                 {!['C01d', 'C02d', 'C03d', 'C62d'].includes(c) ? ' · 2T' : ''}
@@ -166,7 +166,7 @@ export function EonVariantPrices({ context }: { context: ComparisonContext }) {
           </p>
         )}
         <p className="hint">
-          ČEZ ESCO je SPOT · orientační scénář podle září 2026, nikoli garantovaná roční pevná cena.
+          ČEZ ESCO Elektřina 24 je pevný produkt s fixací na 24 měsíců.
           Cenové pořadí nepotvrzuje technický nárok na sazbu.
         </p>
       </section>

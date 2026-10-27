@@ -1,0 +1,38 @@
+{
+  "src/tariffs/CezPrices.tsx": [
+    {
+      "before": "import { useState } from 'react';",
+      "after": "import { useState } from 'react';\nimport { EscoElectricity24Prices } from './EscoElectricity24Prices';"
+    },
+    {
+      "before": "<EscoPrices context={context} />",
+      "after": "<EscoElectricity24Prices context={context} />"
+    }
+  ],
+  "src/tariffs/businessOffers.ts": [
+    {
+      "before": "import { assessEsco } from './cezCosts';",
+      "after": "import { assessElectricity24 as assessEsco } from './escoElectricity24Costs';"
+    },
+    {
+      "before": "pricing: 'SPOT · orientační · září 2026'",
+      "after": "pricing: 'Elektřina 24 · Fixace 24 měsíců'"
+    }
+  ],
+  "src/tariffs/catalog.ts": [
+    {
+      "before": "  'C46d',\n  'C56d',",
+      "after": "  'C46d',\n  'C55d',\n  'C56d',"
+    }
+  ],
+  "src/tariffs/EonVariantPrices.tsx": [
+    {
+      "before": "companyTariffCodes.map((c) => (",
+      "after": "companyTariffCodes.filter((c) => c !== 'C55d').map((c) => ("
+    },
+    {
+      "before": "ČEZ ESCO je SPOT · orientační scénář podle září 2026, nikoli garantovaná roční pevná cena.",
+      "after": "ČEZ ESCO Elektřina 24 je pevný produkt s fixací na 24 měsíců."
+    }
+  ]
+}

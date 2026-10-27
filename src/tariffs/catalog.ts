@@ -10,6 +10,7 @@ export const companyTariffCodes = [
   'C35d',
   'C45d',
   'C46d',
+  'C55d',
   'C56d',
   'C60d',
   'C62d',

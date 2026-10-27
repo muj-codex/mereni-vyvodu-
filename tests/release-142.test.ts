@@ -78,7 +78,7 @@ describe('flat connection math kept inside tariffs', () => {
     expect(r.breakerA).toBe(64);
     expect(r.recommendedA).toBe(32);
     const c = comparisonContext('C', 'flat', 'ČEZ Distribuce', r.annualKwh, r.breakerA);
-    expect(c.candidates).toHaveLength(8 * 12);
+    expect(c.candidates).toHaveLength(8 * 13);
     expect(
       c.candidates.every(
         (x) =>
@@ -169,7 +169,7 @@ describe('company readings use actual elapsed time in Europe/Prague', () => {
     const r = calculateCompany(company());
     const c = comparisonContext('C', 'company', 'EG.D', r.annualKwh, r.breakerA, r.originalTariff);
     expect(c.originalTariff).toBe('C02d');
-    expect(c.candidates).toHaveLength(12);
+    expect(c.candidates).toHaveLength(13);
     expect(
       c.candidates.every(
         (x) =>

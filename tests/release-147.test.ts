@@ -18,12 +18,13 @@ import {
   spotRefresh,
 } from '../src/tariffs/cezCosts';
 import baseline from './fixtures/frozen-146.json';
+import { frozen149Content } from './frozen-reference1410';
 import type { DistributionArea } from '../src/tariffs/model';
 
 describe('1.4.7 exact source data and isolation', () => {
   it('preserves every existing source file except the explicitly audited tariff integration', () => {
     for (const [path, sha] of Object.entries(baseline))
-      expect(createHash('sha256').update(readFileSync(path)).digest('hex'), path).toBe(sha);
+      expect(createHash('sha256').update(frozen149Content(path)).digest('hex'), path).toBe(sha);
   });
   it('retains the four actual source PDFs with exact hashes', () => {
     for (const { metadata: m } of [escoSource, ...Object.values(householdSources)])

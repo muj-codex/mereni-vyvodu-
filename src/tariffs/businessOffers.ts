@@ -1,5 +1,5 @@
 import { assessOrlen } from './orlenCosts';
-import { assessEsco } from './cezCosts';
+import { assessElectricity24 as assessEsco } from './escoElectricity24Costs';
 import { assessEonVariant } from './eonVariantCosts';
 import type { ComparisonContext } from './calculations';
 export function compareBusinessOffers(code: string, context: ComparisonContext) {
@@ -18,7 +18,7 @@ export function compareBusinessOffers(code: string, context: ComparisonContext) 
     { name: 'ORLEN', pricing: 'Ověřený ceník 2026', value: orlen.priceWithVat },
     {
       name: 'ČEZ ESCO',
-      pricing: 'SPOT · orientační · září 2026',
+      pricing: 'Elektřina 24 · Fixace 24 měsíců',
       value: esco?.priceWithVat ?? null,
     },
     { name: 'E.ON Variant', pricing: 'Fixace 2 roky', value: variant.priceWithVat },

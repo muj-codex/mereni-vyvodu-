@@ -359,3 +359,9 @@ Paušální připojení zobrazuje `C25d · 2T` a `C45d · 2T`. Interní hodnoty 
 - Hlavní E.ON firemní produkt je Variant na 2 roky 10/26 Profi, fixace 2 roky, účinnost od 1. 10. 2026. Úplná roční cena pro ověřené C sazby a ČEZ Distribuce, včetně skutečných jističových pásem nad 160 A.
 - Pořadí úplných nabídek ORLEN / E.ON Variant / ČEZ ESCO při stejných vstupech a rozdíly Kč/rok. ESCO zůstává označen jako orientační zářijový SPOT scénář; starý E.ON SPOT není hlavní karta.
 - Měření, ORLEN a domácnosti beze změny. [Zdrojová dokumentace, výpočet a omezení](docs/eon-variant-1.4.9.md).
+
+### 1.4.10 – ČEZ ESCO Elektřina 24 pro firmy
+
+- Hlavní firemní ČEZ ESCO používá Elektřinu 24, fixaci 24 měsíců a celorepublikovou obchodní cenu ze zdrojového PDF. Bez aktivního SPOT scénáře nebo přirážky.
+- Pořadí úplných nabídek a rozdíly používají stejné vstupy a roční ceny včetně DPH. C55d má pouze ověřenou obchodní cenu ČEZ ESCO; neověřená regulace se nedoplňuje.
+- Domácnosti, ORLEN, ceny E.ON Variant a měřicí část beze změn. [Zdroj, ceny a omezení](docs/esco24-1.4.10.md).

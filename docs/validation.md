@@ -266,3 +266,14 @@ Detaily zdrojů, pravidel a omezení: [E.ON import 1.4.8](eon-import-1.4.8.md), 
 - Celých **73** původních zdrojových souborů 1.4.8 je chráněno SHA; **70** je bajtově totožných a pouze tři tarifní soubory mají přesné auditované integrační změny. ORLEN i všechny domácí a měřicí výpočty jsou beze změny. Historické SHA baseline se nepřegenerovávají.
 
 [Dokumentace importu a omezení](eon-variant-1.4.9.md), [strojový report](eon-variant-validation-1.4.9.json).
+
+## 1.4.10 – ČEZ ESCO Elektřina 24 a navazující kontrola
+
+- `npm test`: 575/575, 32 souborů.
+- `npm run build`: úspěch, TypeScript + production + offline precache 8 souborů.
+- `npm run build:pwa`: úspěch, samostatný build.
+- `CI=1 npm run test:e2e -- --workers=4`: 284/284 (142 iPhone, 142 iPad), celý běh nad dokončeným buildem, 8,7 minuty.
+- `python scripts/validate-esco24-pdf.py`: 12 sazeb, 64 zdrojových čísel, 0 nečitelných. C55d pouze obchodní část.
+- Kontrola cen, shodných vstupů, řazení hrubých ročních cen, rozdílů a neúplných kombinací prošla. Domácnosti jen ČEZ/E.ON. ORLEN a E.ON Variant ceny neměněny.
+- 77 původních zdrojových souborů ověřeno proti skutečnému HEAD 1.4.9; přesně vymezené integrace ve čtyřech tarifních souborech, měřicí část beze změn.
+- První pokusy E2E odhalily chybu testovacího regulárního výrazu (SPOT versus SPOTŘEBY) a běh zasahující obnovu buildu. Opraven test, zastaveny předchozí běhy, finální kompletní běh úspěšný. Kvůli kontrole nevznikla další aplikační oprava ani další patch verze.

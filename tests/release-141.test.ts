@@ -16,6 +16,7 @@ const C = [
   'C35d',
   'C45d',
   'C46d',
+  'C55d',
   'C56d',
   'C60d',
   'C62d',
@@ -23,7 +24,7 @@ const C = [
 const D = ['D01d', 'D02d', 'D25d', 'D26d', 'D27d', 'D35d', 'D45d', 'D56d', 'D57d', 'D61d'];
 const single = ['C01d', 'C02d', 'C03d', 'D01d', 'D02d'];
 describe('complete tariff metadata', () => {
-  it('has exactly the requested 12 C and 10 D tariffs with no cross-category matches', () => {
+  it('has exactly the requested 13 C and 10 D tariffs with no cross-category matches', () => {
     expect(tariffsFor('C').map((t) => t.code)).toEqual(C);
     expect(tariffsFor('D').map((t) => t.code)).toEqual(D);
     expect(tariffFor('C', 'D02d')).toBeUndefined();

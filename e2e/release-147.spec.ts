@@ -55,7 +55,7 @@ for (const [area, dist02, breaker02, dist25, nt25, breaker25, high57] of [
     await tariffLayout(page);
   });
 }
-test('business SPOT reference, complete control, supplier coverage and unknown areas', async ({
+test('business fixed Electricity 24 replaces the old SPOT reference and preserves verified ORLEN', async ({
   page,
 }) => {
   await page.goto('/');
@@ -63,35 +63,34 @@ test('business SPOT reference, complete control, supplier coverage and unknown a
   const s = rates(page);
   await s.getByLabel('Použitý jistič', { exact: true }).selectOption('3×40 A');
   await s.getByRole('button', { name: 'POKRAČOVAT K POROVNÁNÍ', exact: true }).click();
-  const card = s.getByRole('region', { name: 'ČEZ ESCO SPOT', exact: true });
-  await expect(card).toContainText('Referenční měsíc: září 2026');
-  await expect(card).toContainText('Republiková / všechna distribuční území');
-  await expect(card).toContainText('3 850 Kč/MWh bez DPH');
+  const card = s.getByRole('region', { name: 'ČEZ ESCO Elektřina 24', exact: true });
+  await expect(card).toContainText('Fixace 24 měsíců');
+  await expect(card).toContainText('všechna distribuční území');
+  await expect(card).toContainText('2 860 Kč/MWh bez DPH');
   await expect(card).toContainText('95 Kč/měsíc bez DPH');
-  await expect(card.getByLabel('Roční cena ČEZ', { exact: true })).toContainText(
-    '101 503,51 Kč/rok',
+  await expect(card.getByLabel('Roční cena Elektřina 24', { exact: true })).toContainText(
+    '87 128,71 Kč/rok',
   );
   await expect(s.getByLabel('Konečná roční cena ORLEN', { exact: true })).toContainText(
     '81 959,59 Kč/rok',
   );
-  await expect(card).toContainText('2026-11-16');
   for (const [code, price] of [
-    ['C25d', '3 845'],
-    ['C45d', '3 863'],
-    ['C62d', '4 459'],
+    ['C25d', '2 839'],
+    ['C45d', '2 887'],
+    ['C62d', '2 860'],
   ]) {
-    await card.getByLabel('Sazba ČEZ ESCO', { exact: true }).selectOption(code);
+    await card.getByLabel('Sazba ČEZ ESCO Elektřina 24', { exact: true }).selectOption(code);
     await expect(card).toContainText(`${price} Kč/MWh bez DPH`);
     if (code === 'C62d')
-      await expect(card.getByLabel('Roční cena ČEZ', { exact: true })).toBeVisible();
-    else await expect(card.getByLabel('Roční cena ČEZ', { exact: true })).toHaveCount(0);
+      await expect(card.getByLabel('Roční cena Elektřina 24', { exact: true })).toBeVisible();
+    else await expect(card.getByLabel('Roční cena Elektřina 24', { exact: true })).toHaveCount(0);
   }
-  await card.getByLabel('Sazba ČEZ ESCO', { exact: true }).selectOption('C60d');
-  await expect(card).toContainText('Pro tuto sazbu nemáme ověřený cenový podklad.');
-  await expect(card.getByLabel('Roční cena ČEZ', { exact: true })).toHaveCount(0);
+  await card.getByLabel('Sazba ČEZ ESCO Elektřina 24', { exact: true }).selectOption('C55d');
+  await expect(card).toContainText('ověřenou pouze obchodní cenu');
+  await expect(card.getByLabel('Roční cena Elektřina 24', { exact: true })).toHaveCount(0);
   await tariffLayout(page);
 });
-test('company estimate shows ESCO using measured VT/NT and keeps unavailable distribution explicit', async ({
+test('company fixed ESCO retains explicit unavailable distribution rather than guessing other areas', async ({
   page,
 }) => {
   await page.goto('/');
@@ -100,13 +99,13 @@ test('company estimate shows ESCO using measured VT/NT and keeps unavailable dis
   await s.getByRole('button', { name: 'POKRAČOVAT K OBLASTI', exact: true }).click();
   await s.getByLabel('Distribuční oblast', { exact: true }).selectOption('EG.D');
   await s.getByRole('button', { name: 'VYHODNOTIT', exact: true }).click();
-  const card = s.getByRole('region', { name: 'ČEZ ESCO SPOT', exact: true });
-  await expect(card).toContainText('Úplný roční výpočet není pro tuto kombinaci k dispozici.');
+  const card = s.getByRole('region', { name: 'ČEZ ESCO Elektřina 24', exact: true });
+  await expect(card).toContainText('Pro tuto distribuční oblast nemáme ověřenou regulovanou část.');
   await expect(card).toContainText('Distribuční oblast odběrného místa: EG.D');
-  await expect(card.getByLabel('Roční cena ČEZ', { exact: true })).toHaveCount(0);
+  await expect(card.getByLabel('Roční cena Elektřina 24', { exact: true })).toHaveCount(0);
   await expect(s.getByRole('region', { name: 'ČEZ domácnosti', exact: true })).toHaveCount(0);
 });
-test('SPOT recommends refresh after 20 days and still uses last verified September prices', async ({
+test('fixed Electricity 24 keeps its fixed data after the old SPOT refresh window', async ({
   page,
 }) => {
   await page.clock.setFixedTime(new Date('2026-11-16T12:00:00Z'));
@@ -114,13 +113,12 @@ test('SPOT recommends refresh after 20 days and still uses last verified Septemb
   await fillFlat(page);
   const s = rates(page);
   await s.getByRole('button', { name: 'POKRAČOVAT K POROVNÁNÍ', exact: true }).click();
-  const card = s.getByRole('region', { name: 'ČEZ ESCO SPOT', exact: true });
-  await expect(card).toContainText('Doporučena kontrola ceníku.');
-  await expect(card).toContainText('3 850 Kč/MWh bez DPH');
-  await expect(card.getByLabel('Roční cena ČEZ', { exact: true })).toBeVisible();
+  const card = s.getByRole('region', { name: 'ČEZ ESCO Elektřina 24', exact: true });
+  await expect(card).not.toContainText('Doporučena kontrola ceníku.');
+  await expect(s).not.toContainText(/SPOT(?![\p{L}])|září 2026/u);
+  await expect(card.getByLabel('Roční cena Elektřina 24', { exact: true })).toBeVisible();
 });
-
-test('C25d company comparison shares measured annual VT/NT and uses the single SPOT commodity price', async ({
+test('C25d company comparison uses actual annual VT/NT with fixed equal commodity prices', async ({
   page,
 }) => {
   await page.goto('/');
@@ -135,12 +133,11 @@ test('C25d company comparison shares measured annual VT/NT and uses the single S
   await s.getByRole('button', { name: 'POKRAČOVAT K OBLASTI', exact: true }).click();
   await s.getByLabel('Distribuční oblast', { exact: true }).selectOption('ČEZ Distribuce');
   await s.getByRole('button', { name: 'VYHODNOTIT', exact: true }).click();
-  const card = s.getByRole('region', { name: 'ČEZ ESCO SPOT', exact: true });
-  await expect(card).toContainText('Dodávka VT = NT: 3 845 Kč/MWh bez DPH');
+  const card = s.getByRole('region', { name: 'ČEZ ESCO Elektřina 24', exact: true });
   const net =
-    10.95 * (3845 + 164.24 + 28.3) + 3.65 * 2208.39 + 7.3 * 116.5 + 12 * (95 + 844 + 12.87);
+    10.95 * (2839 + 164.24 + 28.3) + 3.65 * 2208.39 + 7.3 * 116.5 + 12 * (95 + 844 + 12.87);
   const expected = new Intl.NumberFormat('cs-CZ', { maximumFractionDigits: 2 }).format(net * 1.21);
-  await expect(card.getByLabel('Roční cena ČEZ', { exact: true })).toContainText(
+  await expect(card.getByLabel('Roční cena Elektřina 24', { exact: true })).toContainText(
     `${expected} Kč/rok`,
   );
   await expect(s.getByLabel('Konečná roční cena ORLEN', { exact: true })).toBeVisible();

@@ -18,6 +18,7 @@ test('company workflow keeps the complete C catalog and single/dual tariff infor
     'C35d · 2T',
     'C45d · 2T',
     'C46d · 2T',
+    'C55d · 2T',
     'C56d · 2T',
     'C60d · 2T',
     'C62d · 2T',

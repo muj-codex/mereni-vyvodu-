@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { EscoElectricity24Prices } from './EscoElectricity24Prices';
 import { EonHouseholdComparison } from './EonPrices';
 import type { ComparisonContext } from './calculations';
 import { companyTariffCodes, householdTariffCodes } from './catalog';
@@ -273,7 +274,7 @@ function HouseholdPrices({ context }: { context: ComparisonContext }) {
 }
 export function CezPrices({ context }: { context: ComparisonContext }) {
   return context.customer === 'C' ? (
-    <EscoPrices context={context} />
+    <EscoElectricity24Prices context={context} />
   ) : (
     <HouseholdPrices context={context} />
   );

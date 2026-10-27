@@ -60,7 +60,7 @@ test('C flat connection: 26 A, 32 A recommendation, manual 64 A, annualisation a
   await expect(summary).toContainText('Použitý jistič3×32 A');
   const cards = s.locator('.tariff-supplier');
   await expect(cards).toHaveCount(6);
-  await expect(s.getByRole('region', { name: 'ČEZ ESCO SPOT', exact: true })).toBeVisible();
+  await expect(s.getByRole('region', { name: 'ČEZ ESCO Elektřina 24', exact: true })).toBeVisible();
   await expect(cards.first()).toHaveAttribute('aria-label', 'ORLEN Unipetrol');
   await context.setOffline(true);
   const requests: string[] = [];

@@ -1,8 +1,8 @@
-import { readFileSync } from 'node:fs';
+import { frozen149Content } from './frozen-reference1410';
 import assert from 'node:assert/strict';
 import patches from './fixtures/tariff-149-integration.json';
 export function frozen148Content(path: string) {
-  let content = readFileSync(path, 'utf8');
+  let content = frozen149Content(path);
   for (const patch of [
     ...((patches as Record<string, { before: string; after: string }[]>)[path] ?? []),
   ].reverse()) {

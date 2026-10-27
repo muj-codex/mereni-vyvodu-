@@ -109,7 +109,7 @@ describe.each([
       );
       const result = compareBusinessOffers(code, context);
       expect(result.offers.map((o) => o.name)).toEqual(
-        code === 'C62d' ? ['E.ON Variant', 'ČEZ ESCO'] : ['ORLEN', 'E.ON Variant', 'ČEZ ESCO'],
+        code === 'C62d' ? ['ČEZ ESCO', 'E.ON Variant'] : ['ORLEN', 'ČEZ ESCO', 'E.ON Variant'],
       );
       expect(result.offers.find((o) => o.name === 'E.ON Variant')!.value).toBeCloseTo(
         expected * 1.21,
@@ -121,7 +121,7 @@ describe.each([
       const html = renderToStaticMarkup(createElement(EonVariantPrices, { context }));
       expect(html).toContain('Fixace 2 roky');
       expect(html).toContain('Pořadí dostupných úplných nabídek');
-      expect(html).toContain('SPOT · orientační · září 2026');
+      expect(html).toContain('Elektřina 24 · Fixace 24 měsíců');
       expect(html).not.toContain('OTE + 350');
       expect(html).not.toContain('Přesné porovnání vyžaduje průběhová SPOT data.');
     });

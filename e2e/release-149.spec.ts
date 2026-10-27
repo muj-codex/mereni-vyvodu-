@@ -51,11 +51,11 @@ for (const [code, net, vtPrice, ntPrice, delta] of [
     await expect(total).toContainText(`${fmt(net * 1.21)} Kč/rok`);
     const offers = card.getByLabel('Pořadí firemních nabídek', { exact: true }).locator('li');
     const expected =
-      code === 'C62d' ? ['E.ON Variant', 'ČEZ ESCO'] : ['ORLEN', 'E.ON Variant', 'ČEZ ESCO'];
+      code === 'C62d' ? ['ČEZ ESCO', 'E.ON Variant'] : ['ORLEN', 'ČEZ ESCO', 'E.ON Variant'];
     await expect(offers).toHaveCount(expected.length);
     for (let i = 0; i < expected.length; i++)
       await expect(offers.nth(i)).toContainText(expected[i]);
-    await expect(card).toContainText('SPOT · orientační · září 2026');
+    await expect(card).toContainText('Elektřina 24 · Fixace 24 měsíců');
     if (delta !== null)
       await expect(
         card.getByLabel('Rozdíly E.ON Variant proti dodavatelům', { exact: true }),
