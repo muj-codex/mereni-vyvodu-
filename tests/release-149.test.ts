@@ -1,3 +1,4 @@
+import expectedOrders from './fixtures/business-orders-1413';
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
@@ -109,7 +110,7 @@ describe.each([
       );
       const result = compareBusinessOffers(code, context);
       expect(result.offers.map((o) => o.name)).toEqual(
-        code === 'C62d' ? ['ČEZ ESCO', 'E.ON Variant', 'innogy', 'PRE'] : ['ORLEN', 'ČEZ ESCO', 'E.ON Variant', 'innogy', 'PRE'],
+        expectedOrders[code as keyof typeof expectedOrders],
       );
       expect(result.offers.find((o) => o.name === 'E.ON Variant')!.value).toBeCloseTo(
         expected * 1.21,
@@ -153,8 +154,8 @@ it('never invents missing tariffs, areas or a VT/NT split, and excludes incomple
     expect(r.priceWithVat).toBeNull();
     expect(r.commercial).not.toBeNull();
     expect(
-      compareBusinessOffers('C02d', comparisonContext('C', 'flat', area, 12000, 40)).offers,
-    ).toEqual([]);
+      compareBusinessOffers('C02d', comparisonContext('C', 'flat', area, 12000, 40)).offers.map(o=>o.name),
+    ).toEqual(['Centropol']);
   }
   expect(assessEonVariant('C25d', 'ČEZ Distribuce', 40, 12000, null).priceWithVat).toBeNull();
   expect(

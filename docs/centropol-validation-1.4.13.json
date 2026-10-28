@@ -1,0 +1,463 @@
+{
+  "version": "1.4.13",
+  "sources": 6,
+  "verifiedNetGrossPairs": 1443,
+  "tariffsPerArea": {
+    "C": 12,
+    "D": 10
+  },
+  "C55d": "commodity only in all areas",
+  "unreadable": 0,
+  "independentUnitTotals": "verified",
+  "printedRoundingDifferences": [
+    {
+      "source": "c-fixne-pro-podnikatele-na-2-roky-21092026-c-cez-01012026.pdf",
+      "row": 24,
+      "tariff": "C25d",
+      "net": 5387.93,
+      "printedGross": 6519.39,
+      "calculatedGross": 6519.4
+    },
+    {
+      "source": "c-fixne-pro-podnikatele-na-2-roky-21092026-c-cez-01012026.pdf",
+      "row": 24,
+      "tariff": "C27d",
+      "net": 5387.93,
+      "printedGross": 6519.39,
+      "calculatedGross": 6519.4
+    },
+    {
+      "source": "c-fixne-pro-podnikatele-na-2-roky-21092026-c-egd-01012026.pdf",
+      "row": 24,
+      "tariff": "C02d",
+      "net": 6246.03,
+      "printedGross": 7557.69,
+      "calculatedGross": 7557.7
+    },
+    {
+      "source": "c-fixne-pro-podnikatele-na-2-roky-21092026-c-egd-01012026.pdf",
+      "row": 24,
+      "tariff": "C62d",
+      "net": 3455.61,
+      "printedGross": 4181.28,
+      "calculatedGross": 4181.29
+    },
+    {
+      "source": "c-fixne-pro-podnikatele-na-2-roky-21092026-c-egd-01012026.pdf",
+      "row": 25,
+      "tariff": "C25d",
+      "net": 3118.84,
+      "printedGross": 3773.79,
+      "calculatedGross": 3773.8
+    },
+    {
+      "source": "c-fixne-pro-podnikatele-na-2-roky-21092026-c-egd-01012026.pdf",
+      "row": 25,
+      "tariff": "C26d",
+      "net": 3118.84,
+      "printedGross": 3773.79,
+      "calculatedGross": 3773.8
+    },
+    {
+      "source": "c-fixne-pro-podnikatele-na-2-roky-21092026-c-egd-01012026.pdf",
+      "row": 25,
+      "tariff": "C27d",
+      "net": 3118.84,
+      "printedGross": 3773.79,
+      "calculatedGross": 3773.8
+    },
+    {
+      "source": "c-fixne-pro-podnikatele-na-2-roky-21092026-c-egd-01012026.pdf",
+      "row": 25,
+      "tariff": "C35d",
+      "net": 3218.84,
+      "printedGross": 3894.79,
+      "calculatedGross": 3894.8
+    },
+    {
+      "source": "c-fixne-pro-podnikatele-na-2-roky-21092026-c-egd-01012026.pdf",
+      "row": 25,
+      "tariff": "C45d",
+      "net": 3270.84,
+      "printedGross": 3957.71,
+      "calculatedGross": 3957.72
+    },
+    {
+      "source": "c-fixne-pro-podnikatele-na-2-roky-21092026-c-egd-01012026.pdf",
+      "row": 25,
+      "tariff": "C46d",
+      "net": 3270.84,
+      "printedGross": 3957.71,
+      "calculatedGross": 3957.72
+    },
+    {
+      "source": "c-fixne-pro-podnikatele-na-2-roky-21092026-c-egd-01012026.pdf",
+      "row": 25,
+      "tariff": "C56d",
+      "net": 3270.84,
+      "printedGross": 3957.71,
+      "calculatedGross": 3957.72
+    },
+    {
+      "source": "c-fixne-pro-podnikatele-na-2-roky-21092026-c-pre-01012026.pdf",
+      "row": 24,
+      "tariff": "C01d",
+      "net": 6309.93,
+      "printedGross": 7635.01,
+      "calculatedGross": 7635.02
+    },
+    {
+      "source": "c-fixne-pro-podnikatele-na-2-roky-21092026-c-pre-01012026.pdf",
+      "row": 24,
+      "tariff": "C02d",
+      "net": 5654.42,
+      "printedGross": 6841.84,
+      "calculatedGross": 6841.85
+    },
+    {
+      "source": "c-fixne-pro-podnikatele-na-2-roky-21092026-c-pre-01012026.pdf",
+      "row": 24,
+      "tariff": "C25d",
+      "net": 5665.23,
+      "printedGross": 6854.92,
+      "calculatedGross": 6854.93
+    },
+    {
+      "source": "c-fixne-pro-podnikatele-na-2-roky-21092026-c-pre-01012026.pdf",
+      "row": 24,
+      "tariff": "C27d",
+      "net": 5665.23,
+      "printedGross": 6854.92,
+      "calculatedGross": 6854.93
+    },
+    {
+      "source": "c-fixne-pro-podnikatele-na-2-roky-21092026-c-pre-01012026.pdf",
+      "row": 24,
+      "tariff": "C46d",
+      "net": 6437.93,
+      "printedGross": 7789.89,
+      "calculatedGross": 7789.9
+    },
+    {
+      "source": "c-fixne-pro-podnikatele-na-2-roky-21092026-c-pre-01012026.pdf",
+      "row": 25,
+      "tariff": "C25d",
+      "net": 3069.74,
+      "printedGross": 3714.38,
+      "calculatedGross": 3714.39
+    },
+    {
+      "source": "c-fixne-pro-podnikatele-na-2-roky-21092026-c-pre-01012026.pdf",
+      "row": 25,
+      "tariff": "C26d",
+      "net": 3069.74,
+      "printedGross": 3714.38,
+      "calculatedGross": 3714.39
+    },
+    {
+      "source": "c-fixne-pro-podnikatele-na-2-roky-21092026-c-pre-01012026.pdf",
+      "row": 25,
+      "tariff": "C27d",
+      "net": 3069.74,
+      "printedGross": 3714.38,
+      "calculatedGross": 3714.39
+    },
+    {
+      "source": "c-fixne-pro-podnikatele-na-2-roky-21092026-c-pre-01012026.pdf",
+      "row": 25,
+      "tariff": "C35d",
+      "net": 3169.74,
+      "printedGross": 3835.38,
+      "calculatedGross": 3835.39
+    },
+    {
+      "source": "c-fixne-pro-podnikatele-na-2-roky-21092026-c-pre-01012026.pdf",
+      "row": 25,
+      "tariff": "C45d",
+      "net": 3221.74,
+      "printedGross": 3898.3,
+      "calculatedGross": 3898.31
+    },
+    {
+      "source": "c-fixne-pro-podnikatele-na-2-roky-21092026-c-pre-01012026.pdf",
+      "row": 25,
+      "tariff": "C46d",
+      "net": 3221.74,
+      "printedGross": 3898.3,
+      "calculatedGross": 3898.31
+    },
+    {
+      "source": "c-fixne-pro-podnikatele-na-2-roky-21092026-c-pre-01012026.pdf",
+      "row": 25,
+      "tariff": "C56d",
+      "net": 3221.74,
+      "printedGross": 3898.3,
+      "calculatedGross": 3898.31
+    },
+    {
+      "source": "d-fixne-online-pro-zacatek-na-2-roky-24092026-d-cez-01012026.pdf",
+      "row": 25,
+      "tariff": "D02d",
+      "net": 4989.12,
+      "printedGross": 6036.83,
+      "calculatedGross": 6036.84
+    },
+    {
+      "source": "d-fixne-online-pro-zacatek-na-2-roky-24092026-d-cez-01012026.pdf",
+      "row": 25,
+      "tariff": "D25d",
+      "net": 5298.99,
+      "printedGross": 6411.77,
+      "calculatedGross": 6411.78
+    },
+    {
+      "source": "d-fixne-online-pro-zacatek-na-2-roky-24092026-d-cez-01012026.pdf",
+      "row": 25,
+      "tariff": "D26d",
+      "net": 4248.6,
+      "printedGross": 5140.8,
+      "calculatedGross": 5140.81
+    },
+    {
+      "source": "d-fixne-online-pro-zacatek-na-2-roky-24092026-d-cez-01012026.pdf",
+      "row": 25,
+      "tariff": "D27d",
+      "net": 5298.99,
+      "printedGross": 6411.77,
+      "calculatedGross": 6411.78
+    },
+    {
+      "source": "d-fixne-online-pro-zacatek-na-2-roky-24092026-d-cez-01012026.pdf",
+      "row": 25,
+      "tariff": "D35d",
+      "net": 3828.31,
+      "printedGross": 4632.25,
+      "calculatedGross": 4632.26
+    },
+    {
+      "source": "d-fixne-online-pro-zacatek-na-2-roky-24092026-d-cez-01012026.pdf",
+      "row": 25,
+      "tariff": "D45d",
+      "net": 3801.31,
+      "printedGross": 4599.58,
+      "calculatedGross": 4599.59
+    },
+    {
+      "source": "d-fixne-online-pro-zacatek-na-2-roky-24092026-d-cez-01012026.pdf",
+      "row": 25,
+      "tariff": "D56d",
+      "net": 3801.31,
+      "printedGross": 4599.58,
+      "calculatedGross": 4599.59
+    },
+    {
+      "source": "d-fixne-online-pro-zacatek-na-2-roky-24092026-d-cez-01012026.pdf",
+      "row": 25,
+      "tariff": "D57d",
+      "net": 3801.31,
+      "printedGross": 4599.58,
+      "calculatedGross": 4599.59
+    },
+    {
+      "source": "d-fixne-online-pro-zacatek-na-2-roky-24092026-d-egd-01012026.pdf",
+      "row": 25,
+      "tariff": "D25d",
+      "net": 5290.42,
+      "printedGross": 6401.4,
+      "calculatedGross": 6401.41
+    },
+    {
+      "source": "d-fixne-online-pro-zacatek-na-2-roky-24092026-d-egd-01012026.pdf",
+      "row": 25,
+      "tariff": "D27d",
+      "net": 5290.42,
+      "printedGross": 6401.4,
+      "calculatedGross": 6401.41
+    },
+    {
+      "source": "d-fixne-online-pro-zacatek-na-2-roky-24092026-d-egd-01012026.pdf",
+      "row": 25,
+      "tariff": "D35d",
+      "net": 3823.41,
+      "printedGross": 4626.32,
+      "calculatedGross": 4626.33
+    },
+    {
+      "source": "d-fixne-online-pro-zacatek-na-2-roky-24092026-d-egd-01012026.pdf",
+      "row": 25,
+      "tariff": "D45d",
+      "net": 3796.41,
+      "printedGross": 4593.65,
+      "calculatedGross": 4593.66
+    },
+    {
+      "source": "d-fixne-online-pro-zacatek-na-2-roky-24092026-d-egd-01012026.pdf",
+      "row": 25,
+      "tariff": "D56d",
+      "net": 3796.41,
+      "printedGross": 4593.65,
+      "calculatedGross": 4593.66
+    },
+    {
+      "source": "d-fixne-online-pro-zacatek-na-2-roky-24092026-d-egd-01012026.pdf",
+      "row": 25,
+      "tariff": "D57d",
+      "net": 3796.41,
+      "printedGross": 4593.65,
+      "calculatedGross": 4593.66
+    },
+    {
+      "source": "d-fixne-online-pro-zacatek-na-2-roky-24092026-d-egd-01012026.pdf",
+      "row": 26,
+      "tariff": "D25d",
+      "net": 2999.84,
+      "printedGross": 3629.8,
+      "calculatedGross": 3629.81
+    },
+    {
+      "source": "d-fixne-online-pro-zacatek-na-2-roky-24092026-d-egd-01012026.pdf",
+      "row": 26,
+      "tariff": "D26d",
+      "net": 2999.84,
+      "printedGross": 3629.8,
+      "calculatedGross": 3629.81
+    },
+    {
+      "source": "d-fixne-online-pro-zacatek-na-2-roky-24092026-d-egd-01012026.pdf",
+      "row": 26,
+      "tariff": "D27d",
+      "net": 2999.84,
+      "printedGross": 3629.8,
+      "calculatedGross": 3629.81
+    },
+    {
+      "source": "d-fixne-online-pro-zacatek-na-2-roky-24092026-d-egd-01012026.pdf",
+      "row": 26,
+      "tariff": "D35d",
+      "net": 3189.84,
+      "printedGross": 3859.7,
+      "calculatedGross": 3859.71
+    },
+    {
+      "source": "d-fixne-online-pro-zacatek-na-2-roky-24092026-d-egd-01012026.pdf",
+      "row": 26,
+      "tariff": "D45d",
+      "net": 3216.84,
+      "printedGross": 3892.37,
+      "calculatedGross": 3892.38
+    },
+    {
+      "source": "d-fixne-online-pro-zacatek-na-2-roky-24092026-d-egd-01012026.pdf",
+      "row": 26,
+      "tariff": "D56d",
+      "net": 3216.84,
+      "printedGross": 3892.37,
+      "calculatedGross": 3892.38
+    },
+    {
+      "source": "d-fixne-online-pro-zacatek-na-2-roky-24092026-d-egd-01012026.pdf",
+      "row": 26,
+      "tariff": "D57d",
+      "net": 3216.84,
+      "printedGross": 3892.37,
+      "calculatedGross": 3892.38
+    },
+    {
+      "source": "d-fixne-online-pro-zacatek-na-2-roky-24092026-d-egd-01012026.pdf",
+      "row": 26,
+      "tariff": "D61d",
+      "net": 3026.84,
+      "printedGross": 3662.47,
+      "calculatedGross": 3662.48
+    },
+    {
+      "source": "d-fixne-online-pro-zacatek-na-2-roky-24092026-d-pre-01012026.pdf",
+      "row": 25,
+      "tariff": "D25d",
+      "net": 4703.03,
+      "printedGross": 5690.66,
+      "calculatedGross": 5690.67
+    },
+    {
+      "source": "d-fixne-online-pro-zacatek-na-2-roky-24092026-d-pre-01012026.pdf",
+      "row": 25,
+      "tariff": "D26d",
+      "net": 4055.89,
+      "printedGross": 4907.62,
+      "calculatedGross": 4907.63
+    },
+    {
+      "source": "d-fixne-online-pro-zacatek-na-2-roky-24092026-d-pre-01012026.pdf",
+      "row": 25,
+      "tariff": "D27d",
+      "net": 4703.03,
+      "printedGross": 5690.66,
+      "calculatedGross": 5690.67
+    },
+    {
+      "source": "d-fixne-online-pro-zacatek-na-2-roky-24092026-d-pre-01012026.pdf",
+      "row": 26,
+      "tariff": "D25d",
+      "net": 2950.74,
+      "printedGross": 3570.39,
+      "calculatedGross": 3570.4
+    },
+    {
+      "source": "d-fixne-online-pro-zacatek-na-2-roky-24092026-d-pre-01012026.pdf",
+      "row": 26,
+      "tariff": "D26d",
+      "net": 2950.74,
+      "printedGross": 3570.39,
+      "calculatedGross": 3570.4
+    },
+    {
+      "source": "d-fixne-online-pro-zacatek-na-2-roky-24092026-d-pre-01012026.pdf",
+      "row": 26,
+      "tariff": "D27d",
+      "net": 2950.74,
+      "printedGross": 3570.39,
+      "calculatedGross": 3570.4
+    },
+    {
+      "source": "d-fixne-online-pro-zacatek-na-2-roky-24092026-d-pre-01012026.pdf",
+      "row": 26,
+      "tariff": "D35d",
+      "net": 3140.74,
+      "printedGross": 3800.29,
+      "calculatedGross": 3800.3
+    },
+    {
+      "source": "d-fixne-online-pro-zacatek-na-2-roky-24092026-d-pre-01012026.pdf",
+      "row": 26,
+      "tariff": "D45d",
+      "net": 3167.74,
+      "printedGross": 3832.96,
+      "calculatedGross": 3832.97
+    },
+    {
+      "source": "d-fixne-online-pro-zacatek-na-2-roky-24092026-d-pre-01012026.pdf",
+      "row": 26,
+      "tariff": "D56d",
+      "net": 3167.74,
+      "printedGross": 3832.96,
+      "calculatedGross": 3832.97
+    },
+    {
+      "source": "d-fixne-online-pro-zacatek-na-2-roky-24092026-d-pre-01012026.pdf",
+      "row": 26,
+      "tariff": "D57d",
+      "net": 3167.74,
+      "printedGross": 3832.96,
+      "calculatedGross": 3832.97
+    },
+    {
+      "source": "d-fixne-online-pro-zacatek-na-2-roky-24092026-d-pre-01012026.pdf",
+      "row": 26,
+      "tariff": "D61d",
+      "net": 2977.74,
+      "printedGross": 3603.06,
+      "calculatedGross": 3603.07
+    }
+  ],
+  "nonApplicableSummary": "C62d printed NT summary is not an NT supply/distribution price and is not used"
+}

@@ -1,3 +1,4 @@
+import expectedOrders from '../tests/fixtures/business-orders-1413';
 import { test, expect } from '@playwright/test';
 import { fillCompany, fillFlat, rates, tariffLayout } from './tariffs';
 const fmt = (n: number) => new Intl.NumberFormat('cs-CZ', { maximumFractionDigits: 2 }).format(n);
@@ -51,7 +52,7 @@ for (const [code, net, vtPrice, ntPrice, delta] of [
     await expect(total).toContainText(`${fmt(net * 1.21)} Kč/rok`);
     const offers = card.getByLabel('Pořadí firemních nabídek', { exact: true }).locator('li');
     const expected =
-      code === 'C62d' ? ['ČEZ ESCO', 'E.ON Variant', 'innogy', 'PRE'] : ['ORLEN', 'ČEZ ESCO', 'E.ON Variant', 'innogy', 'PRE'];
+      expectedOrders[code as keyof typeof expectedOrders];
     await expect(offers).toHaveCount(expected.length);
     for (let i = 0; i < expected.length; i++)
       await expect(offers.nth(i)).toContainText(expected[i]);
@@ -86,7 +87,8 @@ test('flat unsupported tariff, missing split and unverified areas never receive 
   await s.getByRole('button', { name: 'POKRAČOVAT K POROVNÁNÍ', exact: true }).click();
   await expect(card).toContainText('Pro tuto distribuční oblast nemáme kompletní ověřený podklad.');
   await expect(card.getByLabel('Roční cena E.ON Variant', { exact: true })).toHaveCount(0);
-  await expect(card.getByLabel('Pořadí firemních nabídek', { exact: true })).toHaveCount(0);
+  await expect(card.getByLabel('Pořadí firemních nabídek', { exact: true }).locator('li')).toHaveCount(1);
+  await expect(card.getByLabel('Pořadí firemních nabídek', { exact: true })).toContainText('Centropol');
 });
 test('explicit 200A fixed tariff stays complete and does not inherit the old SPOT applicability warning', async ({
   page,

@@ -299,3 +299,14 @@ Detaily zdrojů, pravidel a omezení: [E.ON import 1.4.8](eon-import-1.4.8.md), 
 - Cílené E2E: 44/44. Finální `CI=1 npm run test:e2e -- --workers=4`: 346/346, 173 iPhone + 173 iPad, 10,3 minuty nad dokončeným aktuálním buildem, bez přeskočených scénářů.
 - Nových 32 E2E případů ověřuje C02d/C25d/C27d/C35d/C45d/C56d/C62d a D02d/D25d/D27d/D35d/D45d/D56d/D57d/D61d, obchodní VT/NT, roční náklady s DPH, skutečné pořadí, rozdíly, domácí 1f, chybějící vstupy a nedostupnost EG.D/PRE pro obě kategorie.
 - Původní regresní scénáře měření, UZEL, MTP, diagnostiky, odečtů, historie, IndexedDB, backupu a PWA prošly. Baseline 84 původních zdrojových souborů odpovídá skutečnému HEAD 1.4.11; přesné integrační změny pouze ve čtyřech tarifních souborech. Původní cenové datasety a funkce ORLEN/ČEZ/E.ON/innogy i měřicí část beze změn.
+
+## 1.4.13 – Centropol ve všech třech oblastech
+
+- Skutečný výchozí main 1.4.12: `08d8d9d479c495b24c8dbbffba08d58e171c9229`. Verze zvýšena přesně o jeden patch na 1.4.13, oba root manifesty sjednocené, závislosti zachované.
+- `python scripts/import-centropol.py --check`: 6 původních PDF, 1443 ověřených dvojic cen bez/s DPH; 12 C + 10 D sazeb v každé oblasti. C55d obchodní cena pouze, 63 úplných kombinací a 3 neúplné C55d. Žádné nečitelné hodnoty odhadnuté jako čísla. [Report včetně 56 tištěných souhrnných haléřových rozdílů](centropol-validation-1.4.13.json).
+- `npm test`: 713/713, 35 souborů.
+- `npm run build`: úspěch, TypeScript + production + 8 souborů offline precache.
+- `npm run build:pwa`: samostatný úspěšný build, 8 offline souborů.
+- V cíleném běhu prošlo všech 34 nových E2E případů; starší očekávání prázdného firemního pořadí v EG.D bylo upraveno na nově dostupný Centropol. Finální `CI=1 npm run test:e2e -- --workers=4`: 380/380, 190 iPhone + 190 iPad, 11,8 minuty nad aktuálním dokončeným buildem, bez přeskočených scénářů.
+- Nové scénáře ověřují C02d/C25d/C35d/C45d/C56d/C62d a D02d/D25d/D35d/D45d/D57d/D61d, úplné ceny v každé oblasti, nezávislé C/D jističe, D57d, 1f vstupy, společné řazení, rozdíly a vyloučení C55d ve všech třech oblastech. Jediná úplná firemní nabídka v EG.D/PRE je zobrazena na 1. místě, neověřené nabídky nedostávají cenu.
+- Původní regresní scénáře měření, MTP, diagnostiky, UZEL, odečtů, série, historie, IndexedDB, backupů a PWA prošly. Baseline 87 původních zdrojových souborů je ověřená proti skutečnému HEAD 1.4.12; přesné integrační změny pouze v pěti tarifních prezentačních/porovnávacích souborech. Původní ceníky, cenové funkce ORLEN/ČEZ/E.ON/innogy/PRE a měřicí matematika beze změn.

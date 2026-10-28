@@ -1,3 +1,4 @@
+import expectedOrders from './fixtures/business-orders-1413';
 import { it, expect, describe } from 'vitest';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
@@ -107,7 +108,7 @@ describe.each([
     );
     const ranked = compareBusinessOffers(code, context);
     expect(ranked.offers.map((o) => o.name)).toEqual(
-      code === 'C62d' ? ['ČEZ ESCO', 'E.ON Variant', 'innogy', 'PRE'] : ['ORLEN', 'ČEZ ESCO', 'E.ON Variant', 'innogy', 'PRE'],
+      expectedOrders[code as keyof typeof expectedOrders],
     );
     expect(ranked.offers.find((o) => o.name === 'ČEZ ESCO')!.value).toBeCloseTo(expected * 1.21, 8);
     expect(ranked.offers.every((o, i) => i === 0 || o.value >= ranked.offers[i - 1].value)).toBe(

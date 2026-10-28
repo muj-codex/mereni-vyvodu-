@@ -131,6 +131,7 @@ it('includes all five complete business offers with the same inputs, sorted by g
   expect(result.offers.map((o) => o.name)).toEqual([
     'ORLEN',
     'ČEZ ESCO',
+    'Centropol',
     'E.ON Variant',
     'innogy',
     'PRE',

@@ -1,3 +1,4 @@
+import { assessCentropol } from './centropolCosts';
 import { assessPre } from './preCosts';
 import { assessInnogy, innogyLimitWarning } from './innogyCosts';
 import { assessOrlen } from './orlenCosts';
@@ -26,6 +27,7 @@ export function compareBusinessOffers(code: string, context: ComparisonContext) 
     { name: 'E.ON Variant', pricing: 'Fixace 2 roky', value: variant.priceWithVat },
     { name: 'innogy', pricing: context.annualKwh > 30000 ? `elektřina Benefit 24 · Fixace 24 měsíců · ${innogyLimitWarning}` : 'elektřina Benefit 24 · Fixace 24 měsíců', value: assessInnogy('C', ...args).priceWithVat },
     { name: 'PRE', pricing: 'PRE PROUD FAVORIT 2 10/2026 · Garance do 30. 9. 2028', value: assessPre('C', ...args).priceWithVat },
+    { name: 'Centropol', pricing: 'FIXNĚ PRO PODNIKATELE na 2 roky', value: assessCentropol('C', ...args).priceWithVat },
   ];
   const offers = results
     .filter((r): r is typeof r & { value: number } => r.value !== null)

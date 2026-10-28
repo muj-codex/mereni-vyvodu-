@@ -129,7 +129,7 @@ export function EonVariantPrices({ context }: { context: ComparisonContext }) {
           Stejná sazba {code}, stejná distribuční oblast, jistič a roční spotřeba VT/NT. Sazbu pro
           toto porovnání určuje výběr u E.ON Variant, u odhadu firmy původní sazba.
         </p>
-        {comparison.offers.length >= 2 ? (
+        {comparison.offers.length >= 1 ? (
           <ol aria-label="Pořadí firemních nabídek">
             {comparison.offers.map((o) => (
               <li key={o.name}>
@@ -138,7 +138,7 @@ export function EonVariantPrices({ context }: { context: ComparisonContext }) {
             ))}
           </ol>
         ) : (
-          <p className="hint">Pro pořadí potřebujeme alespoň dvě úplné ověřené nabídky.</p>
+          <p className="hint">Pro pořadí potřebujeme alespoň jednu úplnou ověřenou nabídku.</p>
         )}
         {eonPrice !== null && (
           <dl className="tariff-summary" aria-label="Rozdíly E.ON Variant proti dodavatelům">

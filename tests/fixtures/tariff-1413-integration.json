@@ -1,0 +1,60 @@
+{
+  "src/tariffs/businessOffers.ts": [
+    {
+      "before": "import { assessPre }",
+      "after": "import { assessCentropol } from './centropolCosts';\nimport { assessPre }"
+    },
+    {
+      "before": "    { name: 'PRE', pricing: 'PRE PROUD FAVORIT 2 10/2026 · Garance do 30. 9. 2028', value: assessPre('C', ...args).priceWithVat },",
+      "after": "    { name: 'PRE', pricing: 'PRE PROUD FAVORIT 2 10/2026 · Garance do 30. 9. 2028', value: assessPre('C', ...args).priceWithVat },\n    { name: 'Centropol', pricing: 'FIXNĚ PRO PODNIKATELE na 2 roky', value: assessCentropol('C', ...args).priceWithVat },"
+    }
+  ],
+  "src/tariffs/CezPrices.tsx": [
+    {
+      "before": "import { useState } from 'react';",
+      "after": "import { useState } from 'react';\nimport { CentropolBusinessPrices } from './CentropolPrices';"
+    },
+    {
+      "before": "<PreBusinessPrices context={context} />",
+      "after": "<PreBusinessPrices context={context} /><CentropolBusinessPrices context={context} />"
+    },
+    {
+      "before": "ČEZ, E.ON, innogy i PRE.",
+      "after": "ČEZ, E.ON, innogy, PRE i Centropol."
+    }
+  ],
+  "src/tariffs/TariffCalculator.tsx": [
+    {
+      "before": "&& s.id !== 'pre'",
+      "after": "&& s.id !== 'pre' && s.id !== 'centropol'"
+    }
+  ],
+  "src/tariffs/InnogyHouseholdComparison.tsx": [
+    {
+      "before": "import { InnogyPrices } from './InnogyPrices';",
+      "after": "import { InnogyPrices } from './InnogyPrices';\nimport { CentropolPrices } from './CentropolPrices';\nimport { assessCentropol } from './centropolCosts';"
+    },
+    {
+      "before": "  const offers = [",
+      "after": "  let centropol: ReturnType<typeof assessCentropol> | null = null;\n  try { centropol = assessCentropol('D', code, area, amps, vt+nt, {annualVT:vt,annualNT:nt}, phases); } catch { /* Shared validation. */ }\n  const offers = ["
+    },
+    {
+      "before": "    { name: 'PRE', value: pre?.priceWithVat ?? null },",
+      "after": "    { name: 'PRE', value: pre?.priceWithVat ?? null },\n    { name: 'Centropol', value: centropol?.priceWithVat ?? null },"
+    },
+    {
+      "before": "      <section className=\"card\" aria-label=\"Společné pořadí domácností\">",
+      "after": "      <CentropolPrices customer=\"D\" code={code} area={area} amps={amps} phases={phases} annualKwh={vt+nt} split={{annualVT:vt,annualNT:nt}} />\n      <section className=\"card\" aria-label=\"Společné pořadí domácností\">"
+    }
+  ],
+  "src/tariffs/EonVariantPrices.tsx": [
+    {
+      "before": "comparison.offers.length >= 2",
+      "after": "comparison.offers.length >= 1"
+    },
+    {
+      "before": "Pro pořadí potřebujeme alespoň dvě úplné ověřené nabídky.",
+      "after": "Pro pořadí potřebujeme alespoň jednu úplnou ověřenou nabídku."
+    }
+  ]
+}

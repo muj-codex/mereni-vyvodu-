@@ -376,3 +376,8 @@ Paušální připojení zobrazuje `C25d · 2T` a `C45d · 2T`. Interní hodnoty 
 
 - PRE PROUD FAVORIT 2 10/2026 pro firmy i domácnosti na území ČEZ Distribuce, garance obchodní ceny do 30. 9. 2028. Vlastní ověřené jističové tabulky, úplné roční náklady, společné pořadí a rozdíly.
 - EG.D/PREdistribuce bez ceny z těchto podkladů. Stávající ceníky, výpočty a měřicí část zachovány. [Zdroje, ceny a pravidla](docs/pre-favorit2-1.4.12.md).
+
+### 1.4.13 – Centropol ve třech oblastech
+
+- Firmy: FIXNĚ PRO PODNIKATELE na 2 roky od 21. 9. 2026. Domácnosti: FIXNĚ ONLINE PRO ZAČÁTEK na 2 roky od 24. 9. 2026. Samostatné ceníky ČEZ Distribuce, EG.D a PREdistribuce.
+- Úplné roční náklady a společné pořadí podle stejných vstupů; C55d pouze obchodní cena bez doplňování chybějící regulace. Původní dodavatelé a měřicí část zachovány. [Zdroje, pravidla a omezení](docs/centropol-1.4.13.md).

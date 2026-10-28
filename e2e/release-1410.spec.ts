@@ -1,3 +1,4 @@
+import expectedOrders from '../tests/fixtures/business-orders-1413';
 import { test, expect } from '@playwright/test';
 import { fillCompany, fillFlat, rates, tariffLayout } from './tariffs';
 const fmt = (n: number) => new Intl.NumberFormat('cs-CZ', { maximumFractionDigits: 2 }).format(n);
@@ -57,7 +58,7 @@ for (const [code, price, net] of [
       );
       const order = s.getByLabel('Pořadí firemních nabídek', { exact: true }).locator('li');
       const names =
-        code === 'C62d' ? ['ČEZ ESCO', 'E.ON Variant', 'innogy', 'PRE'] : ['ORLEN', 'ČEZ ESCO', 'E.ON Variant', 'innogy', 'PRE'];
+        expectedOrders[code as keyof typeof expectedOrders];
       await expect(order).toHaveCount(names.length);
       for (let i = 0; i < names.length; i++) await expect(order.nth(i)).toContainText(names[i]);
       for (const entry of await order.all()) await expect(entry).not.toContainText('SPOT');
