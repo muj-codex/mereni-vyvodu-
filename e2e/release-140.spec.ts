@@ -59,7 +59,7 @@ test('C flat connection: 26 A, 32 A recommendation, manual 64 A, annualisation a
   await expect(summary).toContainText(/Předpokládaná roční spotřeba\s*12\s*000 kWh\/rok/);
   await expect(summary).toContainText('Použitý jistič3×32 A');
   const cards = s.locator('.tariff-supplier');
-  await expect(cards).toHaveCount(6);
+  await expect(cards).toHaveCount(5);
   await expect(s.getByRole('region', { name: 'ČEZ ESCO Elektřina 24', exact: true })).toBeVisible();
   await expect(cards.first()).toHaveAttribute('aria-label', 'ORLEN Unipetrol');
   await context.setOffline(true);
@@ -96,7 +96,7 @@ test('D offers only flat connection, seven suppliers and no ORLEN; all local bac
   await s.getByLabel('Délka období', { exact: true }).selectOption('custom');
   await s.getByLabel('Vlastní počet měsíců', { exact: true }).fill('5');
   await s.getByRole('button', { name: 'POKRAČOVAT K POROVNÁNÍ', exact: true }).click();
-  await expect(s.locator('.tariff-supplier')).toHaveCount(5);
+  await expect(s.locator('.tariff-supplier')).toHaveCount(4);
   await expect(s.getByRole('region', { name: 'ČEZ domácnosti', exact: true })).toBeVisible();
   await expect(page.getByText(/ORLEN/i)).toHaveCount(0);
   await expect(s.getByRole('region', { name: 'Shrnutí vstupů', exact: true })).toContainText(

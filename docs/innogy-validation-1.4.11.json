@@ -1,0 +1,49 @@
+{
+  "version": "1.4.11",
+  "supplier": "innogy",
+  "product": "elektřina Benefit 24",
+  "distributionArea": "ČEZ Distribuce",
+  "validFrom": "2026-04-01",
+  "tariffCount": {
+    "C": 11,
+    "D": 10
+  },
+  "unreadableValues": 0,
+  "missingApplicableBreakerCells": 0,
+  "publishedNetAndGrossUnitTotals": "independently reconciled",
+  "businessLimitKwh": 30000,
+  "householdLimit": null,
+  "otherAreas": "unavailable",
+  "sources": {
+    "C": {
+      "supplier": "innogy",
+      "productName": "elektřina Benefit 24",
+      "pricingType": "fixed",
+      "fixationMonths": 24,
+      "validFrom": "2026-04-01",
+      "regulatedFrom": "2026-01-01",
+      "distributionArea": "CEZ_DISTRIBUCE",
+      "customer": "C",
+      "sourceFile": "EE_CEN_BEN24_260401_MO_CEZ.pdf",
+      "sourcePage": 1,
+      "sha256": "1155c6ddad74abf74d6494fe34290d8be1e49a417915ea10696c266112a92c7c",
+      "lastVerifiedAt": "2026-10-28",
+      "prices": "without VAT; published gross unit totals reconciled separately"
+    },
+    "D": {
+      "supplier": "innogy",
+      "productName": "elektřina Benefit 24",
+      "pricingType": "fixed",
+      "fixationMonths": 24,
+      "validFrom": "2026-04-01",
+      "regulatedFrom": "2026-01-01",
+      "distributionArea": "CEZ_DISTRIBUCE",
+      "customer": "D",
+      "sourceFile": "EE_CEN_BEN24_260401_DOM_CEZ.pdf",
+      "sourcePage": 1,
+      "sha256": "5ed65e097a465d8af2dc257d5b52634c743d44d46f852f191784d5a484bc5d4e",
+      "lastVerifiedAt": "2026-10-28",
+      "prices": "without VAT; published gross unit totals reconciled separately"
+    }
+  }
+}

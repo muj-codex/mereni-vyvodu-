@@ -109,7 +109,7 @@ describe.each([
       );
       const result = compareBusinessOffers(code, context);
       expect(result.offers.map((o) => o.name)).toEqual(
-        code === 'C62d' ? ['ČEZ ESCO', 'E.ON Variant'] : ['ORLEN', 'ČEZ ESCO', 'E.ON Variant'],
+        code === 'C62d' ? ['ČEZ ESCO', 'E.ON Variant', 'innogy'] : ['ORLEN', 'ČEZ ESCO', 'E.ON Variant', 'innogy'],
       );
       expect(result.offers.find((o) => o.name === 'E.ON Variant')!.value).toBeCloseTo(
         expected * 1.21,

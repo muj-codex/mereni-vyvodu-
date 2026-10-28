@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { InnogyBusinessPrices } from './InnogyPrices';
+import { InnogyHouseholdComparison } from './InnogyHouseholdComparison';
 import { EscoElectricity24Prices } from './EscoElectricity24Prices';
 import { EonHouseholdComparison } from './EonPrices';
 import type { ComparisonContext } from './calculations';
@@ -168,7 +170,7 @@ function HouseholdPrices({ context }: { context: ComparisonContext }) {
       <h2>Domácnosti / sazby D – ČEZ</h2>
       <p>Elektřina na dobu neurčitou · účinnost od 1. 1. 2026</p>
       <p>Distribuční oblast: {context.distributionArea}</p>
-      <p className="hint">Vstupy sazby, jističe a spotřeby níže platí společně pro ČEZ i E.ON.</p>
+      <p className="hint">Vstupy sazby, jističe a spotřeby níže platí společně pro ČEZ, E.ON i innogy.</p>
       <div className="field-grid">
         <label className="field">
           <span>Sazba domácnosti ČEZ</span>
@@ -265,6 +267,7 @@ function HouseholdPrices({ context }: { context: ComparisonContext }) {
         </>
       )}
       <EonHouseholdComparison code={code} area={context.distributionArea} amps={amps.trim() === '' ? NaN : Number(amps.replace(',', '.'))} phases={phases} vt={annualVT} nt={annualNT} cezResult={result} />
+      <InnogyHouseholdComparison code={code} area={context.distributionArea} amps={amps.trim() === '' ? NaN : Number(amps.replace(',', '.'))} phases={phases} vt={annualVT} nt={annualNT} cezResult={result} />
       <p className="hint">
         Zdroj: {metadata.sourceFile} · ověřeno {metadata.lastVerifiedAt}. Ceny v závorkách zdroje
         jsou bez DPH; DPH se přičítá jednou.
@@ -274,7 +277,7 @@ function HouseholdPrices({ context }: { context: ComparisonContext }) {
 }
 export function CezPrices({ context }: { context: ComparisonContext }) {
   return context.customer === 'C' ? (
-    <EscoElectricity24Prices context={context} />
+    <><EscoElectricity24Prices context={context} /><InnogyBusinessPrices context={context} /></>
   ) : (
     <HouseholdPrices context={context} />
   );

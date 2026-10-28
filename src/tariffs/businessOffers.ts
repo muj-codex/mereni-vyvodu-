@@ -1,3 +1,4 @@
+import { assessInnogy, innogyLimitWarning } from './innogyCosts';
 import { assessOrlen } from './orlenCosts';
 import { assessElectricity24 as assessEsco } from './escoElectricity24Costs';
 import { assessEonVariant } from './eonVariantCosts';
@@ -22,6 +23,7 @@ export function compareBusinessOffers(code: string, context: ComparisonContext) 
       value: esco?.priceWithVat ?? null,
     },
     { name: 'E.ON Variant', pricing: 'Fixace 2 roky', value: variant.priceWithVat },
+    { name: 'innogy', pricing: context.annualKwh > 30000 ? `elektřina Benefit 24 · Fixace 24 měsíců · ${innogyLimitWarning}` : 'elektřina Benefit 24 · Fixace 24 měsíců', value: assessInnogy('C', ...args).priceWithVat },
   ];
   const offers = results
     .filter((r): r is typeof r & { value: number } => r.value !== null)

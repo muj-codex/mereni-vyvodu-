@@ -365,3 +365,9 @@ Paušální připojení zobrazuje `C25d · 2T` a `C45d · 2T`. Interní hodnoty 
 - Hlavní firemní ČEZ ESCO používá Elektřinu 24, fixaci 24 měsíců a celorepublikovou obchodní cenu ze zdrojového PDF. Bez aktivního SPOT scénáře nebo přirážky.
 - Pořadí úplných nabídek a rozdíly používají stejné vstupy a roční ceny včetně DPH. C55d má pouze ověřenou obchodní cenu ČEZ ESCO; neověřená regulace se nedoplňuje.
 - Domácnosti, ORLEN, ceny E.ON Variant a měřicí část beze změn. [Zdroj, ceny a omezení](docs/esco24-1.4.10.md).
+
+### 1.4.11 – innogy Benefit 24
+
+- Firmy i domácnosti: innogy elektřina Benefit 24, fixace 24 měsíců, ceníky od 1. 4. 2026 pro ČEZ Distribuce. Samostatné ověřené jističové tabulky a společné pořadí úplných ročních cen včetně DPH.
+- Nad 30 MWh pouze u firem upozornění na omezení nabídky; cena a pořadí zůstávají orientačně dostupné. EG.D/PRE bez ověřeného ceníku innogy.
+- Stávající ceny dodavatelů a měřicí část zachovány. [Zdroje, pravidla a omezení](docs/innogy-benefit24-1.4.11.md).

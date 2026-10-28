@@ -277,3 +277,14 @@ Detaily zdrojů, pravidel a omezení: [E.ON import 1.4.8](eon-import-1.4.8.md), 
 - Kontrola cen, shodných vstupů, řazení hrubých ročních cen, rozdílů a neúplných kombinací prošla. Domácnosti jen ČEZ/E.ON. ORLEN a E.ON Variant ceny neměněny.
 - 77 původních zdrojových souborů ověřeno proti skutečnému HEAD 1.4.9; přesně vymezené integrace ve čtyřech tarifních souborech, měřicí část beze změn.
 - První pokusy E2E odhalily chybu testovacího regulárního výrazu (SPOT versus SPOTŘEBY) a běh zasahující obnovu buildu. Opraven test, zastaveny předchozí běhy, finální kompletní běh úspěšný. Kvůli kontrole nevznikla další aplikační oprava ani další patch verze.
+
+## 1.4.11 – innogy elektřina Benefit 24
+
+- Skutečný výchozí main 1.4.10: `635adc06edd2bbc6fb2686209bb3c3b1621abdb0`; patch zvýšen přesně o 1 na 1.4.11 v obou root manifestech. Závislosti beze změn.
+- `python scripts/import-innogy.py --check`: 11 C + 10 D sazeb, oba originály PDF a SHA, kontrola všech použitelných jističových buněk, obchodních skupin i nezávislých jednotkových součtů bez/s DPH; bez nečitelných hodnot. [Report](innogy-validation-1.4.11.json).
+- `npm test`: 603/603, 33 souborů.
+- `npm run build`: úspěch, TypeScript + production + offline precache 8 souborů.
+- `npm run build:pwa`: samostatný úspěšný build, 8 offline souborů.
+- Finální `CI=1 npm run test:e2e -- --workers=4`: 314/314, 157 iPhone + 157 iPad, 8,5 minuty nad dokončeným aktuálním buildem. Žádné přeskočené scénáře.
+- Nových 30 E2E případů ověřuje C02d/C25d/C26d/C27d/C45d/C56d/C62d a D02d/D25d/D27d/D45d/D56d/D57d/D61d, úplné roční ceny, řazení, vlastní domácí 1f tabulku, chybějící vstupy, 30 MWh přesně a nad limit, obě nedostupné oblasti a nepřenášení firemního omezení na domácnosti.
+- Všechny původní měřicí regresní scénáře, odečty, UZEL, historie, IndexedDB, backup a PWA prošly. Baseline 80 původních zdrojových souborů odpovídá skutečnému HEAD 1.4.10; přesné integrační změny jen ve třech tarifních souborech. Původní cenové datasety a funkce ORLEN/ČEZ/E.ON i měřicí část beze změn.

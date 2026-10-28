@@ -57,7 +57,7 @@ for (const [code, price, net] of [
       );
       const order = s.getByLabel('Pořadí firemních nabídek', { exact: true }).locator('li');
       const names =
-        code === 'C62d' ? ['ČEZ ESCO', 'E.ON Variant'] : ['ORLEN', 'ČEZ ESCO', 'E.ON Variant'];
+        code === 'C62d' ? ['ČEZ ESCO', 'E.ON Variant', 'innogy'] : ['ORLEN', 'ČEZ ESCO', 'E.ON Variant', 'innogy'];
       await expect(order).toHaveCount(names.length);
       for (let i = 0; i < names.length; i++) await expect(order.nth(i)).toContainText(names[i]);
       for (const entry of await order.all()) await expect(entry).not.toContainText('SPOT');

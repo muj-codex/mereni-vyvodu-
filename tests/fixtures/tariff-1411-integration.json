@@ -1,0 +1,36 @@
+{
+  "src/tariffs/businessOffers.ts": [
+    {
+      "before": "import { assessOrlen }",
+      "after": "import { assessInnogy, innogyLimitWarning } from './innogyCosts';\nimport { assessOrlen }"
+    },
+    {
+      "before": "    { name: 'E.ON Variant', pricing: 'Fixace 2 roky', value: variant.priceWithVat },",
+      "after": "    { name: 'E.ON Variant', pricing: 'Fixace 2 roky', value: variant.priceWithVat },\n    { name: 'innogy', pricing: context.annualKwh > 30000 ? `elektřina Benefit 24 · Fixace 24 měsíců · ${innogyLimitWarning}` : 'elektřina Benefit 24 · Fixace 24 měsíců', value: assessInnogy('C', ...args).priceWithVat },"
+    }
+  ],
+  "src/tariffs/CezPrices.tsx": [
+    {
+      "before": "import { useState } from 'react';",
+      "after": "import { useState } from 'react';\nimport { InnogyBusinessPrices } from './InnogyPrices';\nimport { InnogyHouseholdComparison } from './InnogyHouseholdComparison';"
+    },
+    {
+      "before": "<EscoElectricity24Prices context={context} />",
+      "after": "<><EscoElectricity24Prices context={context} /><InnogyBusinessPrices context={context} /></>"
+    },
+    {
+      "before": "      <EonHouseholdComparison code={code} area={context.distributionArea} amps={amps.trim() === '' ? NaN : Number(amps.replace(',', '.'))} phases={phases} vt={annualVT} nt={annualNT} cezResult={result} />",
+      "after": "      <EonHouseholdComparison code={code} area={context.distributionArea} amps={amps.trim() === '' ? NaN : Number(amps.replace(',', '.'))} phases={phases} vt={annualVT} nt={annualNT} cezResult={result} />\n      <InnogyHouseholdComparison code={code} area={context.distributionArea} amps={amps.trim() === '' ? NaN : Number(amps.replace(',', '.'))} phases={phases} vt={annualVT} nt={annualNT} cezResult={result} />"
+    },
+    {
+      "before": "Vstupy sazby, jističe a spotřeby níže platí společně pro ČEZ i E.ON.",
+      "after": "Vstupy sazby, jističe a spotřeby níže platí společně pro ČEZ, E.ON i innogy."
+    }
+  ],
+  "src/tariffs/TariffCalculator.tsx": [
+    {
+      "before": "s.id !== 'cez' && s.id !== 'eon'",
+      "after": "s.id !== 'cez' && s.id !== 'eon' && s.id !== 'innogy'"
+    }
+  ]
+}
