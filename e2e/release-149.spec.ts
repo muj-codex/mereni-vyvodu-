@@ -51,7 +51,7 @@ for (const [code, net, vtPrice, ntPrice, delta] of [
     await expect(total).toContainText(`${fmt(net * 1.21)} Kč/rok`);
     const offers = card.getByLabel('Pořadí firemních nabídek', { exact: true }).locator('li');
     const expected =
-      code === 'C62d' ? ['ČEZ ESCO', 'E.ON Variant', 'innogy'] : ['ORLEN', 'ČEZ ESCO', 'E.ON Variant', 'innogy'];
+      code === 'C62d' ? ['ČEZ ESCO', 'E.ON Variant', 'innogy', 'PRE'] : ['ORLEN', 'ČEZ ESCO', 'E.ON Variant', 'innogy', 'PRE'];
     await expect(offers).toHaveCount(expected.length);
     for (let i = 0; i < expected.length; i++)
       await expect(offers.nth(i)).toContainText(expected[i]);

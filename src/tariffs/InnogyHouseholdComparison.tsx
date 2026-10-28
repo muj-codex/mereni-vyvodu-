@@ -1,4 +1,6 @@
 import { InnogyPrices } from './InnogyPrices';
+import { PrePrices } from './PrePrices';
+import { assessPre } from './preCosts';
 import { assessInnogy } from './innogyCosts';
 import { assessEonHousehold } from './eonCosts';
 import type { assessHousehold } from './cezCosts';
@@ -28,10 +30,13 @@ export function InnogyHouseholdComparison({
   } catch {
     /* Shared input validation is displayed above. */
   }
+  let pre: ReturnType<typeof assessPre> | null = null;
+  try { pre = assessPre('D', code, area, amps, vt + nt, { annualVT: vt, annualNT: nt }, phases); } catch { /* Shared validation. */ }
   const offers = [
     { name: 'ČEZ', value: cezResult?.priceWithVat ?? null },
     { name: 'E.ON', value: eon?.priceWithVat ?? null },
     { name: 'innogy', value: innogy?.priceWithVat ?? null },
+    { name: 'PRE', value: pre?.priceWithVat ?? null },
   ]
     .filter((o): o is { name: string; value: number } => o.value !== null)
     .sort((a, b) => a.value - b.value || a.name.localeCompare(b.name));
@@ -50,6 +55,7 @@ export function InnogyHouseholdComparison({
         annualKwh={vt + nt}
         split={{ annualVT: vt, annualNT: nt }}
       />
+      <PrePrices customer="D" code={code} area={area} amps={amps} phases={phases} annualKwh={vt + nt} split={{annualVT:vt,annualNT:nt}} />
       <section className="card" aria-label="Společné pořadí domácností">
         <h3>Pořadí úplných nabídek domácností</h3>
         <p>

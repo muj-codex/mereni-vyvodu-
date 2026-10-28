@@ -1,0 +1,50 @@
+{
+  "src/tariffs/businessOffers.ts": [
+    {
+      "before": "import { assessInnogy, innogyLimitWarning }",
+      "after": "import { assessPre } from './preCosts';\nimport { assessInnogy, innogyLimitWarning }"
+    },
+    {
+      "before": "    { name: 'innogy', pricing: context.annualKwh > 30000 ? `elektřina Benefit 24 · Fixace 24 měsíců · ${innogyLimitWarning}` : 'elektřina Benefit 24 · Fixace 24 měsíců', value: assessInnogy('C', ...args).priceWithVat },",
+      "after": "    { name: 'innogy', pricing: context.annualKwh > 30000 ? `elektřina Benefit 24 · Fixace 24 měsíců · ${innogyLimitWarning}` : 'elektřina Benefit 24 · Fixace 24 měsíců', value: assessInnogy('C', ...args).priceWithVat },\n    { name: 'PRE', pricing: 'PRE PROUD FAVORIT 2 10/2026 · Garance do 30. 9. 2028', value: assessPre('C', ...args).priceWithVat },"
+    }
+  ],
+  "src/tariffs/CezPrices.tsx": [
+    {
+      "before": "import { useState } from 'react';",
+      "after": "import { useState } from 'react';\nimport { PreBusinessPrices } from './PrePrices';"
+    },
+    {
+      "before": "<InnogyBusinessPrices context={context} />",
+      "after": "<InnogyBusinessPrices context={context} /><PreBusinessPrices context={context} />"
+    },
+    {
+      "before": "ČEZ, E.ON i innogy.",
+      "after": "ČEZ, E.ON, innogy i PRE."
+    }
+  ],
+  "src/tariffs/TariffCalculator.tsx": [
+    {
+      "before": "&& s.id !== 'innogy'",
+      "after": "&& s.id !== 'innogy' && s.id !== 'pre'"
+    }
+  ],
+  "src/tariffs/InnogyHouseholdComparison.tsx": [
+    {
+      "before": "import { InnogyPrices } from './InnogyPrices';",
+      "after": "import { InnogyPrices } from './InnogyPrices';\nimport { PrePrices } from './PrePrices';\nimport { assessPre } from './preCosts';"
+    },
+    {
+      "before": "  const offers = [",
+      "after": "  let pre: ReturnType<typeof assessPre> | null = null;\n  try { pre = assessPre('D', code, area, amps, vt + nt, { annualVT: vt, annualNT: nt }, phases); } catch { /* Shared validation. */ }\n  const offers = ["
+    },
+    {
+      "before": "    { name: 'innogy', value: innogy?.priceWithVat ?? null },",
+      "after": "    { name: 'innogy', value: innogy?.priceWithVat ?? null },\n    { name: 'PRE', value: pre?.priceWithVat ?? null },"
+    },
+    {
+      "before": "      <section className=\"card\" aria-label=\"Společné pořadí domácností\">",
+      "after": "      <PrePrices customer=\"D\" code={code} area={area} amps={amps} phases={phases} annualKwh={vt + nt} split={{annualVT:vt,annualNT:nt}} />\n      <section className=\"card\" aria-label=\"Společné pořadí domácností\">"
+    }
+  ]
+}

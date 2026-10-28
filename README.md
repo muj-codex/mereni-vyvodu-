@@ -371,3 +371,8 @@ Paušální připojení zobrazuje `C25d · 2T` a `C45d · 2T`. Interní hodnoty 
 - Firmy i domácnosti: innogy elektřina Benefit 24, fixace 24 měsíců, ceníky od 1. 4. 2026 pro ČEZ Distribuce. Samostatné ověřené jističové tabulky a společné pořadí úplných ročních cen včetně DPH.
 - Nad 30 MWh pouze u firem upozornění na omezení nabídky; cena a pořadí zůstávají orientačně dostupné. EG.D/PRE bez ověřeného ceníku innogy.
 - Stávající ceny dodavatelů a měřicí část zachovány. [Zdroje, pravidla a omezení](docs/innogy-benefit24-1.4.11.md).
+
+### 1.4.12 – PRE PROUD FAVORIT 2
+
+- PRE PROUD FAVORIT 2 10/2026 pro firmy i domácnosti na území ČEZ Distribuce, garance obchodní ceny do 30. 9. 2028. Vlastní ověřené jističové tabulky, úplné roční náklady, společné pořadí a rozdíly.
+- EG.D/PREdistribuce bez ceny z těchto podkladů. Stávající ceníky, výpočty a měřicí část zachovány. [Zdroje, ceny a pravidla](docs/pre-favorit2-1.4.12.md).

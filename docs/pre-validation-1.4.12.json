@@ -1,0 +1,50 @@
+{
+  "version": "1.4.12",
+  "supplier": "PRE",
+  "productName": "PRE PROUD FAVORIT 2 10/2026",
+  "validFrom": "2026-10-01",
+  "priceGuaranteeUntil": "2028-09-30",
+  "distributionArea": "ČEZ Distribuce",
+  "tariffCounts": {
+    "C": 11,
+    "D": 10
+  },
+  "verifiedNetGrossPairs": 371,
+  "unreadableValues": 0,
+  "missingApplicableBreakerCells": 0,
+  "independentUnitTotals": "verified",
+  "sources": {
+    "C": {
+      "supplier": "PRE",
+      "productName": "PRE PROUD FAVORIT 2 10/2026",
+      "pricingType": "fixed",
+      "validFrom": "2026-10-01",
+      "priceGuaranteeUntil": "2028-09-30",
+      "distributionArea": "CEZ_DISTRIBUCE",
+      "sourceFile": "pre-proud-favorit-2.pdf",
+      "sourcePages": [
+        1,
+        2
+      ],
+      "sha256": "4ca7b3617c0609f6482ec3a57a47776eff391911053f450d0fac6a0df2d52a3b",
+      "lastVerifiedAt": "2026-10-28",
+      "vatConvention": "parentheses without VAT; bold with 21% VAT"
+    },
+    "D": {
+      "supplier": "PRE",
+      "productName": "PRE PROUD FAVORIT 2 10/2026",
+      "pricingType": "fixed",
+      "validFrom": "2026-10-01",
+      "priceGuaranteeUntil": "2028-09-30",
+      "distributionArea": "CEZ_DISTRIBUCE",
+      "sourceFile": "pre-proud-favorit-2 2.pdf",
+      "sourcePages": [
+        1,
+        2
+      ],
+      "sha256": "8b2dd1f5cd28933c246c958946bdd021ad24647b87559737dba9d4ab2bdfda6d",
+      "lastVerifiedAt": "2026-10-28",
+      "vatConvention": "parentheses without VAT; bold with 21% VAT"
+    }
+  }
+}

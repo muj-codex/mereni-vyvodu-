@@ -288,3 +288,14 @@ Detaily zdrojů, pravidel a omezení: [E.ON import 1.4.8](eon-import-1.4.8.md), 
 - Finální `CI=1 npm run test:e2e -- --workers=4`: 314/314, 157 iPhone + 157 iPad, 8,5 minuty nad dokončeným aktuálním buildem. Žádné přeskočené scénáře.
 - Nových 30 E2E případů ověřuje C02d/C25d/C26d/C27d/C45d/C56d/C62d a D02d/D25d/D27d/D45d/D56d/D57d/D61d, úplné roční ceny, řazení, vlastní domácí 1f tabulku, chybějící vstupy, 30 MWh přesně a nad limit, obě nedostupné oblasti a nepřenášení firemního omezení na domácnosti.
 - Všechny původní měřicí regresní scénáře, odečty, UZEL, historie, IndexedDB, backup a PWA prošly. Baseline 80 původních zdrojových souborů odpovídá skutečnému HEAD 1.4.10; přesné integrační změny jen ve třech tarifních souborech. Původní cenové datasety a funkce ORLEN/ČEZ/E.ON i měřicí část beze změn.
+
+## 1.4.12 – PRE PROUD FAVORIT 2 10/2026
+
+- Výchozí ověřený main 1.4.11: `528eabf3dfe76e0b414edb87f8d801a4f0c148dd`. Patch zvýšen přesně o 1 na 1.4.12, root manifesty sjednocené, závislosti beze změn.
+- `python scripts/import-pre.py --check`: 11 C + 10 D sazeb, 371 ověřených zdrojových dvojic bez/s DPH, všechny použitelné jističové buňky a nezávislé jednotkové součty. Žádné nečitelné hodnoty doplněné odhadem. [Report](pre-validation-1.4.12.json).
+- `npm test`: 630/630, 34 souborů.
+- `npm run build`: úspěch, TypeScript + production + offline precache 8 souborů.
+- `npm run build:pwa`: samostatný úspěšný build, 8 offline souborů.
+- Cílené E2E: 44/44. Finální `CI=1 npm run test:e2e -- --workers=4`: 346/346, 173 iPhone + 173 iPad, 10,3 minuty nad dokončeným aktuálním buildem, bez přeskočených scénářů.
+- Nových 32 E2E případů ověřuje C02d/C25d/C27d/C35d/C45d/C56d/C62d a D02d/D25d/D27d/D35d/D45d/D56d/D57d/D61d, obchodní VT/NT, roční náklady s DPH, skutečné pořadí, rozdíly, domácí 1f, chybějící vstupy a nedostupnost EG.D/PRE pro obě kategorie.
+- Původní regresní scénáře měření, UZEL, MTP, diagnostiky, odečtů, historie, IndexedDB, backupu a PWA prošly. Baseline 84 původních zdrojových souborů odpovídá skutečnému HEAD 1.4.11; přesné integrační změny pouze ve čtyřech tarifních souborech. Původní cenové datasety a funkce ORLEN/ČEZ/E.ON/innogy i měřicí část beze změn.

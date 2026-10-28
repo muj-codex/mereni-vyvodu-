@@ -136,7 +136,7 @@ it('sorts all four business offers by the same full gross annual cost', () => {
     'C02d',
     comparisonContext('C', 'company', 'ČEZ Distribuce', 12000, 40, 'C02d'),
   );
-  expect(r.offers.map((o) => o.name)).toEqual(['ORLEN', 'ČEZ ESCO', 'E.ON Variant', 'innogy']);
+  expect(r.offers.map((o) => o.name)).toEqual(['ORLEN', 'ČEZ ESCO', 'E.ON Variant', 'innogy', 'PRE']);
   expect(r.offers.find((o) => o.name === 'innogy')!.value).toBeCloseTo(93110.952, 7);
 });
 it('adds innogy to shared household ranking without ORLEN or business limit warning', () => {
