@@ -381,3 +381,9 @@ Paušální připojení zobrazuje `C25d · 2T` a `C45d · 2T`. Interní hodnoty 
 
 - Firmy: FIXNĚ PRO PODNIKATELE na 2 roky od 21. 9. 2026. Domácnosti: FIXNĚ ONLINE PRO ZAČÁTEK na 2 roky od 24. 9. 2026. Samostatné ceníky ČEZ Distribuce, EG.D a PREdistribuce.
 - Úplné roční náklady a společné pořadí podle stejných vstupů; C55d pouze obchodní cena bez doplňování chybějící regulace. Původní dodavatelé a měřicí část zachovány. [Zdroje, pravidla a omezení](docs/centropol-1.4.13.md).
+
+### 1.4.14 – MND Proud, Ceník Prosinec 28
+
+- MND pro firmy i domácnosti ve všech třech oblastech, účinnost od 7. 10. 2026 a pevná obchodní cena do 31. 12. 2028. Vlastní ověřené regulované a jističové tabulky, včetně D57d.
+- Limit 30 MWh se týká obou kategorií. Nad limit cena a pořadí zůstávají orientačně dostupné s upozorněním. Infrastruktura účtována jednou, bez automatických sankcí.
+- Ostatní dodavatelé a měřicí část zachovány. [Zdroje, výpočet a podmínky](docs/mnd-1.4.14.md).

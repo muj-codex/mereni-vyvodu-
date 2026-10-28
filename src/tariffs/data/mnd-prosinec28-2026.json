@@ -1,0 +1,5388 @@
+{
+  "C": {
+    "ČEZ Distribuce": {
+      "metadata": {
+        "supplier": "MND Energie a.s.",
+        "productName": "Proud – Ceník Prosinec 28",
+        "pricingType": "fixed",
+        "validFrom": "2026-10-07",
+        "priceGuaranteeUntil": "2028-12-31",
+        "revertsToBasicFrom": "2029-01-01",
+        "distributionArea": "ČEZ Distribuce",
+        "sourceFile": "2026_10_01_MND_Proud_Cenik_Prosinec_28_CEZ_MO.pdf",
+        "sourcePages": [
+          1,
+          2
+        ],
+        "sha256": "ec4470bd47bdca6b81ac4cf79243aa1d393088ba3c91c545c283617be9f840ff",
+        "lastVerifiedAt": "2026-10-28",
+        "vatConvention": "square brackets without VAT; leading price with VAT",
+        "limitKwh": 30000
+      },
+      "tariffs": {
+        "C01d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 66.0,
+              "priceWithVat": 79.86
+            },
+            "10": {
+              "priceWithoutVat": 105.0,
+              "priceWithVat": 127.05
+            },
+            "11": {
+              "priceWithoutVat": 131.0,
+              "priceWithVat": 158.51
+            },
+            "12": {
+              "priceWithoutVat": 164.0,
+              "priceWithVat": 198.44
+            },
+            "13": {
+              "priceWithoutVat": 210.0,
+              "priceWithVat": 254.1
+            },
+            "14": {
+              "priceWithoutVat": 263.0,
+              "priceWithVat": 318.23
+            },
+            "15": {
+              "priceWithoutVat": 329.0,
+              "priceWithVat": 398.09
+            },
+            "16": {
+              "priceWithoutVat": 414.0,
+              "priceWithVat": 500.94
+            },
+            "17": {
+              "priceWithoutVat": 526.0,
+              "priceWithVat": 636.46
+            },
+            "18": {
+              "priceWithoutVat": 657.0,
+              "priceWithVat": 794.97
+            },
+            "19": {
+              "priceWithoutVat": 821.0,
+              "priceWithVat": 993.41
+            },
+            "20": {
+              "priceWithoutVat": 1051.0,
+              "priceWithVat": 1271.71
+            },
+            "21": {
+              "priceWithoutVat": 6.57,
+              "priceWithVat": 7.95
+            },
+            "22": {
+              "priceWithoutVat": 2.19,
+              "priceWithVat": 2.65
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2899.17,
+            "priceWithVat": 3508.0
+          },
+          "commodityNT": null,
+          "distributionVT": {
+            "priceWithoutVat": 3124.85,
+            "priceWithVat": 3781.07
+          },
+          "distributionNT": null
+        },
+        "C02d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 144.0,
+              "priceWithVat": 174.24
+            },
+            "10": {
+              "priceWithoutVat": 231.0,
+              "priceWithVat": 279.51
+            },
+            "11": {
+              "priceWithoutVat": 289.0,
+              "priceWithVat": 349.69
+            },
+            "12": {
+              "priceWithoutVat": 361.0,
+              "priceWithVat": 436.81
+            },
+            "13": {
+              "priceWithoutVat": 462.0,
+              "priceWithVat": 559.02
+            },
+            "14": {
+              "priceWithoutVat": 577.0,
+              "priceWithVat": 698.17
+            },
+            "15": {
+              "priceWithoutVat": 722.0,
+              "priceWithVat": 873.62
+            },
+            "16": {
+              "priceWithoutVat": 909.0,
+              "priceWithVat": 1099.89
+            },
+            "17": {
+              "priceWithoutVat": 1154.0,
+              "priceWithVat": 1396.34
+            },
+            "18": {
+              "priceWithoutVat": 1443.0,
+              "priceWithVat": 1746.03
+            },
+            "19": {
+              "priceWithoutVat": 1804.0,
+              "priceWithVat": 2182.84
+            },
+            "20": {
+              "priceWithoutVat": 2309.0,
+              "priceWithVat": 2793.89
+            },
+            "21": {
+              "priceWithoutVat": 14.43,
+              "priceWithVat": 17.46
+            },
+            "22": {
+              "priceWithoutVat": 4.81,
+              "priceWithVat": 5.82
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2899.17,
+            "priceWithVat": 3508.0
+          },
+          "commodityNT": null,
+          "distributionVT": {
+            "priceWithoutVat": 2263.19,
+            "priceWithVat": 2738.46
+          },
+          "distributionNT": null
+        },
+        "C03d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 819.0,
+              "priceWithVat": 990.99
+            },
+            "10": {
+              "priceWithoutVat": 1311.0,
+              "priceWithVat": 1586.31
+            },
+            "11": {
+              "priceWithoutVat": 1639.0,
+              "priceWithVat": 1983.19
+            },
+            "12": {
+              "priceWithoutVat": 2048.0,
+              "priceWithVat": 2478.08
+            },
+            "13": {
+              "priceWithoutVat": 2622.0,
+              "priceWithVat": 3172.62
+            },
+            "14": {
+              "priceWithoutVat": 3277.0,
+              "priceWithVat": 3965.17
+            },
+            "15": {
+              "priceWithoutVat": 4097.0,
+              "priceWithVat": 4957.37
+            },
+            "16": {
+              "priceWithoutVat": 5162.0,
+              "priceWithVat": 6246.02
+            },
+            "17": {
+              "priceWithoutVat": 6554.0,
+              "priceWithVat": 7930.34
+            },
+            "18": {
+              "priceWithoutVat": 8193.0,
+              "priceWithVat": 9913.53
+            },
+            "19": {
+              "priceWithoutVat": 10241.0,
+              "priceWithVat": 12391.61
+            },
+            "20": {
+              "priceWithoutVat": 13109.0,
+              "priceWithVat": 15861.89
+            },
+            "21": {
+              "priceWithoutVat": 81.93,
+              "priceWithVat": 99.14
+            },
+            "22": {
+              "priceWithoutVat": 27.31,
+              "priceWithVat": 33.05
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2899.17,
+            "priceWithVat": 3508.0
+          },
+          "commodityNT": null,
+          "distributionVT": {
+            "priceWithoutVat": 993.15,
+            "priceWithVat": 1201.71
+          },
+          "distributionNT": null
+        },
+        "C25d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 211.0,
+              "priceWithVat": 255.31
+            },
+            "10": {
+              "priceWithoutVat": 337.0,
+              "priceWithVat": 407.77
+            },
+            "11": {
+              "priceWithoutVat": 422.0,
+              "priceWithVat": 510.62
+            },
+            "12": {
+              "priceWithoutVat": 527.0,
+              "priceWithVat": 637.67
+            },
+            "13": {
+              "priceWithoutVat": 675.0,
+              "priceWithVat": 816.75
+            },
+            "14": {
+              "priceWithoutVat": 844.0,
+              "priceWithVat": 1021.24
+            },
+            "15": {
+              "priceWithoutVat": 1055.0,
+              "priceWithVat": 1276.55
+            },
+            "16": {
+              "priceWithoutVat": 1329.0,
+              "priceWithVat": 1608.09
+            },
+            "17": {
+              "priceWithoutVat": 1687.0,
+              "priceWithVat": 2041.27
+            },
+            "18": {
+              "priceWithoutVat": 2109.0,
+              "priceWithVat": 2551.89
+            },
+            "19": {
+              "priceWithoutVat": 2636.0,
+              "priceWithVat": 3189.56
+            },
+            "20": {
+              "priceWithoutVat": 3374.0,
+              "priceWithVat": 4082.54
+            },
+            "21": {
+              "priceWithoutVat": 21.09,
+              "priceWithVat": 25.52
+            },
+            "22": {
+              "priceWithoutVat": 7.03,
+              "priceWithVat": 8.51
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2930.57,
+            "priceWithVat": 3546.0
+          },
+          "commodityNT": {
+            "priceWithoutVat": 2757.85,
+            "priceWithVat": 3337.0
+          },
+          "distributionVT": {
+            "priceWithoutVat": 2208.39,
+            "priceWithVat": 2672.15
+          },
+          "distributionNT": {
+            "priceWithoutVat": 116.5,
+            "priceWithVat": 140.97
+          }
+        },
+        "C26d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 507.0,
+              "priceWithVat": 613.47
+            },
+            "10": {
+              "priceWithoutVat": 811.0,
+              "priceWithVat": 981.31
+            },
+            "11": {
+              "priceWithoutVat": 1014.0,
+              "priceWithVat": 1226.94
+            },
+            "12": {
+              "priceWithoutVat": 1268.0,
+              "priceWithVat": 1534.28
+            },
+            "13": {
+              "priceWithoutVat": 1622.0,
+              "priceWithVat": 1962.62
+            },
+            "14": {
+              "priceWithoutVat": 2028.0,
+              "priceWithVat": 2453.88
+            },
+            "15": {
+              "priceWithoutVat": 2535.0,
+              "priceWithVat": 3067.35
+            },
+            "16": {
+              "priceWithoutVat": 3194.0,
+              "priceWithVat": 3864.74
+            },
+            "17": {
+              "priceWithoutVat": 4056.0,
+              "priceWithVat": 4907.76
+            },
+            "18": {
+              "priceWithoutVat": 5070.0,
+              "priceWithVat": 6134.7
+            },
+            "19": {
+              "priceWithoutVat": 6338.0,
+              "priceWithVat": 7668.98
+            },
+            "20": {
+              "priceWithoutVat": 8112.0,
+              "priceWithVat": 9815.52
+            },
+            "21": {
+              "priceWithoutVat": 50.7,
+              "priceWithVat": 61.35
+            },
+            "22": {
+              "priceWithoutVat": 16.9,
+              "priceWithVat": 20.45
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2930.57,
+            "priceWithVat": 3546.0
+          },
+          "commodityNT": {
+            "priceWithoutVat": 2757.85,
+            "priceWithVat": 3337.0
+          },
+          "distributionVT": {
+            "priceWithoutVat": 1302.61,
+            "priceWithVat": 1576.16
+          },
+          "distributionNT": {
+            "priceWithoutVat": 116.5,
+            "priceWithVat": 140.97
+          }
+        },
+        "C27d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 200.0,
+              "priceWithVat": 242.0
+            },
+            "10": {
+              "priceWithoutVat": 321.0,
+              "priceWithVat": 388.41
+            },
+            "11": {
+              "priceWithoutVat": 401.0,
+              "priceWithVat": 485.21
+            },
+            "12": {
+              "priceWithoutVat": 501.0,
+              "priceWithVat": 606.21
+            },
+            "13": {
+              "priceWithoutVat": 641.0,
+              "priceWithVat": 775.61
+            },
+            "14": {
+              "priceWithoutVat": 802.0,
+              "priceWithVat": 970.42
+            },
+            "15": {
+              "priceWithoutVat": 1002.0,
+              "priceWithVat": 1212.42
+            },
+            "16": {
+              "priceWithoutVat": 1263.0,
+              "priceWithVat": 1528.23
+            },
+            "17": {
+              "priceWithoutVat": 1603.0,
+              "priceWithVat": 1939.63
+            },
+            "18": {
+              "priceWithoutVat": 2004.0,
+              "priceWithVat": 2424.84
+            },
+            "19": {
+              "priceWithoutVat": 2505.0,
+              "priceWithVat": 3031.05
+            },
+            "20": {
+              "priceWithoutVat": 3206.0,
+              "priceWithVat": 3879.26
+            },
+            "21": {
+              "priceWithoutVat": 20.04,
+              "priceWithVat": 24.25
+            },
+            "22": {
+              "priceWithoutVat": 6.68,
+              "priceWithVat": 8.08
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2930.57,
+            "priceWithVat": 3546.0
+          },
+          "commodityNT": {
+            "priceWithoutVat": 2757.85,
+            "priceWithVat": 3337.0
+          },
+          "distributionVT": {
+            "priceWithoutVat": 2208.39,
+            "priceWithVat": 2672.15
+          },
+          "distributionNT": {
+            "priceWithoutVat": 116.5,
+            "priceWithVat": 140.97
+          }
+        },
+        "C35d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 586.0,
+              "priceWithVat": 709.06
+            },
+            "10": {
+              "priceWithoutVat": 937.0,
+              "priceWithVat": 1133.77
+            },
+            "11": {
+              "priceWithoutVat": 1172.0,
+              "priceWithVat": 1418.12
+            },
+            "12": {
+              "priceWithoutVat": 1465.0,
+              "priceWithVat": 1772.65
+            },
+            "13": {
+              "priceWithoutVat": 1875.0,
+              "priceWithVat": 2268.75
+            },
+            "14": {
+              "priceWithoutVat": 2344.0,
+              "priceWithVat": 2836.24
+            },
+            "15": {
+              "priceWithoutVat": 2930.0,
+              "priceWithVat": 3545.3
+            },
+            "16": {
+              "priceWithoutVat": 3691.0,
+              "priceWithVat": 4466.11
+            },
+            "17": {
+              "priceWithoutVat": 4687.0,
+              "priceWithVat": 5671.27
+            },
+            "18": {
+              "priceWithoutVat": 5859.0,
+              "priceWithVat": 7089.39
+            },
+            "19": {
+              "priceWithoutVat": 7324.0,
+              "priceWithVat": 8862.04
+            },
+            "20": {
+              "priceWithoutVat": 9374.0,
+              "priceWithVat": 11342.54
+            },
+            "21": {
+              "priceWithoutVat": 58.59,
+              "priceWithVat": 70.89
+            },
+            "22": {
+              "priceWithoutVat": 19.53,
+              "priceWithVat": 23.63
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2947.93,
+            "priceWithVat": 3567.0
+          },
+          "commodityNT": {
+            "priceWithoutVat": 2839.66,
+            "priceWithVat": 3436.0
+          },
+          "distributionVT": {
+            "priceWithoutVat": 635.38,
+            "priceWithVat": 768.81
+          },
+          "distributionNT": {
+            "priceWithoutVat": 116.5,
+            "priceWithVat": 140.97
+          }
+        },
+        "C45d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 586.0,
+              "priceWithVat": 709.06
+            },
+            "10": {
+              "priceWithoutVat": 937.0,
+              "priceWithVat": 1133.77
+            },
+            "11": {
+              "priceWithoutVat": 1172.0,
+              "priceWithVat": 1418.12
+            },
+            "12": {
+              "priceWithoutVat": 1465.0,
+              "priceWithVat": 1772.65
+            },
+            "13": {
+              "priceWithoutVat": 1875.0,
+              "priceWithVat": 2268.75
+            },
+            "14": {
+              "priceWithoutVat": 2344.0,
+              "priceWithVat": 2836.24
+            },
+            "15": {
+              "priceWithoutVat": 2930.0,
+              "priceWithVat": 3545.3
+            },
+            "16": {
+              "priceWithoutVat": 3691.0,
+              "priceWithVat": 4466.11
+            },
+            "17": {
+              "priceWithoutVat": 4687.0,
+              "priceWithVat": 5671.27
+            },
+            "18": {
+              "priceWithoutVat": 5859.0,
+              "priceWithVat": 7089.39
+            },
+            "19": {
+              "priceWithoutVat": 7324.0,
+              "priceWithVat": 8862.04
+            },
+            "20": {
+              "priceWithoutVat": 9374.0,
+              "priceWithVat": 11342.54
+            },
+            "21": {
+              "priceWithoutVat": 58.59,
+              "priceWithVat": 70.89
+            },
+            "22": {
+              "priceWithoutVat": 19.53,
+              "priceWithVat": 23.63
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2935.53,
+            "priceWithVat": 3552.0
+          },
+          "commodityNT": {
+            "priceWithoutVat": 2908.26,
+            "priceWithVat": 3519.0
+          },
+          "distributionVT": {
+            "priceWithoutVat": 635.38,
+            "priceWithVat": 768.81
+          },
+          "distributionNT": {
+            "priceWithoutVat": 116.5,
+            "priceWithVat": 140.97
+          }
+        },
+        "C46d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 586.0,
+              "priceWithVat": 709.06
+            },
+            "10": {
+              "priceWithoutVat": 938.0,
+              "priceWithVat": 1134.98
+            },
+            "11": {
+              "priceWithoutVat": 1172.0,
+              "priceWithVat": 1418.12
+            },
+            "12": {
+              "priceWithoutVat": 1465.0,
+              "priceWithVat": 1772.65
+            },
+            "13": {
+              "priceWithoutVat": 1875.0,
+              "priceWithVat": 2268.75
+            },
+            "14": {
+              "priceWithoutVat": 2368.0,
+              "priceWithVat": 2865.28
+            },
+            "15": {
+              "priceWithoutVat": 2989.0,
+              "priceWithVat": 3616.69
+            },
+            "16": {
+              "priceWithoutVat": 3879.0,
+              "priceWithVat": 4693.59
+            },
+            "17": {
+              "priceWithoutVat": 5419.0,
+              "priceWithVat": 6556.99
+            },
+            "18": {
+              "priceWithoutVat": 8128.0,
+              "priceWithVat": 9834.88
+            },
+            "19": {
+              "priceWithoutVat": 13208.0,
+              "priceWithVat": 15981.68
+            },
+            "20": {
+              "priceWithoutVat": 22399.0,
+              "priceWithVat": 27102.79
+            },
+            "21": {
+              "priceWithoutVat": 139.99,
+              "priceWithVat": 169.39
+            },
+            "22": {
+              "priceWithoutVat": 46.66,
+              "priceWithVat": 56.46
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2935.53,
+            "priceWithVat": 3552.0
+          },
+          "commodityNT": {
+            "priceWithoutVat": 2908.26,
+            "priceWithVat": 3519.0
+          },
+          "distributionVT": {
+            "priceWithoutVat": 3124.85,
+            "priceWithVat": 3781.07
+          },
+          "distributionNT": {
+            "priceWithoutVat": 116.5,
+            "priceWithVat": 140.97
+          }
+        },
+        "C56d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 586.0,
+              "priceWithVat": 709.06
+            },
+            "10": {
+              "priceWithoutVat": 937.0,
+              "priceWithVat": 1133.77
+            },
+            "11": {
+              "priceWithoutVat": 1172.0,
+              "priceWithVat": 1418.12
+            },
+            "12": {
+              "priceWithoutVat": 1465.0,
+              "priceWithVat": 1772.65
+            },
+            "13": {
+              "priceWithoutVat": 1875.0,
+              "priceWithVat": 2268.75
+            },
+            "14": {
+              "priceWithoutVat": 2344.0,
+              "priceWithVat": 2836.24
+            },
+            "15": {
+              "priceWithoutVat": 2930.0,
+              "priceWithVat": 3545.3
+            },
+            "16": {
+              "priceWithoutVat": 3691.0,
+              "priceWithVat": 4466.11
+            },
+            "17": {
+              "priceWithoutVat": 4687.0,
+              "priceWithVat": 5671.27
+            },
+            "18": {
+              "priceWithoutVat": 5859.0,
+              "priceWithVat": 7089.39
+            },
+            "19": {
+              "priceWithoutVat": 7324.0,
+              "priceWithVat": 8862.04
+            },
+            "20": {
+              "priceWithoutVat": 9374.0,
+              "priceWithVat": 11342.54
+            },
+            "21": {
+              "priceWithoutVat": 58.59,
+              "priceWithVat": 70.89
+            },
+            "22": {
+              "priceWithoutVat": 19.53,
+              "priceWithVat": 23.63
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2935.53,
+            "priceWithVat": 3552.0
+          },
+          "commodityNT": {
+            "priceWithoutVat": 2908.26,
+            "priceWithVat": 3519.0
+          },
+          "distributionVT": {
+            "priceWithoutVat": 635.38,
+            "priceWithVat": 768.81
+          },
+          "distributionNT": {
+            "priceWithoutVat": 116.5,
+            "priceWithVat": 140.97
+          }
+        },
+        "C62d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 200.0,
+              "priceWithVat": 242.0
+            },
+            "10": {
+              "priceWithoutVat": 320.0,
+              "priceWithVat": 387.2
+            },
+            "11": {
+              "priceWithoutVat": 400.0,
+              "priceWithVat": 484.0
+            },
+            "12": {
+              "priceWithoutVat": 500.0,
+              "priceWithVat": 605.0
+            },
+            "13": {
+              "priceWithoutVat": 640.0,
+              "priceWithVat": 774.4
+            },
+            "14": {
+              "priceWithoutVat": 800.0,
+              "priceWithVat": 968.0
+            },
+            "15": {
+              "priceWithoutVat": 1001.0,
+              "priceWithVat": 1211.21
+            },
+            "16": {
+              "priceWithoutVat": 1261.0,
+              "priceWithVat": 1525.81
+            },
+            "17": {
+              "priceWithoutVat": 1601.0,
+              "priceWithVat": 1937.21
+            },
+            "18": {
+              "priceWithoutVat": 2001.0,
+              "priceWithVat": 2421.21
+            },
+            "19": {
+              "priceWithoutVat": 2501.0,
+              "priceWithVat": 3026.21
+            },
+            "20": {
+              "priceWithoutVat": 3202.0,
+              "priceWithVat": 3874.42
+            },
+            "21": {
+              "priceWithoutVat": 20.01,
+              "priceWithVat": 24.21
+            },
+            "22": {
+              "priceWithoutVat": 6.67,
+              "priceWithVat": 8.07
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2771.9,
+            "priceWithVat": 3354.0
+          },
+          "commodityNT": null,
+          "distributionVT": {
+            "priceWithoutVat": 297.41,
+            "priceWithVat": 359.87
+          },
+          "distributionNT": null
+        }
+      },
+      "common": {
+        "system": {
+          "priceWithoutVat": 164.24,
+          "priceWithVat": 198.73
+        },
+        "pozePerMwh": {
+          "priceWithoutVat": 0.0,
+          "priceWithVat": 0.0
+        },
+        "infrastructure": {
+          "priceWithoutVat": 12.87,
+          "priceWithVat": 15.57
+        },
+        "tax": {
+          "priceWithoutVat": 28.3,
+          "priceWithVat": 34.24
+        }
+      },
+      "infrastructureComponentsWithoutVat": {
+        "dataCentre": 5.88,
+        "eru": 4,
+        "oteSettlement": 1.61,
+        "pozeAdministration": 1.38
+      },
+      "publishedUnitSummaries": {
+        "VT": {
+          "C01d": {
+            "priceWithoutVat": 6216.56,
+            "priceWithVat": 7522.04
+          },
+          "C02d": {
+            "priceWithoutVat": 5354.9,
+            "priceWithVat": 6479.43
+          },
+          "C03d": {
+            "priceWithoutVat": 4084.86,
+            "priceWithVat": 4942.68
+          },
+          "C25d": {
+            "priceWithoutVat": 5331.5,
+            "priceWithVat": 6451.12
+          },
+          "C26d": {
+            "priceWithoutVat": 4425.72,
+            "priceWithVat": 5355.12
+          },
+          "C27d": {
+            "priceWithoutVat": 5331.5,
+            "priceWithVat": 6451.12
+          },
+          "C35d": {
+            "priceWithoutVat": 3775.85,
+            "priceWithVat": 4568.78
+          },
+          "C45d": {
+            "priceWithoutVat": 3763.45,
+            "priceWithVat": 4553.77
+          },
+          "C46d": {
+            "priceWithoutVat": 6252.92,
+            "priceWithVat": 7566.03
+          },
+          "C56d": {
+            "priceWithoutVat": 3763.45,
+            "priceWithVat": 4553.77
+          },
+          "C62d": {
+            "priceWithoutVat": 3261.85,
+            "priceWithVat": 3946.84
+          }
+        },
+        "NT": {
+          "C25d": {
+            "priceWithoutVat": 3066.89,
+            "priceWithVat": 3710.94
+          },
+          "C26d": {
+            "priceWithoutVat": 3066.89,
+            "priceWithVat": 3710.94
+          },
+          "C27d": {
+            "priceWithoutVat": 3066.89,
+            "priceWithVat": 3710.94
+          },
+          "C35d": {
+            "priceWithoutVat": 3148.7,
+            "priceWithVat": 3809.93
+          },
+          "C45d": {
+            "priceWithoutVat": 3217.3,
+            "priceWithVat": 3892.93
+          },
+          "C46d": {
+            "priceWithoutVat": 3217.3,
+            "priceWithVat": 3892.93
+          },
+          "C56d": {
+            "priceWithoutVat": 3217.3,
+            "priceWithVat": 3892.93
+          }
+        }
+      }
+    },
+    "EG.D": {
+      "metadata": {
+        "supplier": "MND Energie a.s.",
+        "productName": "Proud – Ceník Prosinec 28",
+        "pricingType": "fixed",
+        "validFrom": "2026-10-07",
+        "priceGuaranteeUntil": "2028-12-31",
+        "revertsToBasicFrom": "2029-01-01",
+        "distributionArea": "EG.D",
+        "sourceFile": "2026_10_01_MND_Proud_Cenik_Prosinec_28_EGD_MO.pdf",
+        "sourcePages": [
+          1,
+          2
+        ],
+        "sha256": "830513fa6ee9b9728a0b5e4e1a71aa78e3120eaf6691818ac74c20e46fe8cd38",
+        "lastVerifiedAt": "2026-10-28",
+        "vatConvention": "square brackets without VAT; leading price with VAT",
+        "limitKwh": 30000
+      },
+      "tariffs": {
+        "C01d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 68.0,
+              "priceWithVat": 82.28
+            },
+            "10": {
+              "priceWithoutVat": 109.0,
+              "priceWithVat": 131.89
+            },
+            "11": {
+              "priceWithoutVat": 137.0,
+              "priceWithVat": 165.77
+            },
+            "12": {
+              "priceWithoutVat": 171.0,
+              "priceWithVat": 206.91
+            },
+            "13": {
+              "priceWithoutVat": 219.0,
+              "priceWithVat": 264.99
+            },
+            "14": {
+              "priceWithoutVat": 274.0,
+              "priceWithVat": 331.54
+            },
+            "15": {
+              "priceWithoutVat": 342.0,
+              "priceWithVat": 413.82
+            },
+            "16": {
+              "priceWithoutVat": 431.0,
+              "priceWithVat": 521.51
+            },
+            "17": {
+              "priceWithoutVat": 547.0,
+              "priceWithVat": 661.87
+            },
+            "18": {
+              "priceWithoutVat": 684.0,
+              "priceWithVat": 827.64
+            },
+            "19": {
+              "priceWithoutVat": 855.0,
+              "priceWithVat": 1034.55
+            },
+            "20": {
+              "priceWithoutVat": 1094.0,
+              "priceWithVat": 1323.74
+            },
+            "21": {
+              "priceWithoutVat": 6.84,
+              "priceWithVat": 8.28
+            },
+            "22": {
+              "priceWithoutVat": 2.28,
+              "priceWithVat": 2.76
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2899.17,
+            "priceWithVat": 3508.0
+          },
+          "commodityNT": null,
+          "distributionVT": {
+            "priceWithoutVat": 4168.98,
+            "priceWithVat": 5044.47
+          },
+          "distributionNT": null
+        },
+        "C02d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 151.0,
+              "priceWithVat": 182.71
+            },
+            "10": {
+              "priceWithoutVat": 241.0,
+              "priceWithVat": 291.61
+            },
+            "11": {
+              "priceWithoutVat": 302.0,
+              "priceWithVat": 365.42
+            },
+            "12": {
+              "priceWithoutVat": 377.0,
+              "priceWithVat": 456.17
+            },
+            "13": {
+              "priceWithoutVat": 483.0,
+              "priceWithVat": 584.43
+            },
+            "14": {
+              "priceWithoutVat": 604.0,
+              "priceWithVat": 730.84
+            },
+            "15": {
+              "priceWithoutVat": 755.0,
+              "priceWithVat": 913.55
+            },
+            "16": {
+              "priceWithoutVat": 951.0,
+              "priceWithVat": 1150.71
+            },
+            "17": {
+              "priceWithoutVat": 1207.0,
+              "priceWithVat": 1460.47
+            },
+            "18": {
+              "priceWithoutVat": 1509.0,
+              "priceWithVat": 1825.89
+            },
+            "19": {
+              "priceWithoutVat": 1886.0,
+              "priceWithVat": 2282.06
+            },
+            "20": {
+              "priceWithoutVat": 2414.0,
+              "priceWithVat": 2920.94
+            },
+            "21": {
+              "priceWithoutVat": 15.09,
+              "priceWithVat": 18.26
+            },
+            "22": {
+              "priceWithoutVat": 5.03,
+              "priceWithVat": 6.09
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2899.17,
+            "priceWithVat": 3508.0
+          },
+          "commodityNT": null,
+          "distributionVT": {
+            "priceWithoutVat": 3185.49,
+            "priceWithVat": 3854.44
+          },
+          "distributionNT": null
+        },
+        "C03d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 957.0,
+              "priceWithVat": 1157.97
+            },
+            "10": {
+              "priceWithoutVat": 1531.0,
+              "priceWithVat": 1852.51
+            },
+            "11": {
+              "priceWithoutVat": 1913.0,
+              "priceWithVat": 2314.73
+            },
+            "12": {
+              "priceWithoutVat": 2392.0,
+              "priceWithVat": 2894.32
+            },
+            "13": {
+              "priceWithoutVat": 3061.0,
+              "priceWithVat": 3703.81
+            },
+            "14": {
+              "priceWithoutVat": 3827.0,
+              "priceWithVat": 4630.67
+            },
+            "15": {
+              "priceWithoutVat": 4784.0,
+              "priceWithVat": 5788.64
+            },
+            "16": {
+              "priceWithoutVat": 6027.0,
+              "priceWithVat": 7292.67
+            },
+            "17": {
+              "priceWithoutVat": 7654.0,
+              "priceWithVat": 9261.34
+            },
+            "18": {
+              "priceWithoutVat": 9567.0,
+              "priceWithVat": 11576.07
+            },
+            "19": {
+              "priceWithoutVat": 11959.0,
+              "priceWithVat": 14470.39
+            },
+            "20": {
+              "priceWithoutVat": 15307.0,
+              "priceWithVat": 18521.47
+            },
+            "21": {
+              "priceWithoutVat": 95.67,
+              "priceWithVat": 115.76
+            },
+            "22": {
+              "priceWithoutVat": 31.89,
+              "priceWithVat": 38.59
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2899.17,
+            "priceWithVat": 3508.0
+          },
+          "commodityNT": null,
+          "distributionVT": {
+            "priceWithoutVat": 1627.41,
+            "priceWithVat": 1969.17
+          },
+          "distributionNT": null
+        },
+        "C25d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 230.0,
+              "priceWithVat": 278.3
+            },
+            "10": {
+              "priceWithoutVat": 367.0,
+              "priceWithVat": 444.07
+            },
+            "11": {
+              "priceWithoutVat": 459.0,
+              "priceWithVat": 555.39
+            },
+            "12": {
+              "priceWithoutVat": 574.0,
+              "priceWithVat": 694.54
+            },
+            "13": {
+              "priceWithoutVat": 734.0,
+              "priceWithVat": 888.14
+            },
+            "14": {
+              "priceWithoutVat": 918.0,
+              "priceWithVat": 1110.78
+            },
+            "15": {
+              "priceWithoutVat": 1148.0,
+              "priceWithVat": 1389.08
+            },
+            "16": {
+              "priceWithoutVat": 1446.0,
+              "priceWithVat": 1749.66
+            },
+            "17": {
+              "priceWithoutVat": 1836.0,
+              "priceWithVat": 2221.56
+            },
+            "18": {
+              "priceWithoutVat": 2295.0,
+              "priceWithVat": 2776.95
+            },
+            "19": {
+              "priceWithoutVat": 2869.0,
+              "priceWithVat": 3471.49
+            },
+            "20": {
+              "priceWithoutVat": 3672.0,
+              "priceWithVat": 4443.12
+            },
+            "21": {
+              "priceWithoutVat": 22.95,
+              "priceWithVat": 27.77
+            },
+            "22": {
+              "priceWithoutVat": 7.65,
+              "priceWithVat": 9.26
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2930.57,
+            "priceWithVat": 3546.0
+          },
+          "commodityNT": {
+            "priceWithoutVat": 2757.85,
+            "priceWithVat": 3337.0
+          },
+          "distributionVT": {
+            "priceWithoutVat": 3100.85,
+            "priceWithVat": 3752.03
+          },
+          "distributionNT": {
+            "priceWithoutVat": 224.3,
+            "priceWithVat": 271.4
+          }
+        },
+        "C26d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 522.0,
+              "priceWithVat": 631.62
+            },
+            "10": {
+              "priceWithoutVat": 835.0,
+              "priceWithVat": 1010.35
+            },
+            "11": {
+              "priceWithoutVat": 1044.0,
+              "priceWithVat": 1263.24
+            },
+            "12": {
+              "priceWithoutVat": 1305.0,
+              "priceWithVat": 1579.05
+            },
+            "13": {
+              "priceWithoutVat": 1670.0,
+              "priceWithVat": 2020.7
+            },
+            "14": {
+              "priceWithoutVat": 2088.0,
+              "priceWithVat": 2526.48
+            },
+            "15": {
+              "priceWithoutVat": 2610.0,
+              "priceWithVat": 3158.1
+            },
+            "16": {
+              "priceWithoutVat": 3289.0,
+              "priceWithVat": 3979.69
+            },
+            "17": {
+              "priceWithoutVat": 4176.0,
+              "priceWithVat": 5052.96
+            },
+            "18": {
+              "priceWithoutVat": 5220.0,
+              "priceWithVat": 6316.2
+            },
+            "19": {
+              "priceWithoutVat": 6525.0,
+              "priceWithVat": 7895.25
+            },
+            "20": {
+              "priceWithoutVat": 8352.0,
+              "priceWithVat": 10105.92
+            },
+            "21": {
+              "priceWithoutVat": 52.2,
+              "priceWithVat": 63.16
+            },
+            "22": {
+              "priceWithoutVat": 17.4,
+              "priceWithVat": 21.05
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2930.57,
+            "priceWithVat": 3546.0
+          },
+          "commodityNT": {
+            "priceWithoutVat": 2757.85,
+            "priceWithVat": 3337.0
+          },
+          "distributionVT": {
+            "priceWithoutVat": 1573.86,
+            "priceWithVat": 1904.37
+          },
+          "distributionNT": {
+            "priceWithoutVat": 224.3,
+            "priceWithVat": 271.4
+          }
+        },
+        "C27d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 218.0,
+              "priceWithVat": 263.78
+            },
+            "10": {
+              "priceWithoutVat": 348.0,
+              "priceWithVat": 421.08
+            },
+            "11": {
+              "priceWithoutVat": 436.0,
+              "priceWithVat": 527.56
+            },
+            "12": {
+              "priceWithoutVat": 545.0,
+              "priceWithVat": 659.45
+            },
+            "13": {
+              "priceWithoutVat": 697.0,
+              "priceWithVat": 843.37
+            },
+            "14": {
+              "priceWithoutVat": 871.0,
+              "priceWithVat": 1053.91
+            },
+            "15": {
+              "priceWithoutVat": 1089.0,
+              "priceWithVat": 1317.69
+            },
+            "16": {
+              "priceWithoutVat": 1372.0,
+              "priceWithVat": 1660.12
+            },
+            "17": {
+              "priceWithoutVat": 1742.0,
+              "priceWithVat": 2107.82
+            },
+            "18": {
+              "priceWithoutVat": 2178.0,
+              "priceWithVat": 2635.38
+            },
+            "19": {
+              "priceWithoutVat": 2723.0,
+              "priceWithVat": 3294.83
+            },
+            "20": {
+              "priceWithoutVat": 3485.0,
+              "priceWithVat": 4216.85
+            },
+            "21": {
+              "priceWithoutVat": 21.78,
+              "priceWithVat": 26.35
+            },
+            "22": {
+              "priceWithoutVat": 7.26,
+              "priceWithVat": 8.78
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2930.57,
+            "priceWithVat": 3546.0
+          },
+          "commodityNT": {
+            "priceWithoutVat": 2757.85,
+            "priceWithVat": 3337.0
+          },
+          "distributionVT": {
+            "priceWithoutVat": 3100.85,
+            "priceWithVat": 3752.03
+          },
+          "distributionNT": {
+            "priceWithoutVat": 224.3,
+            "priceWithVat": 271.4
+          }
+        },
+        "C35d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 603.0,
+              "priceWithVat": 729.63
+            },
+            "10": {
+              "priceWithoutVat": 965.0,
+              "priceWithVat": 1167.65
+            },
+            "11": {
+              "priceWithoutVat": 1207.0,
+              "priceWithVat": 1460.47
+            },
+            "12": {
+              "priceWithoutVat": 1508.0,
+              "priceWithVat": 1824.68
+            },
+            "13": {
+              "priceWithoutVat": 1931.0,
+              "priceWithVat": 2336.51
+            },
+            "14": {
+              "priceWithoutVat": 2413.0,
+              "priceWithVat": 2919.73
+            },
+            "15": {
+              "priceWithoutVat": 3017.0,
+              "priceWithVat": 3650.57
+            },
+            "16": {
+              "priceWithoutVat": 3801.0,
+              "priceWithVat": 4599.21
+            },
+            "17": {
+              "priceWithoutVat": 4826.0,
+              "priceWithVat": 5839.46
+            },
+            "18": {
+              "priceWithoutVat": 6033.0,
+              "priceWithVat": 7299.93
+            },
+            "19": {
+              "priceWithoutVat": 7541.0,
+              "priceWithVat": 9124.61
+            },
+            "20": {
+              "priceWithoutVat": 9653.0,
+              "priceWithVat": 11680.13
+            },
+            "21": {
+              "priceWithoutVat": 60.33,
+              "priceWithVat": 73.0
+            },
+            "22": {
+              "priceWithoutVat": 20.11,
+              "priceWithVat": 24.33
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2947.93,
+            "priceWithVat": 3567.0
+          },
+          "commodityNT": {
+            "priceWithoutVat": 2839.66,
+            "priceWithVat": 3436.0
+          },
+          "distributionVT": {
+            "priceWithoutVat": 759.67,
+            "priceWithVat": 919.2
+          },
+          "distributionNT": {
+            "priceWithoutVat": 224.3,
+            "priceWithVat": 271.4
+          }
+        },
+        "C45d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 603.0,
+              "priceWithVat": 729.63
+            },
+            "10": {
+              "priceWithoutVat": 965.0,
+              "priceWithVat": 1167.65
+            },
+            "11": {
+              "priceWithoutVat": 1207.0,
+              "priceWithVat": 1460.47
+            },
+            "12": {
+              "priceWithoutVat": 1508.0,
+              "priceWithVat": 1824.68
+            },
+            "13": {
+              "priceWithoutVat": 1931.0,
+              "priceWithVat": 2336.51
+            },
+            "14": {
+              "priceWithoutVat": 2413.0,
+              "priceWithVat": 2919.73
+            },
+            "15": {
+              "priceWithoutVat": 3017.0,
+              "priceWithVat": 3650.57
+            },
+            "16": {
+              "priceWithoutVat": 3801.0,
+              "priceWithVat": 4599.21
+            },
+            "17": {
+              "priceWithoutVat": 4826.0,
+              "priceWithVat": 5839.46
+            },
+            "18": {
+              "priceWithoutVat": 6033.0,
+              "priceWithVat": 7299.93
+            },
+            "19": {
+              "priceWithoutVat": 7541.0,
+              "priceWithVat": 9124.61
+            },
+            "20": {
+              "priceWithoutVat": 9653.0,
+              "priceWithVat": 11680.13
+            },
+            "21": {
+              "priceWithoutVat": 60.33,
+              "priceWithVat": 73.0
+            },
+            "22": {
+              "priceWithoutVat": 20.11,
+              "priceWithVat": 24.33
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2935.53,
+            "priceWithVat": 3552.0
+          },
+          "commodityNT": {
+            "priceWithoutVat": 2908.26,
+            "priceWithVat": 3519.0
+          },
+          "distributionVT": {
+            "priceWithoutVat": 759.67,
+            "priceWithVat": 919.2
+          },
+          "distributionNT": {
+            "priceWithoutVat": 224.3,
+            "priceWithVat": 271.4
+          }
+        },
+        "C46d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 603.0,
+              "priceWithVat": 729.63
+            },
+            "10": {
+              "priceWithoutVat": 965.0,
+              "priceWithVat": 1167.65
+            },
+            "11": {
+              "priceWithoutVat": 1206.0,
+              "priceWithVat": 1459.26
+            },
+            "12": {
+              "priceWithoutVat": 1508.0,
+              "priceWithVat": 1824.68
+            },
+            "13": {
+              "priceWithoutVat": 1930.0,
+              "priceWithVat": 2335.3
+            },
+            "14": {
+              "priceWithoutVat": 2437.0,
+              "priceWithVat": 2948.77
+            },
+            "15": {
+              "priceWithoutVat": 3077.0,
+              "priceWithVat": 3723.17
+            },
+            "16": {
+              "priceWithoutVat": 3993.0,
+              "priceWithVat": 4831.53
+            },
+            "17": {
+              "priceWithoutVat": 5577.0,
+              "priceWithVat": 6748.17
+            },
+            "18": {
+              "priceWithoutVat": 8366.0,
+              "priceWithVat": 10122.86
+            },
+            "19": {
+              "priceWithoutVat": 12862.0,
+              "priceWithVat": 15563.02
+            },
+            "20": {
+              "priceWithoutVat": 20445.0,
+              "priceWithVat": 24738.45
+            },
+            "21": {
+              "priceWithoutVat": 127.78,
+              "priceWithVat": 154.61
+            },
+            "22": {
+              "priceWithoutVat": 42.59,
+              "priceWithVat": 51.53
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2935.53,
+            "priceWithVat": 3552.0
+          },
+          "commodityNT": {
+            "priceWithoutVat": 2908.26,
+            "priceWithVat": 3519.0
+          },
+          "distributionVT": {
+            "priceWithoutVat": 4168.98,
+            "priceWithVat": 5044.47
+          },
+          "distributionNT": {
+            "priceWithoutVat": 224.3,
+            "priceWithVat": 271.4
+          }
+        },
+        "C56d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 603.0,
+              "priceWithVat": 729.63
+            },
+            "10": {
+              "priceWithoutVat": 965.0,
+              "priceWithVat": 1167.65
+            },
+            "11": {
+              "priceWithoutVat": 1207.0,
+              "priceWithVat": 1460.47
+            },
+            "12": {
+              "priceWithoutVat": 1508.0,
+              "priceWithVat": 1824.68
+            },
+            "13": {
+              "priceWithoutVat": 1931.0,
+              "priceWithVat": 2336.51
+            },
+            "14": {
+              "priceWithoutVat": 2413.0,
+              "priceWithVat": 2919.73
+            },
+            "15": {
+              "priceWithoutVat": 3017.0,
+              "priceWithVat": 3650.57
+            },
+            "16": {
+              "priceWithoutVat": 3801.0,
+              "priceWithVat": 4599.21
+            },
+            "17": {
+              "priceWithoutVat": 4826.0,
+              "priceWithVat": 5839.46
+            },
+            "18": {
+              "priceWithoutVat": 6033.0,
+              "priceWithVat": 7299.93
+            },
+            "19": {
+              "priceWithoutVat": 7541.0,
+              "priceWithVat": 9124.61
+            },
+            "20": {
+              "priceWithoutVat": 9653.0,
+              "priceWithVat": 11680.13
+            },
+            "21": {
+              "priceWithoutVat": 60.33,
+              "priceWithVat": 73.0
+            },
+            "22": {
+              "priceWithoutVat": 20.11,
+              "priceWithVat": 24.33
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2935.53,
+            "priceWithVat": 3552.0
+          },
+          "commodityNT": {
+            "priceWithoutVat": 2908.26,
+            "priceWithVat": 3519.0
+          },
+          "distributionVT": {
+            "priceWithoutVat": 759.67,
+            "priceWithVat": 919.2
+          },
+          "distributionNT": {
+            "priceWithoutVat": 224.3,
+            "priceWithVat": 271.4
+          }
+        },
+        "C62d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 197.0,
+              "priceWithVat": 238.37
+            },
+            "10": {
+              "priceWithoutVat": 314.0,
+              "priceWithVat": 379.94
+            },
+            "11": {
+              "priceWithoutVat": 393.0,
+              "priceWithVat": 475.53
+            },
+            "12": {
+              "priceWithoutVat": 491.0,
+              "priceWithVat": 594.11
+            },
+            "13": {
+              "priceWithoutVat": 629.0,
+              "priceWithVat": 761.09
+            },
+            "14": {
+              "priceWithoutVat": 786.0,
+              "priceWithVat": 951.06
+            },
+            "15": {
+              "priceWithoutVat": 983.0,
+              "priceWithVat": 1189.43
+            },
+            "16": {
+              "priceWithoutVat": 1238.0,
+              "priceWithVat": 1497.98
+            },
+            "17": {
+              "priceWithoutVat": 1572.0,
+              "priceWithVat": 1902.12
+            },
+            "18": {
+              "priceWithoutVat": 1965.0,
+              "priceWithVat": 2377.65
+            },
+            "19": {
+              "priceWithoutVat": 2456.0,
+              "priceWithVat": 2971.76
+            },
+            "20": {
+              "priceWithoutVat": 3144.0,
+              "priceWithVat": 3804.24
+            },
+            "21": {
+              "priceWithoutVat": 19.65,
+              "priceWithVat": 23.78
+            },
+            "22": {
+              "priceWithoutVat": 6.55,
+              "priceWithVat": 7.93
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2771.9,
+            "priceWithVat": 3354.0
+          },
+          "commodityNT": null,
+          "distributionVT": {
+            "priceWithoutVat": 385.07,
+            "priceWithVat": 465.93
+          },
+          "distributionNT": null
+        }
+      },
+      "common": {
+        "system": {
+          "priceWithoutVat": 164.24,
+          "priceWithVat": 198.73
+        },
+        "pozePerMwh": {
+          "priceWithoutVat": 0.0,
+          "priceWithVat": 0.0
+        },
+        "infrastructure": {
+          "priceWithoutVat": 12.87,
+          "priceWithVat": 15.57
+        },
+        "tax": {
+          "priceWithoutVat": 28.3,
+          "priceWithVat": 34.24
+        }
+      },
+      "infrastructureComponentsWithoutVat": {
+        "dataCentre": 5.88,
+        "eru": 4,
+        "oteSettlement": 1.61,
+        "pozeAdministration": 1.38
+      },
+      "publishedUnitSummaries": {
+        "VT": {
+          "C01d": {
+            "priceWithoutVat": 7260.69,
+            "priceWithVat": 8785.43
+          },
+          "C02d": {
+            "priceWithoutVat": 6277.2,
+            "priceWithVat": 7595.41
+          },
+          "C03d": {
+            "priceWithoutVat": 4719.12,
+            "priceWithVat": 5710.14
+          },
+          "C25d": {
+            "priceWithoutVat": 6223.96,
+            "priceWithVat": 7530.99
+          },
+          "C26d": {
+            "priceWithoutVat": 4696.97,
+            "priceWithVat": 5683.33
+          },
+          "C27d": {
+            "priceWithoutVat": 6223.96,
+            "priceWithVat": 7530.99
+          },
+          "C35d": {
+            "priceWithoutVat": 3900.14,
+            "priceWithVat": 4719.17
+          },
+          "C45d": {
+            "priceWithoutVat": 3887.74,
+            "priceWithVat": 4704.17
+          },
+          "C46d": {
+            "priceWithoutVat": 7297.05,
+            "priceWithVat": 8829.43
+          },
+          "C56d": {
+            "priceWithoutVat": 3887.74,
+            "priceWithVat": 4704.17
+          },
+          "C62d": {
+            "priceWithoutVat": 3349.51,
+            "priceWithVat": 4052.91
+          }
+        },
+        "NT": {
+          "C25d": {
+            "priceWithoutVat": 3174.69,
+            "priceWithVat": 3841.37
+          },
+          "C26d": {
+            "priceWithoutVat": 3174.69,
+            "priceWithVat": 3841.37
+          },
+          "C27d": {
+            "priceWithoutVat": 3174.69,
+            "priceWithVat": 3841.37
+          },
+          "C35d": {
+            "priceWithoutVat": 3256.5,
+            "priceWithVat": 3940.37
+          },
+          "C45d": {
+            "priceWithoutVat": 3325.1,
+            "priceWithVat": 4023.37
+          },
+          "C46d": {
+            "priceWithoutVat": 3325.1,
+            "priceWithVat": 4023.37
+          },
+          "C56d": {
+            "priceWithoutVat": 3325.1,
+            "priceWithVat": 4023.37
+          }
+        }
+      }
+    },
+    "PREdistribuce": {
+      "metadata": {
+        "supplier": "MND Energie a.s.",
+        "productName": "Proud – Ceník Prosinec 28",
+        "pricingType": "fixed",
+        "validFrom": "2026-10-07",
+        "priceGuaranteeUntil": "2028-12-31",
+        "revertsToBasicFrom": "2029-01-01",
+        "distributionArea": "PREdistribuce",
+        "sourceFile": "2026_10_01_MND_Proud_Cenik_Prosinec_28_PRE_MO.pdf",
+        "sourcePages": [
+          1,
+          2
+        ],
+        "sha256": "28e3a3de00200a6c286083a834ac14b864009a70fc2b8b360107b90ca22dbf59",
+        "lastVerifiedAt": "2026-10-28",
+        "vatConvention": "square brackets without VAT; leading price with VAT",
+        "limitKwh": 30000
+      },
+      "tariffs": {
+        "C01d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 54.0,
+              "priceWithVat": 65.34
+            },
+            "10": {
+              "priceWithoutVat": 86.0,
+              "priceWithVat": 104.06
+            },
+            "11": {
+              "priceWithoutVat": 107.0,
+              "priceWithVat": 129.47
+            },
+            "12": {
+              "priceWithoutVat": 134.0,
+              "priceWithVat": 162.14
+            },
+            "13": {
+              "priceWithoutVat": 172.0,
+              "priceWithVat": 208.12
+            },
+            "14": {
+              "priceWithoutVat": 215.0,
+              "priceWithVat": 260.15
+            },
+            "15": {
+              "priceWithoutVat": 269.0,
+              "priceWithVat": 325.49
+            },
+            "16": {
+              "priceWithoutVat": 338.0,
+              "priceWithVat": 408.98
+            },
+            "17": {
+              "priceWithoutVat": 430.0,
+              "priceWithVat": 520.3
+            },
+            "18": {
+              "priceWithoutVat": 537.0,
+              "priceWithVat": 649.77
+            },
+            "19": {
+              "priceWithoutVat": 671.0,
+              "priceWithVat": 811.91
+            },
+            "20": {
+              "priceWithoutVat": 859.0,
+              "priceWithVat": 1039.39
+            },
+            "21": {
+              "priceWithoutVat": 5.37,
+              "priceWithVat": 6.5
+            },
+            "22": {
+              "priceWithoutVat": 1.79,
+              "priceWithVat": 2.17
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2899.17,
+            "priceWithVat": 3508.0
+          },
+          "commodityNT": null,
+          "distributionVT": {
+            "priceWithoutVat": 3249.39,
+            "priceWithVat": 3931.76
+          },
+          "distributionNT": null
+        },
+        "C02d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 119.0,
+              "priceWithVat": 143.99
+            },
+            "10": {
+              "priceWithoutVat": 190.0,
+              "priceWithVat": 229.9
+            },
+            "11": {
+              "priceWithoutVat": 238.0,
+              "priceWithVat": 287.98
+            },
+            "12": {
+              "priceWithoutVat": 297.0,
+              "priceWithVat": 359.37
+            },
+            "13": {
+              "priceWithoutVat": 380.0,
+              "priceWithVat": 459.8
+            },
+            "14": {
+              "priceWithoutVat": 475.0,
+              "priceWithVat": 574.75
+            },
+            "15": {
+              "priceWithoutVat": 594.0,
+              "priceWithVat": 718.74
+            },
+            "16": {
+              "priceWithoutVat": 748.0,
+              "priceWithVat": 905.08
+            },
+            "17": {
+              "priceWithoutVat": 950.0,
+              "priceWithVat": 1149.5
+            },
+            "18": {
+              "priceWithoutVat": 1188.0,
+              "priceWithVat": 1437.48
+            },
+            "19": {
+              "priceWithoutVat": 1485.0,
+              "priceWithVat": 1796.85
+            },
+            "20": {
+              "priceWithoutVat": 1901.0,
+              "priceWithVat": 2300.21
+            },
+            "21": {
+              "priceWithoutVat": 11.88,
+              "priceWithVat": 14.37
+            },
+            "22": {
+              "priceWithoutVat": 3.96,
+              "priceWithVat": 4.79
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2899.17,
+            "priceWithVat": 3508.0
+          },
+          "commodityNT": null,
+          "distributionVT": {
+            "priceWithoutVat": 2593.88,
+            "priceWithVat": 3138.59
+          },
+          "distributionNT": null
+        },
+        "C03d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 703.0,
+              "priceWithVat": 850.63
+            },
+            "10": {
+              "priceWithoutVat": 1125.0,
+              "priceWithVat": 1361.25
+            },
+            "11": {
+              "priceWithoutVat": 1406.0,
+              "priceWithVat": 1701.26
+            },
+            "12": {
+              "priceWithoutVat": 1757.0,
+              "priceWithVat": 2125.97
+            },
+            "13": {
+              "priceWithoutVat": 2249.0,
+              "priceWithVat": 2721.29
+            },
+            "14": {
+              "priceWithoutVat": 2812.0,
+              "priceWithVat": 3402.52
+            },
+            "15": {
+              "priceWithoutVat": 3515.0,
+              "priceWithVat": 4253.15
+            },
+            "16": {
+              "priceWithoutVat": 4428.0,
+              "priceWithVat": 5357.88
+            },
+            "17": {
+              "priceWithoutVat": 5623.0,
+              "priceWithVat": 6803.83
+            },
+            "18": {
+              "priceWithoutVat": 7029.0,
+              "priceWithVat": 8505.09
+            },
+            "19": {
+              "priceWithoutVat": 8786.0,
+              "priceWithVat": 10631.06
+            },
+            "20": {
+              "priceWithoutVat": 11246.0,
+              "priceWithVat": 13607.66
+            },
+            "21": {
+              "priceWithoutVat": 70.29,
+              "priceWithVat": 85.05
+            },
+            "22": {
+              "priceWithoutVat": 23.43,
+              "priceWithVat": 28.35
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2899.17,
+            "priceWithVat": 3508.0
+          },
+          "commodityNT": null,
+          "distributionVT": {
+            "priceWithoutVat": 1286.52,
+            "priceWithVat": 1556.69
+          },
+          "distributionNT": null
+        },
+        "C25d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 184.0,
+              "priceWithVat": 222.64
+            },
+            "10": {
+              "priceWithoutVat": 294.0,
+              "priceWithVat": 355.74
+            },
+            "11": {
+              "priceWithoutVat": 368.0,
+              "priceWithVat": 445.28
+            },
+            "12": {
+              "priceWithoutVat": 460.0,
+              "priceWithVat": 556.6
+            },
+            "13": {
+              "priceWithoutVat": 588.0,
+              "priceWithVat": 711.48
+            },
+            "14": {
+              "priceWithoutVat": 736.0,
+              "priceWithVat": 890.56
+            },
+            "15": {
+              "priceWithoutVat": 920.0,
+              "priceWithVat": 1113.2
+            },
+            "16": {
+              "priceWithoutVat": 1159.0,
+              "priceWithVat": 1402.39
+            },
+            "17": {
+              "priceWithoutVat": 1471.0,
+              "priceWithVat": 1779.91
+            },
+            "18": {
+              "priceWithoutVat": 1839.0,
+              "priceWithVat": 2225.19
+            },
+            "19": {
+              "priceWithoutVat": 2299.0,
+              "priceWithVat": 2781.79
+            },
+            "20": {
+              "priceWithoutVat": 2942.0,
+              "priceWithVat": 3559.82
+            },
+            "21": {
+              "priceWithoutVat": 18.39,
+              "priceWithVat": 22.25
+            },
+            "22": {
+              "priceWithoutVat": 6.13,
+              "priceWithVat": 7.42
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2930.57,
+            "priceWithVat": 3546.0
+          },
+          "commodityNT": {
+            "priceWithoutVat": 2757.85,
+            "priceWithVat": 3337.0
+          },
+          "distributionVT": {
+            "priceWithoutVat": 2485.69,
+            "priceWithVat": 3007.68
+          },
+          "distributionNT": {
+            "priceWithoutVat": 175.2,
+            "priceWithVat": 211.99
+          }
+        },
+        "C26d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 417.0,
+              "priceWithVat": 504.57
+            },
+            "10": {
+              "priceWithoutVat": 668.0,
+              "priceWithVat": 808.28
+            },
+            "11": {
+              "priceWithoutVat": 835.0,
+              "priceWithVat": 1010.35
+            },
+            "12": {
+              "priceWithoutVat": 1043.0,
+              "priceWithVat": 1262.03
+            },
+            "13": {
+              "priceWithoutVat": 1335.0,
+              "priceWithVat": 1615.35
+            },
+            "14": {
+              "priceWithoutVat": 1669.0,
+              "priceWithVat": 2019.49
+            },
+            "15": {
+              "priceWithoutVat": 2087.0,
+              "priceWithVat": 2525.27
+            },
+            "16": {
+              "priceWithoutVat": 2629.0,
+              "priceWithVat": 3181.09
+            },
+            "17": {
+              "priceWithoutVat": 3338.0,
+              "priceWithVat": 4038.98
+            },
+            "18": {
+              "priceWithoutVat": 4173.0,
+              "priceWithVat": 5049.33
+            },
+            "19": {
+              "priceWithoutVat": 5216.0,
+              "priceWithVat": 6311.36
+            },
+            "20": {
+              "priceWithoutVat": 6677.0,
+              "priceWithVat": 8079.17
+            },
+            "21": {
+              "priceWithoutVat": 41.73,
+              "priceWithVat": 50.49
+            },
+            "22": {
+              "priceWithoutVat": 13.91,
+              "priceWithVat": 16.83
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2930.57,
+            "priceWithVat": 3546.0
+          },
+          "commodityNT": {
+            "priceWithoutVat": 2757.85,
+            "priceWithVat": 3337.0
+          },
+          "distributionVT": {
+            "priceWithoutVat": 1300.31,
+            "priceWithVat": 1573.38
+          },
+          "distributionNT": {
+            "priceWithoutVat": 175.2,
+            "priceWithVat": 211.99
+          }
+        },
+        "C27d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 175.0,
+              "priceWithVat": 211.75
+            },
+            "10": {
+              "priceWithoutVat": 280.0,
+              "priceWithVat": 338.8
+            },
+            "11": {
+              "priceWithoutVat": 350.0,
+              "priceWithVat": 423.5
+            },
+            "12": {
+              "priceWithoutVat": 437.0,
+              "priceWithVat": 528.77
+            },
+            "13": {
+              "priceWithoutVat": 560.0,
+              "priceWithVat": 677.6
+            },
+            "14": {
+              "priceWithoutVat": 700.0,
+              "priceWithVat": 847.0
+            },
+            "15": {
+              "priceWithoutVat": 875.0,
+              "priceWithVat": 1058.75
+            },
+            "16": {
+              "priceWithoutVat": 1102.0,
+              "priceWithVat": 1333.42
+            },
+            "17": {
+              "priceWithoutVat": 1399.0,
+              "priceWithVat": 1692.79
+            },
+            "18": {
+              "priceWithoutVat": 1749.0,
+              "priceWithVat": 2116.29
+            },
+            "19": {
+              "priceWithoutVat": 2186.0,
+              "priceWithVat": 2645.06
+            },
+            "20": {
+              "priceWithoutVat": 2798.0,
+              "priceWithVat": 3385.58
+            },
+            "21": {
+              "priceWithoutVat": 17.49,
+              "priceWithVat": 21.16
+            },
+            "22": {
+              "priceWithoutVat": 5.83,
+              "priceWithVat": 7.05
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2930.57,
+            "priceWithVat": 3546.0
+          },
+          "commodityNT": {
+            "priceWithoutVat": 2757.85,
+            "priceWithVat": 3337.0
+          },
+          "distributionVT": {
+            "priceWithoutVat": 2485.69,
+            "priceWithVat": 3007.68
+          },
+          "distributionNT": {
+            "priceWithoutVat": 175.2,
+            "priceWithVat": 211.99
+          }
+        },
+        "C35d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 511.0,
+              "priceWithVat": 618.31
+            },
+            "10": {
+              "priceWithoutVat": 817.0,
+              "priceWithVat": 988.57
+            },
+            "11": {
+              "priceWithoutVat": 1021.0,
+              "priceWithVat": 1235.41
+            },
+            "12": {
+              "priceWithoutVat": 1277.0,
+              "priceWithVat": 1545.17
+            },
+            "13": {
+              "priceWithoutVat": 1634.0,
+              "priceWithVat": 1977.14
+            },
+            "14": {
+              "priceWithoutVat": 2042.0,
+              "priceWithVat": 2470.82
+            },
+            "15": {
+              "priceWithoutVat": 2553.0,
+              "priceWithVat": 3089.13
+            },
+            "16": {
+              "priceWithoutVat": 3217.0,
+              "priceWithVat": 3892.57
+            },
+            "17": {
+              "priceWithoutVat": 4085.0,
+              "priceWithVat": 4942.85
+            },
+            "18": {
+              "priceWithoutVat": 5106.0,
+              "priceWithVat": 6178.26
+            },
+            "19": {
+              "priceWithoutVat": 6383.0,
+              "priceWithVat": 7723.43
+            },
+            "20": {
+              "priceWithoutVat": 8170.0,
+              "priceWithVat": 9885.7
+            },
+            "21": {
+              "priceWithoutVat": 51.06,
+              "priceWithVat": 61.78
+            },
+            "22": {
+              "priceWithoutVat": 17.02,
+              "priceWithVat": 20.59
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2947.93,
+            "priceWithVat": 3567.0
+          },
+          "commodityNT": {
+            "priceWithoutVat": 2839.66,
+            "priceWithVat": 3436.0
+          },
+          "distributionVT": {
+            "priceWithoutVat": 446.05,
+            "priceWithVat": 539.72
+          },
+          "distributionNT": {
+            "priceWithoutVat": 175.2,
+            "priceWithVat": 211.99
+          }
+        },
+        "C45d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 511.0,
+              "priceWithVat": 618.31
+            },
+            "10": {
+              "priceWithoutVat": 817.0,
+              "priceWithVat": 988.57
+            },
+            "11": {
+              "priceWithoutVat": 1021.0,
+              "priceWithVat": 1235.41
+            },
+            "12": {
+              "priceWithoutVat": 1277.0,
+              "priceWithVat": 1545.17
+            },
+            "13": {
+              "priceWithoutVat": 1634.0,
+              "priceWithVat": 1977.14
+            },
+            "14": {
+              "priceWithoutVat": 2042.0,
+              "priceWithVat": 2470.82
+            },
+            "15": {
+              "priceWithoutVat": 2553.0,
+              "priceWithVat": 3089.13
+            },
+            "16": {
+              "priceWithoutVat": 3217.0,
+              "priceWithVat": 3892.57
+            },
+            "17": {
+              "priceWithoutVat": 4085.0,
+              "priceWithVat": 4942.85
+            },
+            "18": {
+              "priceWithoutVat": 5106.0,
+              "priceWithVat": 6178.26
+            },
+            "19": {
+              "priceWithoutVat": 6383.0,
+              "priceWithVat": 7723.43
+            },
+            "20": {
+              "priceWithoutVat": 8170.0,
+              "priceWithVat": 9885.7
+            },
+            "21": {
+              "priceWithoutVat": 51.06,
+              "priceWithVat": 61.78
+            },
+            "22": {
+              "priceWithoutVat": 17.02,
+              "priceWithVat": 20.59
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2935.53,
+            "priceWithVat": 3552.0
+          },
+          "commodityNT": {
+            "priceWithoutVat": 2908.26,
+            "priceWithVat": 3519.0
+          },
+          "distributionVT": {
+            "priceWithoutVat": 446.05,
+            "priceWithVat": 539.72
+          },
+          "distributionNT": {
+            "priceWithoutVat": 175.2,
+            "priceWithVat": 211.99
+          }
+        },
+        "C46d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 510.0,
+              "priceWithVat": 617.1
+            },
+            "10": {
+              "priceWithoutVat": 817.0,
+              "priceWithVat": 988.57
+            },
+            "11": {
+              "priceWithoutVat": 1021.0,
+              "priceWithVat": 1235.41
+            },
+            "12": {
+              "priceWithoutVat": 1276.0,
+              "priceWithVat": 1543.96
+            },
+            "13": {
+              "priceWithoutVat": 1634.0,
+              "priceWithVat": 1977.14
+            },
+            "14": {
+              "priceWithoutVat": 2062.0,
+              "priceWithVat": 2495.02
+            },
+            "15": {
+              "priceWithoutVat": 2604.0,
+              "priceWithVat": 3150.84
+            },
+            "16": {
+              "priceWithoutVat": 3379.0,
+              "priceWithVat": 4088.59
+            },
+            "17": {
+              "priceWithoutVat": 4935.0,
+              "priceWithVat": 5971.35
+            },
+            "18": {
+              "priceWithoutVat": 7710.0,
+              "priceWithVat": 9329.1
+            },
+            "19": {
+              "priceWithoutVat": 13204.0,
+              "priceWithVat": 15976.84
+            },
+            "20": {
+              "priceWithoutVat": 23729.0,
+              "priceWithVat": 28712.09
+            },
+            "21": {
+              "priceWithoutVat": 148.31,
+              "priceWithVat": 179.46
+            },
+            "22": {
+              "priceWithoutVat": 49.44,
+              "priceWithVat": 59.82
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2935.53,
+            "priceWithVat": 3552.0
+          },
+          "commodityNT": {
+            "priceWithoutVat": 2908.26,
+            "priceWithVat": 3519.0
+          },
+          "distributionVT": {
+            "priceWithoutVat": 3249.39,
+            "priceWithVat": 3931.76
+          },
+          "distributionNT": {
+            "priceWithoutVat": 175.2,
+            "priceWithVat": 211.99
+          }
+        },
+        "C56d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 511.0,
+              "priceWithVat": 618.31
+            },
+            "10": {
+              "priceWithoutVat": 817.0,
+              "priceWithVat": 988.57
+            },
+            "11": {
+              "priceWithoutVat": 1021.0,
+              "priceWithVat": 1235.41
+            },
+            "12": {
+              "priceWithoutVat": 1277.0,
+              "priceWithVat": 1545.17
+            },
+            "13": {
+              "priceWithoutVat": 1634.0,
+              "priceWithVat": 1977.14
+            },
+            "14": {
+              "priceWithoutVat": 2042.0,
+              "priceWithVat": 2470.82
+            },
+            "15": {
+              "priceWithoutVat": 2553.0,
+              "priceWithVat": 3089.13
+            },
+            "16": {
+              "priceWithoutVat": 3217.0,
+              "priceWithVat": 3892.57
+            },
+            "17": {
+              "priceWithoutVat": 4085.0,
+              "priceWithVat": 4942.85
+            },
+            "18": {
+              "priceWithoutVat": 5106.0,
+              "priceWithVat": 6178.26
+            },
+            "19": {
+              "priceWithoutVat": 6383.0,
+              "priceWithVat": 7723.43
+            },
+            "20": {
+              "priceWithoutVat": 8170.0,
+              "priceWithVat": 9885.7
+            },
+            "21": {
+              "priceWithoutVat": 51.06,
+              "priceWithVat": 61.78
+            },
+            "22": {
+              "priceWithoutVat": 17.02,
+              "priceWithVat": 20.59
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2935.53,
+            "priceWithVat": 3552.0
+          },
+          "commodityNT": {
+            "priceWithoutVat": 2908.26,
+            "priceWithVat": 3519.0
+          },
+          "distributionVT": {
+            "priceWithoutVat": 446.05,
+            "priceWithVat": 539.72
+          },
+          "distributionNT": {
+            "priceWithoutVat": 175.2,
+            "priceWithVat": 211.99
+          }
+        },
+        "C62d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 173.0,
+              "priceWithVat": 209.33
+            },
+            "10": {
+              "priceWithoutVat": 277.0,
+              "priceWithVat": 335.17
+            },
+            "11": {
+              "priceWithoutVat": 347.0,
+              "priceWithVat": 419.87
+            },
+            "12": {
+              "priceWithoutVat": 434.0,
+              "priceWithVat": 525.14
+            },
+            "13": {
+              "priceWithoutVat": 555.0,
+              "priceWithVat": 671.55
+            },
+            "14": {
+              "priceWithoutVat": 694.0,
+              "priceWithVat": 839.74
+            },
+            "15": {
+              "priceWithoutVat": 867.0,
+              "priceWithVat": 1049.07
+            },
+            "16": {
+              "priceWithoutVat": 1092.0,
+              "priceWithVat": 1321.32
+            },
+            "17": {
+              "priceWithoutVat": 1387.0,
+              "priceWithVat": 1678.27
+            },
+            "18": {
+              "priceWithoutVat": 1734.0,
+              "priceWithVat": 2098.14
+            },
+            "19": {
+              "priceWithoutVat": 2168.0,
+              "priceWithVat": 2623.28
+            },
+            "20": {
+              "priceWithoutVat": 2774.0,
+              "priceWithVat": 3356.54
+            },
+            "21": {
+              "priceWithoutVat": 17.34,
+              "priceWithVat": 20.98
+            },
+            "22": {
+              "priceWithoutVat": 5.78,
+              "priceWithVat": 6.99
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2771.9,
+            "priceWithVat": 3354.0
+          },
+          "commodityNT": null,
+          "distributionVT": {
+            "priceWithoutVat": 494.98,
+            "priceWithVat": 598.93
+          },
+          "distributionNT": null
+        }
+      },
+      "common": {
+        "system": {
+          "priceWithoutVat": 164.24,
+          "priceWithVat": 198.73
+        },
+        "pozePerMwh": {
+          "priceWithoutVat": 0.0,
+          "priceWithVat": 0.0
+        },
+        "infrastructure": {
+          "priceWithoutVat": 12.87,
+          "priceWithVat": 15.57
+        },
+        "tax": {
+          "priceWithoutVat": 28.3,
+          "priceWithVat": 34.24
+        }
+      },
+      "infrastructureComponentsWithoutVat": {
+        "dataCentre": 5.88,
+        "eru": 4,
+        "oteSettlement": 1.61,
+        "pozeAdministration": 1.38
+      },
+      "publishedUnitSummaries": {
+        "VT": {
+          "C01d": {
+            "priceWithoutVat": 6341.1,
+            "priceWithVat": 7672.73
+          },
+          "C02d": {
+            "priceWithoutVat": 5685.59,
+            "priceWithVat": 6879.56
+          },
+          "C03d": {
+            "priceWithoutVat": 4378.23,
+            "priceWithVat": 5297.66
+          },
+          "C25d": {
+            "priceWithoutVat": 5608.8,
+            "priceWithVat": 6786.65
+          },
+          "C26d": {
+            "priceWithoutVat": 4423.42,
+            "priceWithVat": 5352.34
+          },
+          "C27d": {
+            "priceWithoutVat": 5608.8,
+            "priceWithVat": 6786.65
+          },
+          "C35d": {
+            "priceWithoutVat": 3586.52,
+            "priceWithVat": 4339.69
+          },
+          "C45d": {
+            "priceWithoutVat": 3574.12,
+            "priceWithVat": 4324.69
+          },
+          "C46d": {
+            "priceWithoutVat": 6377.46,
+            "priceWithVat": 7716.73
+          },
+          "C56d": {
+            "priceWithoutVat": 3574.12,
+            "priceWithVat": 4324.69
+          },
+          "C62d": {
+            "priceWithoutVat": 3459.42,
+            "priceWithVat": 4185.9
+          }
+        },
+        "NT": {
+          "C25d": {
+            "priceWithoutVat": 3125.59,
+            "priceWithVat": 3781.96
+          },
+          "C26d": {
+            "priceWithoutVat": 3125.59,
+            "priceWithVat": 3781.96
+          },
+          "C27d": {
+            "priceWithoutVat": 3125.59,
+            "priceWithVat": 3781.96
+          },
+          "C35d": {
+            "priceWithoutVat": 3207.4,
+            "priceWithVat": 3880.95
+          },
+          "C45d": {
+            "priceWithoutVat": 3276.0,
+            "priceWithVat": 3963.96
+          },
+          "C46d": {
+            "priceWithoutVat": 3276.0,
+            "priceWithVat": 3963.96
+          },
+          "C56d": {
+            "priceWithoutVat": 3276.0,
+            "priceWithVat": 3963.96
+          }
+        }
+      }
+    }
+  },
+  "D": {
+    "ČEZ Distribuce": {
+      "metadata": {
+        "supplier": "MND Energie a.s.",
+        "productName": "Proud – Ceník Prosinec 28",
+        "pricingType": "fixed",
+        "validFrom": "2026-10-07",
+        "priceGuaranteeUntil": "2028-12-31",
+        "revertsToBasicFrom": "2029-01-01",
+        "distributionArea": "ČEZ Distribuce",
+        "sourceFile": "2026_10_01_MND_Proud_Cenik_Prosinec_28_CEZ.pdf",
+        "sourcePages": [
+          1,
+          2
+        ],
+        "sha256": "9df5aaa76327074c1c1b4be8043f68ec1f7a6477f92cf95f92a23bade12a0bb9",
+        "lastVerifiedAt": "2026-10-28",
+        "vatConvention": "square brackets without VAT; leading price with VAT",
+        "limitKwh": 30000
+      },
+      "tariffs": {
+        "D01d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 50.0,
+              "priceWithVat": 60.5
+            },
+            "10": {
+              "priceWithoutVat": 79.0,
+              "priceWithVat": 95.59
+            },
+            "11": {
+              "priceWithoutVat": 99.0,
+              "priceWithVat": 119.79
+            },
+            "12": {
+              "priceWithoutVat": 124.0,
+              "priceWithVat": 150.04
+            },
+            "13": {
+              "priceWithoutVat": 158.0,
+              "priceWithVat": 191.18
+            },
+            "14": {
+              "priceWithoutVat": 198.0,
+              "priceWithVat": 239.58
+            },
+            "15": {
+              "priceWithoutVat": 248.0,
+              "priceWithVat": 300.08
+            },
+            "16": {
+              "priceWithoutVat": 312.0,
+              "priceWithVat": 377.52
+            },
+            "17": null,
+            "18": null,
+            "19": null,
+            "20": null,
+            "21": null,
+            "22": {
+              "priceWithoutVat": 4.95,
+              "priceWithVat": 5.99
+            },
+            "23": {
+              "priceWithoutVat": 1.65,
+              "priceWithVat": 2.0
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2698.34,
+            "priceWithVat": 3265.0
+          },
+          "commodityNT": null,
+          "distributionVT": {
+            "priceWithoutVat": 2666.66,
+            "priceWithVat": 3226.66
+          },
+          "distributionNT": null
+        },
+        "D02d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 102.0,
+              "priceWithVat": 123.42
+            },
+            "10": {
+              "priceWithoutVat": 164.0,
+              "priceWithVat": 198.44
+            },
+            "11": {
+              "priceWithoutVat": 205.0,
+              "priceWithVat": 248.05
+            },
+            "12": {
+              "priceWithoutVat": 256.0,
+              "priceWithVat": 309.76
+            },
+            "13": {
+              "priceWithoutVat": 327.0,
+              "priceWithVat": 395.67
+            },
+            "14": {
+              "priceWithoutVat": 409.0,
+              "priceWithVat": 494.89
+            },
+            "15": {
+              "priceWithoutVat": 512.0,
+              "priceWithVat": 619.52
+            },
+            "16": {
+              "priceWithoutVat": 644.0,
+              "priceWithVat": 779.24
+            },
+            "17": null,
+            "18": null,
+            "19": null,
+            "20": null,
+            "21": null,
+            "22": {
+              "priceWithoutVat": 10.23,
+              "priceWithVat": 12.38
+            },
+            "23": {
+              "priceWithoutVat": 3.41,
+              "priceWithVat": 4.13
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2698.34,
+            "priceWithVat": 3265.0
+          },
+          "commodityNT": null,
+          "distributionVT": {
+            "priceWithoutVat": 2078.58,
+            "priceWithVat": 2515.08
+          },
+          "distributionNT": null
+        },
+        "D25d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 107.0,
+              "priceWithVat": 129.47
+            },
+            "10": {
+              "priceWithoutVat": 172.0,
+              "priceWithVat": 208.12
+            },
+            "11": {
+              "priceWithoutVat": 215.0,
+              "priceWithVat": 260.15
+            },
+            "12": {
+              "priceWithoutVat": 269.0,
+              "priceWithVat": 325.49
+            },
+            "13": {
+              "priceWithoutVat": 344.0,
+              "priceWithVat": 416.24
+            },
+            "14": {
+              "priceWithoutVat": 430.0,
+              "priceWithVat": 520.3
+            },
+            "15": {
+              "priceWithoutVat": 537.0,
+              "priceWithVat": 649.77
+            },
+            "16": {
+              "priceWithoutVat": 677.0,
+              "priceWithVat": 819.17
+            },
+            "17": null,
+            "18": null,
+            "19": null,
+            "20": null,
+            "21": null,
+            "22": {
+              "priceWithoutVat": 10.74,
+              "priceWithVat": 13.0
+            },
+            "23": {
+              "priceWithoutVat": 3.58,
+              "priceWithVat": 4.33
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2860.33,
+            "priceWithVat": 3461.0
+          },
+          "commodityNT": {
+            "priceWithoutVat": 2603.3,
+            "priceWithVat": 3150.0
+          },
+          "distributionVT": {
+            "priceWithoutVat": 2252.45,
+            "priceWithVat": 2725.46
+          },
+          "distributionNT": {
+            "priceWithoutVat": 116.5,
+            "priceWithVat": 140.97
+          }
+        },
+        "D26d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 145.0,
+              "priceWithVat": 175.45
+            },
+            "10": {
+              "priceWithoutVat": 231.0,
+              "priceWithVat": 279.51
+            },
+            "11": {
+              "priceWithoutVat": 289.0,
+              "priceWithVat": 349.69
+            },
+            "12": {
+              "priceWithoutVat": 362.0,
+              "priceWithVat": 438.02
+            },
+            "13": {
+              "priceWithoutVat": 463.0,
+              "priceWithVat": 560.23
+            },
+            "14": {
+              "priceWithoutVat": 578.0,
+              "priceWithVat": 699.38
+            },
+            "15": {
+              "priceWithoutVat": 723.0,
+              "priceWithVat": 874.83
+            },
+            "16": {
+              "priceWithoutVat": 911.0,
+              "priceWithVat": 1102.31
+            },
+            "17": null,
+            "18": null,
+            "19": null,
+            "20": null,
+            "21": null,
+            "22": {
+              "priceWithoutVat": 14.46,
+              "priceWithVat": 17.5
+            },
+            "23": {
+              "priceWithoutVat": 4.82,
+              "priceWithVat": 5.83
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2860.33,
+            "priceWithVat": 3461.0
+          },
+          "commodityNT": {
+            "priceWithoutVat": 2603.3,
+            "priceWithVat": 3150.0
+          },
+          "distributionVT": {
+            "priceWithoutVat": 1202.06,
+            "priceWithVat": 1454.49
+          },
+          "distributionNT": {
+            "priceWithoutVat": 116.5,
+            "priceWithVat": 140.97
+          }
+        },
+        "D27d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 102.0,
+              "priceWithVat": 123.42
+            },
+            "10": {
+              "priceWithoutVat": 163.0,
+              "priceWithVat": 197.23
+            },
+            "11": {
+              "priceWithoutVat": 204.0,
+              "priceWithVat": 246.84
+            },
+            "12": {
+              "priceWithoutVat": 255.0,
+              "priceWithVat": 308.55
+            },
+            "13": {
+              "priceWithoutVat": 326.0,
+              "priceWithVat": 394.46
+            },
+            "14": {
+              "priceWithoutVat": 408.0,
+              "priceWithVat": 493.68
+            },
+            "15": {
+              "priceWithoutVat": 510.0,
+              "priceWithVat": 617.1
+            },
+            "16": {
+              "priceWithoutVat": 643.0,
+              "priceWithVat": 778.03
+            },
+            "17": null,
+            "18": null,
+            "19": null,
+            "20": null,
+            "21": null,
+            "22": {
+              "priceWithoutVat": 10.2,
+              "priceWithVat": 12.34
+            },
+            "23": {
+              "priceWithoutVat": 3.4,
+              "priceWithVat": 4.11
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2860.33,
+            "priceWithVat": 3461.0
+          },
+          "commodityNT": {
+            "priceWithoutVat": 2603.3,
+            "priceWithVat": 3150.0
+          },
+          "distributionVT": {
+            "priceWithoutVat": 2252.45,
+            "priceWithVat": 2725.46
+          },
+          "distributionNT": {
+            "priceWithoutVat": 116.5,
+            "priceWithVat": 140.97
+          }
+        },
+        "D35d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 222.0,
+              "priceWithVat": 268.62
+            },
+            "10": {
+              "priceWithoutVat": 355.0,
+              "priceWithVat": 429.55
+            },
+            "11": {
+              "priceWithoutVat": 444.0,
+              "priceWithVat": 537.24
+            },
+            "12": {
+              "priceWithoutVat": 555.0,
+              "priceWithVat": 671.55
+            },
+            "13": {
+              "priceWithoutVat": 710.0,
+              "priceWithVat": 859.1
+            },
+            "14": {
+              "priceWithoutVat": 888.0,
+              "priceWithVat": 1074.48
+            },
+            "15": {
+              "priceWithoutVat": 1110.0,
+              "priceWithVat": 1343.1
+            },
+            "16": {
+              "priceWithoutVat": 1399.0,
+              "priceWithVat": 1692.79
+            },
+            "17": null,
+            "18": null,
+            "19": null,
+            "20": null,
+            "21": null,
+            "22": {
+              "priceWithoutVat": 22.2,
+              "priceWithVat": 26.86
+            },
+            "23": {
+              "priceWithoutVat": 7.4,
+              "priceWithVat": 8.95
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2904.13,
+            "priceWithVat": 3514.0
+          },
+          "commodityNT": {
+            "priceWithoutVat": 2761.15,
+            "priceWithVat": 3341.0
+          },
+          "distributionVT": {
+            "priceWithoutVat": 754.77,
+            "priceWithVat": 913.27
+          },
+          "distributionNT": {
+            "priceWithoutVat": 116.5,
+            "priceWithVat": 140.97
+          }
+        },
+        "D45d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 222.0,
+              "priceWithVat": 268.62
+            },
+            "10": {
+              "priceWithoutVat": 355.0,
+              "priceWithVat": 429.55
+            },
+            "11": {
+              "priceWithoutVat": 444.0,
+              "priceWithVat": 537.24
+            },
+            "12": {
+              "priceWithoutVat": 555.0,
+              "priceWithVat": 671.55
+            },
+            "13": {
+              "priceWithoutVat": 710.0,
+              "priceWithVat": 859.1
+            },
+            "14": {
+              "priceWithoutVat": 888.0,
+              "priceWithVat": 1074.48
+            },
+            "15": {
+              "priceWithoutVat": 1110.0,
+              "priceWithVat": 1343.1
+            },
+            "16": {
+              "priceWithoutVat": 1399.0,
+              "priceWithVat": 1692.79
+            },
+            "17": null,
+            "18": null,
+            "19": null,
+            "20": null,
+            "21": null,
+            "22": {
+              "priceWithoutVat": 22.2,
+              "priceWithVat": 26.86
+            },
+            "23": {
+              "priceWithoutVat": 7.4,
+              "priceWithVat": 8.95
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2894.21,
+            "priceWithVat": 3502.0
+          },
+          "commodityNT": {
+            "priceWithoutVat": 2776.03,
+            "priceWithVat": 3359.0
+          },
+          "distributionVT": {
+            "priceWithoutVat": 754.77,
+            "priceWithVat": 913.27
+          },
+          "distributionNT": {
+            "priceWithoutVat": 116.5,
+            "priceWithVat": 140.97
+          }
+        },
+        "D56d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 222.0,
+              "priceWithVat": 268.62
+            },
+            "10": {
+              "priceWithoutVat": 355.0,
+              "priceWithVat": 429.55
+            },
+            "11": {
+              "priceWithoutVat": 444.0,
+              "priceWithVat": 537.24
+            },
+            "12": {
+              "priceWithoutVat": 555.0,
+              "priceWithVat": 671.55
+            },
+            "13": {
+              "priceWithoutVat": 710.0,
+              "priceWithVat": 859.1
+            },
+            "14": {
+              "priceWithoutVat": 888.0,
+              "priceWithVat": 1074.48
+            },
+            "15": {
+              "priceWithoutVat": 1110.0,
+              "priceWithVat": 1343.1
+            },
+            "16": {
+              "priceWithoutVat": 1399.0,
+              "priceWithVat": 1692.79
+            },
+            "17": null,
+            "18": null,
+            "19": null,
+            "20": null,
+            "21": null,
+            "22": {
+              "priceWithoutVat": 22.2,
+              "priceWithVat": 26.86
+            },
+            "23": {
+              "priceWithoutVat": 7.4,
+              "priceWithVat": 8.95
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2894.21,
+            "priceWithVat": 3502.0
+          },
+          "commodityNT": {
+            "priceWithoutVat": 2776.03,
+            "priceWithVat": 3359.0
+          },
+          "distributionVT": {
+            "priceWithoutVat": 754.77,
+            "priceWithVat": 913.27
+          },
+          "distributionNT": {
+            "priceWithoutVat": 116.5,
+            "priceWithVat": 140.97
+          }
+        },
+        "D57d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 222.0,
+              "priceWithVat": 268.62
+            },
+            "10": {
+              "priceWithoutVat": 355.0,
+              "priceWithVat": 429.55
+            },
+            "11": {
+              "priceWithoutVat": 444.0,
+              "priceWithVat": 537.24
+            },
+            "12": {
+              "priceWithoutVat": 555.0,
+              "priceWithVat": 671.55
+            },
+            "13": {
+              "priceWithoutVat": 710.0,
+              "priceWithVat": 859.1
+            },
+            "14": {
+              "priceWithoutVat": 896.0,
+              "priceWithVat": 1084.16
+            },
+            "15": {
+              "priceWithoutVat": 1289.0,
+              "priceWithVat": 1559.69
+            },
+            "16": {
+              "priceWithoutVat": 1949.0,
+              "priceWithVat": 2358.29
+            },
+            "17": {
+              "priceWithoutVat": 3093.0,
+              "priceWithVat": 3742.53
+            },
+            "18": {
+              "priceWithoutVat": 5335.0,
+              "priceWithVat": 6455.35
+            },
+            "19": {
+              "priceWithoutVat": 10471.0,
+              "priceWithVat": 12669.91
+            },
+            "20": {
+              "priceWithoutVat": 19598.0,
+              "priceWithVat": 23713.58
+            },
+            "21": {
+              "priceWithoutVat": 122.49,
+              "priceWithVat": 148.21
+            },
+            "22": null,
+            "23": {
+              "priceWithoutVat": 40.83,
+              "priceWithVat": 49.4
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2894.21,
+            "priceWithVat": 3502.0
+          },
+          "commodityNT": {
+            "priceWithoutVat": 2776.03,
+            "priceWithVat": 3359.0
+          },
+          "distributionVT": {
+            "priceWithoutVat": 754.77,
+            "priceWithVat": 913.27
+          },
+          "distributionNT": {
+            "priceWithoutVat": 116.5,
+            "priceWithVat": 140.97
+          }
+        },
+        "D61d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 89.0,
+              "priceWithVat": 107.69
+            },
+            "10": {
+              "priceWithoutVat": 143.0,
+              "priceWithVat": 173.03
+            },
+            "11": {
+              "priceWithoutVat": 179.0,
+              "priceWithVat": 216.59
+            },
+            "12": {
+              "priceWithoutVat": 224.0,
+              "priceWithVat": 271.04
+            },
+            "13": {
+              "priceWithoutVat": 286.0,
+              "priceWithVat": 346.06
+            },
+            "14": {
+              "priceWithoutVat": 358.0,
+              "priceWithVat": 433.18
+            },
+            "15": {
+              "priceWithoutVat": 447.0,
+              "priceWithVat": 540.87
+            },
+            "16": {
+              "priceWithoutVat": 563.0,
+              "priceWithVat": 681.23
+            },
+            "17": null,
+            "18": null,
+            "19": null,
+            "20": null,
+            "21": null,
+            "22": {
+              "priceWithoutVat": 8.94,
+              "priceWithVat": 10.82
+            },
+            "23": {
+              "priceWithoutVat": 2.98,
+              "priceWithVat": 3.61
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2698.34,
+            "priceWithVat": 3265.0
+          },
+          "commodityNT": {
+            "priceWithoutVat": 2698.34,
+            "priceWithVat": 3265.0
+          },
+          "distributionVT": {
+            "priceWithoutVat": 3306.67,
+            "priceWithVat": 4001.07
+          },
+          "distributionNT": {
+            "priceWithoutVat": 116.5,
+            "priceWithVat": 140.97
+          }
+        }
+      },
+      "common": {
+        "system": {
+          "priceWithoutVat": 164.24,
+          "priceWithVat": 198.73
+        },
+        "pozePerMwh": {
+          "priceWithoutVat": 0.0,
+          "priceWithVat": 0.0
+        },
+        "infrastructure": {
+          "priceWithoutVat": 12.87,
+          "priceWithVat": 15.57
+        },
+        "tax": {
+          "priceWithoutVat": 28.3,
+          "priceWithVat": 34.24
+        }
+      },
+      "infrastructureComponentsWithoutVat": {
+        "dataCentre": 5.88,
+        "eru": 4,
+        "oteSettlement": 1.61,
+        "pozeAdministration": 1.38
+      },
+      "publishedUnitSummaries": {
+        "VT": {
+          "D01d": {
+            "priceWithoutVat": 5557.54,
+            "priceWithVat": 6724.62
+          },
+          "D02d": {
+            "priceWithoutVat": 4969.46,
+            "priceWithVat": 6013.05
+          },
+          "D25d": {
+            "priceWithoutVat": 5305.32,
+            "priceWithVat": 6419.44
+          },
+          "D26d": {
+            "priceWithoutVat": 4254.93,
+            "priceWithVat": 5148.47
+          },
+          "D27d": {
+            "priceWithoutVat": 5305.32,
+            "priceWithVat": 6419.44
+          },
+          "D35d": {
+            "priceWithoutVat": 3851.44,
+            "priceWithVat": 4660.24
+          },
+          "D45d": {
+            "priceWithoutVat": 3841.52,
+            "priceWithVat": 4648.24
+          },
+          "D56d": {
+            "priceWithoutVat": 3841.52,
+            "priceWithVat": 4648.24
+          },
+          "D57d": {
+            "priceWithoutVat": 3841.52,
+            "priceWithVat": 4648.24
+          },
+          "D61d": {
+            "priceWithoutVat": 6197.55,
+            "priceWithVat": 7499.04
+          }
+        },
+        "NT": {
+          "D25d": {
+            "priceWithoutVat": 2912.34,
+            "priceWithVat": 3523.93
+          },
+          "D26d": {
+            "priceWithoutVat": 2912.34,
+            "priceWithVat": 3523.93
+          },
+          "D27d": {
+            "priceWithoutVat": 2912.34,
+            "priceWithVat": 3523.93
+          },
+          "D35d": {
+            "priceWithoutVat": 3070.19,
+            "priceWithVat": 3714.93
+          },
+          "D45d": {
+            "priceWithoutVat": 3085.07,
+            "priceWithVat": 3732.93
+          },
+          "D56d": {
+            "priceWithoutVat": 3085.07,
+            "priceWithVat": 3732.93
+          },
+          "D57d": {
+            "priceWithoutVat": 3085.07,
+            "priceWithVat": 3732.93
+          },
+          "D61d": {
+            "priceWithoutVat": 3007.38,
+            "priceWithVat": 3638.93
+          }
+        }
+      }
+    },
+    "EG.D": {
+      "metadata": {
+        "supplier": "MND Energie a.s.",
+        "productName": "Proud – Ceník Prosinec 28",
+        "pricingType": "fixed",
+        "validFrom": "2026-10-07",
+        "priceGuaranteeUntil": "2028-12-31",
+        "revertsToBasicFrom": "2029-01-01",
+        "distributionArea": "EG.D",
+        "sourceFile": "2026_10_01_MND_Proud_Cenik_Prosinec_28_EGD.pdf",
+        "sourcePages": [
+          1,
+          2
+        ],
+        "sha256": "d9bce6af4a736c7dd4453f5346a4b0a5f084ff78d62aee3f342df05e2168910f",
+        "lastVerifiedAt": "2026-10-28",
+        "vatConvention": "square brackets without VAT; leading price with VAT",
+        "limitKwh": 30000
+      },
+      "tariffs": {
+        "D01d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 48.0,
+              "priceWithVat": 58.08
+            },
+            "10": {
+              "priceWithoutVat": 77.0,
+              "priceWithVat": 93.17
+            },
+            "11": {
+              "priceWithoutVat": 96.0,
+              "priceWithVat": 116.16
+            },
+            "12": {
+              "priceWithoutVat": 120.0,
+              "priceWithVat": 145.2
+            },
+            "13": {
+              "priceWithoutVat": 154.0,
+              "priceWithVat": 186.34
+            },
+            "14": {
+              "priceWithoutVat": 192.0,
+              "priceWithVat": 232.32
+            },
+            "15": {
+              "priceWithoutVat": 240.0,
+              "priceWithVat": 290.4
+            },
+            "16": {
+              "priceWithoutVat": 302.0,
+              "priceWithVat": 365.42
+            },
+            "17": null,
+            "18": null,
+            "19": null,
+            "20": null,
+            "21": null,
+            "22": {
+              "priceWithoutVat": 4.8,
+              "priceWithVat": 5.81
+            },
+            "23": {
+              "priceWithoutVat": 1.6,
+              "priceWithVat": 1.94
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2698.34,
+            "priceWithVat": 3265.0
+          },
+          "commodityNT": null,
+          "distributionVT": {
+            "priceWithoutVat": 2711.14,
+            "priceWithVat": 3280.48
+          },
+          "distributionNT": null
+        },
+        "D02d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 100.0,
+              "priceWithVat": 121.0
+            },
+            "10": {
+              "priceWithoutVat": 160.0,
+              "priceWithVat": 193.6
+            },
+            "11": {
+              "priceWithoutVat": 200.0,
+              "priceWithVat": 242.0
+            },
+            "12": {
+              "priceWithoutVat": 250.0,
+              "priceWithVat": 302.5
+            },
+            "13": {
+              "priceWithoutVat": 320.0,
+              "priceWithVat": 387.2
+            },
+            "14": {
+              "priceWithoutVat": 400.0,
+              "priceWithVat": 484.0
+            },
+            "15": {
+              "priceWithoutVat": 500.0,
+              "priceWithVat": 605.0
+            },
+            "16": {
+              "priceWithoutVat": 629.0,
+              "priceWithVat": 761.09
+            },
+            "17": null,
+            "18": null,
+            "19": null,
+            "20": null,
+            "21": null,
+            "22": {
+              "priceWithoutVat": 9.99,
+              "priceWithVat": 12.09
+            },
+            "23": {
+              "priceWithoutVat": 3.33,
+              "priceWithVat": 4.03
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2698.34,
+            "priceWithVat": 3265.0
+          },
+          "commodityNT": null,
+          "distributionVT": {
+            "priceWithoutVat": 2295.34,
+            "priceWithVat": 2777.36
+          },
+          "distributionNT": null
+        },
+        "D25d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 98.0,
+              "priceWithVat": 118.58
+            },
+            "10": {
+              "priceWithoutVat": 157.0,
+              "priceWithVat": 189.97
+            },
+            "11": {
+              "priceWithoutVat": 196.0,
+              "priceWithVat": 237.16
+            },
+            "12": {
+              "priceWithoutVat": 245.0,
+              "priceWithVat": 296.45
+            },
+            "13": {
+              "priceWithoutVat": 314.0,
+              "priceWithVat": 379.94
+            },
+            "14": {
+              "priceWithoutVat": 392.0,
+              "priceWithVat": 474.32
+            },
+            "15": {
+              "priceWithoutVat": 491.0,
+              "priceWithVat": 594.11
+            },
+            "16": {
+              "priceWithoutVat": 618.0,
+              "priceWithVat": 747.78
+            },
+            "17": null,
+            "18": null,
+            "19": null,
+            "20": null,
+            "21": null,
+            "22": {
+              "priceWithoutVat": 9.81,
+              "priceWithVat": 11.87
+            },
+            "23": {
+              "priceWithoutVat": 3.27,
+              "priceWithVat": 3.96
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2860.33,
+            "priceWithVat": 3461.0
+          },
+          "commodityNT": {
+            "priceWithoutVat": 2603.3,
+            "priceWithVat": 3150.0
+          },
+          "distributionVT": {
+            "priceWithoutVat": 2243.88,
+            "priceWithVat": 2715.09
+          },
+          "distributionNT": {
+            "priceWithoutVat": 224.3,
+            "priceWithVat": 271.4
+          }
+        },
+        "D26d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 140.0,
+              "priceWithVat": 169.4
+            },
+            "10": {
+              "priceWithoutVat": 223.0,
+              "priceWithVat": 269.83
+            },
+            "11": {
+              "priceWithoutVat": 279.0,
+              "priceWithVat": 337.59
+            },
+            "12": {
+              "priceWithoutVat": 349.0,
+              "priceWithVat": 422.29
+            },
+            "13": {
+              "priceWithoutVat": 446.0,
+              "priceWithVat": 539.66
+            },
+            "14": {
+              "priceWithoutVat": 558.0,
+              "priceWithVat": 675.18
+            },
+            "15": {
+              "priceWithoutVat": 698.0,
+              "priceWithVat": 844.58
+            },
+            "16": {
+              "priceWithoutVat": 879.0,
+              "priceWithVat": 1063.59
+            },
+            "17": null,
+            "18": null,
+            "19": null,
+            "20": null,
+            "21": null,
+            "22": {
+              "priceWithoutVat": 13.95,
+              "priceWithVat": 16.88
+            },
+            "23": {
+              "priceWithoutVat": 4.65,
+              "priceWithVat": 5.63
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2860.33,
+            "priceWithVat": 3461.0
+          },
+          "commodityNT": {
+            "priceWithoutVat": 2603.3,
+            "priceWithVat": 3150.0
+          },
+          "distributionVT": {
+            "priceWithoutVat": 1237.94,
+            "priceWithVat": 1497.91
+          },
+          "distributionNT": {
+            "priceWithoutVat": 224.3,
+            "priceWithVat": 271.4
+          }
+        },
+        "D27d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 93.0,
+              "priceWithVat": 112.53
+            },
+            "10": {
+              "priceWithoutVat": 149.0,
+              "priceWithVat": 180.29
+            },
+            "11": {
+              "priceWithoutVat": 187.0,
+              "priceWithVat": 226.27
+            },
+            "12": {
+              "priceWithoutVat": 233.0,
+              "priceWithVat": 281.93
+            },
+            "13": {
+              "priceWithoutVat": 299.0,
+              "priceWithVat": 361.79
+            },
+            "14": {
+              "priceWithoutVat": 373.0,
+              "priceWithVat": 451.33
+            },
+            "15": {
+              "priceWithoutVat": 467.0,
+              "priceWithVat": 565.07
+            },
+            "16": {
+              "priceWithoutVat": 588.0,
+              "priceWithVat": 711.48
+            },
+            "17": null,
+            "18": null,
+            "19": null,
+            "20": null,
+            "21": null,
+            "22": {
+              "priceWithoutVat": 9.33,
+              "priceWithVat": 11.29
+            },
+            "23": {
+              "priceWithoutVat": 3.11,
+              "priceWithVat": 3.76
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2860.33,
+            "priceWithVat": 3461.0
+          },
+          "commodityNT": {
+            "priceWithoutVat": 2603.3,
+            "priceWithVat": 3150.0
+          },
+          "distributionVT": {
+            "priceWithoutVat": 2243.88,
+            "priceWithVat": 2715.09
+          },
+          "distributionNT": {
+            "priceWithoutVat": 224.3,
+            "priceWithVat": 271.4
+          }
+        },
+        "D35d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 190.0,
+              "priceWithVat": 229.9
+            },
+            "10": {
+              "priceWithoutVat": 304.0,
+              "priceWithVat": 367.84
+            },
+            "11": {
+              "priceWithoutVat": 380.0,
+              "priceWithVat": 459.8
+            },
+            "12": {
+              "priceWithoutVat": 475.0,
+              "priceWithVat": 574.75
+            },
+            "13": {
+              "priceWithoutVat": 608.0,
+              "priceWithVat": 735.68
+            },
+            "14": {
+              "priceWithoutVat": 760.0,
+              "priceWithVat": 919.6
+            },
+            "15": {
+              "priceWithoutVat": 950.0,
+              "priceWithVat": 1149.5
+            },
+            "16": {
+              "priceWithoutVat": 1196.0,
+              "priceWithVat": 1447.16
+            },
+            "17": null,
+            "18": null,
+            "19": null,
+            "20": null,
+            "21": null,
+            "22": {
+              "priceWithoutVat": 18.99,
+              "priceWithVat": 22.98
+            },
+            "23": {
+              "priceWithoutVat": 6.33,
+              "priceWithVat": 7.66
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2904.13,
+            "priceWithVat": 3514.0
+          },
+          "commodityNT": {
+            "priceWithoutVat": 2761.15,
+            "priceWithVat": 3341.0
+          },
+          "distributionVT": {
+            "priceWithoutVat": 749.87,
+            "priceWithVat": 907.34
+          },
+          "distributionNT": {
+            "priceWithoutVat": 224.3,
+            "priceWithVat": 271.4
+          }
+        },
+        "D45d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 190.0,
+              "priceWithVat": 229.9
+            },
+            "10": {
+              "priceWithoutVat": 304.0,
+              "priceWithVat": 367.84
+            },
+            "11": {
+              "priceWithoutVat": 380.0,
+              "priceWithVat": 459.8
+            },
+            "12": {
+              "priceWithoutVat": 475.0,
+              "priceWithVat": 574.75
+            },
+            "13": {
+              "priceWithoutVat": 608.0,
+              "priceWithVat": 735.68
+            },
+            "14": {
+              "priceWithoutVat": 760.0,
+              "priceWithVat": 919.6
+            },
+            "15": {
+              "priceWithoutVat": 950.0,
+              "priceWithVat": 1149.5
+            },
+            "16": {
+              "priceWithoutVat": 1196.0,
+              "priceWithVat": 1447.16
+            },
+            "17": null,
+            "18": null,
+            "19": null,
+            "20": null,
+            "21": null,
+            "22": {
+              "priceWithoutVat": 18.99,
+              "priceWithVat": 22.98
+            },
+            "23": {
+              "priceWithoutVat": 6.33,
+              "priceWithVat": 7.66
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2894.21,
+            "priceWithVat": 3502.0
+          },
+          "commodityNT": {
+            "priceWithoutVat": 2776.03,
+            "priceWithVat": 3359.0
+          },
+          "distributionVT": {
+            "priceWithoutVat": 749.87,
+            "priceWithVat": 907.34
+          },
+          "distributionNT": {
+            "priceWithoutVat": 224.3,
+            "priceWithVat": 271.4
+          }
+        },
+        "D56d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 190.0,
+              "priceWithVat": 229.9
+            },
+            "10": {
+              "priceWithoutVat": 304.0,
+              "priceWithVat": 367.84
+            },
+            "11": {
+              "priceWithoutVat": 380.0,
+              "priceWithVat": 459.8
+            },
+            "12": {
+              "priceWithoutVat": 475.0,
+              "priceWithVat": 574.75
+            },
+            "13": {
+              "priceWithoutVat": 608.0,
+              "priceWithVat": 735.68
+            },
+            "14": {
+              "priceWithoutVat": 760.0,
+              "priceWithVat": 919.6
+            },
+            "15": {
+              "priceWithoutVat": 950.0,
+              "priceWithVat": 1149.5
+            },
+            "16": {
+              "priceWithoutVat": 1196.0,
+              "priceWithVat": 1447.16
+            },
+            "17": null,
+            "18": null,
+            "19": null,
+            "20": null,
+            "21": null,
+            "22": {
+              "priceWithoutVat": 18.99,
+              "priceWithVat": 22.98
+            },
+            "23": {
+              "priceWithoutVat": 6.33,
+              "priceWithVat": 7.66
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2894.21,
+            "priceWithVat": 3502.0
+          },
+          "commodityNT": {
+            "priceWithoutVat": 2776.03,
+            "priceWithVat": 3359.0
+          },
+          "distributionVT": {
+            "priceWithoutVat": 749.87,
+            "priceWithVat": 907.34
+          },
+          "distributionNT": {
+            "priceWithoutVat": 224.3,
+            "priceWithVat": 271.4
+          }
+        },
+        "D57d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 189.0,
+              "priceWithVat": 228.69
+            },
+            "10": {
+              "priceWithoutVat": 302.0,
+              "priceWithVat": 365.42
+            },
+            "11": {
+              "priceWithoutVat": 378.0,
+              "priceWithVat": 457.38
+            },
+            "12": {
+              "priceWithoutVat": 473.0,
+              "priceWithVat": 572.33
+            },
+            "13": {
+              "priceWithoutVat": 605.0,
+              "priceWithVat": 732.05
+            },
+            "14": {
+              "priceWithoutVat": 764.0,
+              "priceWithVat": 924.44
+            },
+            "15": {
+              "priceWithoutVat": 1098.0,
+              "priceWithVat": 1328.58
+            },
+            "16": {
+              "priceWithoutVat": 1619.0,
+              "priceWithVat": 1958.99
+            },
+            "17": {
+              "priceWithoutVat": 2631.0,
+              "priceWithVat": 3183.51
+            },
+            "18": {
+              "priceWithoutVat": 4839.0,
+              "priceWithVat": 5855.19
+            },
+            "19": {
+              "priceWithoutVat": 9074.0,
+              "priceWithVat": 10979.54
+            },
+            "20": {
+              "priceWithoutVat": 17889.0,
+              "priceWithVat": 21645.69
+            },
+            "21": {
+              "priceWithoutVat": 111.81,
+              "priceWithVat": 135.29
+            },
+            "22": null,
+            "23": {
+              "priceWithoutVat": 37.27,
+              "priceWithVat": 45.1
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2894.21,
+            "priceWithVat": 3502.0
+          },
+          "commodityNT": {
+            "priceWithoutVat": 2776.03,
+            "priceWithVat": 3359.0
+          },
+          "distributionVT": {
+            "priceWithoutVat": 749.87,
+            "priceWithVat": 907.34
+          },
+          "distributionNT": {
+            "priceWithoutVat": 224.3,
+            "priceWithVat": 271.4
+          }
+        },
+        "D61d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 90.0,
+              "priceWithVat": 108.9
+            },
+            "10": {
+              "priceWithoutVat": 144.0,
+              "priceWithVat": 174.24
+            },
+            "11": {
+              "priceWithoutVat": 179.0,
+              "priceWithVat": 216.59
+            },
+            "12": {
+              "priceWithoutVat": 224.0,
+              "priceWithVat": 271.04
+            },
+            "13": {
+              "priceWithoutVat": 287.0,
+              "priceWithVat": 347.27
+            },
+            "14": {
+              "priceWithoutVat": 359.0,
+              "priceWithVat": 434.39
+            },
+            "15": {
+              "priceWithoutVat": 449.0,
+              "priceWithVat": 543.29
+            },
+            "16": {
+              "priceWithoutVat": 565.0,
+              "priceWithVat": 683.65
+            },
+            "17": null,
+            "18": null,
+            "19": null,
+            "20": null,
+            "21": null,
+            "22": {
+              "priceWithoutVat": 8.97,
+              "priceWithVat": 10.85
+            },
+            "23": {
+              "priceWithoutVat": 2.99,
+              "priceWithVat": 3.62
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2698.34,
+            "priceWithVat": 3265.0
+          },
+          "commodityNT": {
+            "priceWithoutVat": 2698.34,
+            "priceWithVat": 3265.0
+          },
+          "distributionVT": {
+            "priceWithoutVat": 3367.23,
+            "priceWithVat": 4074.35
+          },
+          "distributionNT": {
+            "priceWithoutVat": 224.3,
+            "priceWithVat": 271.4
+          }
+        }
+      },
+      "common": {
+        "system": {
+          "priceWithoutVat": 164.24,
+          "priceWithVat": 198.73
+        },
+        "pozePerMwh": {
+          "priceWithoutVat": 0.0,
+          "priceWithVat": 0.0
+        },
+        "infrastructure": {
+          "priceWithoutVat": 12.87,
+          "priceWithVat": 15.57
+        },
+        "tax": {
+          "priceWithoutVat": 28.3,
+          "priceWithVat": 34.24
+        }
+      },
+      "infrastructureComponentsWithoutVat": {
+        "dataCentre": 5.88,
+        "eru": 4,
+        "oteSettlement": 1.61,
+        "pozeAdministration": 1.38
+      },
+      "publishedUnitSummaries": {
+        "VT": {
+          "D01d": {
+            "priceWithoutVat": 5602.02,
+            "priceWithVat": 6778.44
+          },
+          "D02d": {
+            "priceWithoutVat": 5186.22,
+            "priceWithVat": 6275.33
+          },
+          "D25d": {
+            "priceWithoutVat": 5296.75,
+            "priceWithVat": 6409.07
+          },
+          "D26d": {
+            "priceWithoutVat": 4290.81,
+            "priceWithVat": 5191.88
+          },
+          "D27d": {
+            "priceWithoutVat": 5296.75,
+            "priceWithVat": 6409.07
+          },
+          "D35d": {
+            "priceWithoutVat": 3846.54,
+            "priceWithVat": 4654.31
+          },
+          "D45d": {
+            "priceWithoutVat": 3836.62,
+            "priceWithVat": 4642.31
+          },
+          "D56d": {
+            "priceWithoutVat": 3836.62,
+            "priceWithVat": 4642.31
+          },
+          "D57d": {
+            "priceWithoutVat": 3836.62,
+            "priceWithVat": 4642.31
+          },
+          "D61d": {
+            "priceWithoutVat": 6258.11,
+            "priceWithVat": 7572.31
+          }
+        },
+        "NT": {
+          "D25d": {
+            "priceWithoutVat": 3020.14,
+            "priceWithVat": 3654.37
+          },
+          "D26d": {
+            "priceWithoutVat": 3020.14,
+            "priceWithVat": 3654.37
+          },
+          "D27d": {
+            "priceWithoutVat": 3020.14,
+            "priceWithVat": 3654.37
+          },
+          "D35d": {
+            "priceWithoutVat": 3177.99,
+            "priceWithVat": 3845.37
+          },
+          "D45d": {
+            "priceWithoutVat": 3192.87,
+            "priceWithVat": 3863.37
+          },
+          "D56d": {
+            "priceWithoutVat": 3192.87,
+            "priceWithVat": 3863.37
+          },
+          "D57d": {
+            "priceWithoutVat": 3192.87,
+            "priceWithVat": 3863.37
+          },
+          "D61d": {
+            "priceWithoutVat": 3115.18,
+            "priceWithVat": 3769.37
+          }
+        }
+      }
+    },
+    "PREdistribuce": {
+      "metadata": {
+        "supplier": "MND Energie a.s.",
+        "productName": "Proud – Ceník Prosinec 28",
+        "pricingType": "fixed",
+        "validFrom": "2026-10-07",
+        "priceGuaranteeUntil": "2028-12-31",
+        "revertsToBasicFrom": "2029-01-01",
+        "distributionArea": "PREdistribuce",
+        "sourceFile": "2026_10_01_MND_Proud_Cenik_Prosinec_28_PRE.pdf",
+        "sourcePages": [
+          1,
+          2
+        ],
+        "sha256": "1f87d0ceff1c9b500d92b21005f03517241151ccb154f5191eb79ba3b99d598e",
+        "lastVerifiedAt": "2026-10-28",
+        "vatConvention": "square brackets without VAT; leading price with VAT",
+        "limitKwh": 30000
+      },
+      "tariffs": {
+        "D01d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 44.0,
+              "priceWithVat": 53.24
+            },
+            "10": {
+              "priceWithoutVat": 70.0,
+              "priceWithVat": 84.7
+            },
+            "11": {
+              "priceWithoutVat": 88.0,
+              "priceWithVat": 106.48
+            },
+            "12": {
+              "priceWithoutVat": 110.0,
+              "priceWithVat": 133.1
+            },
+            "13": {
+              "priceWithoutVat": 140.0,
+              "priceWithVat": 169.4
+            },
+            "14": {
+              "priceWithoutVat": 175.0,
+              "priceWithVat": 211.75
+            },
+            "15": {
+              "priceWithoutVat": 219.0,
+              "priceWithVat": 264.99
+            },
+            "16": {
+              "priceWithoutVat": 276.0,
+              "priceWithVat": 333.96
+            },
+            "17": null,
+            "18": null,
+            "19": null,
+            "20": null,
+            "21": null,
+            "22": {
+              "priceWithoutVat": 4.38,
+              "priceWithVat": 5.3
+            },
+            "23": {
+              "priceWithoutVat": 1.46,
+              "priceWithVat": 1.77
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2698.34,
+            "priceWithVat": 3265.0
+          },
+          "commodityNT": null,
+          "distributionVT": {
+            "priceWithoutVat": 1854.71,
+            "priceWithVat": 2244.2
+          },
+          "distributionNT": null
+        },
+        "D02d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 87.0,
+              "priceWithVat": 105.27
+            },
+            "10": {
+              "priceWithoutVat": 139.0,
+              "priceWithVat": 168.19
+            },
+            "11": {
+              "priceWithoutVat": 173.0,
+              "priceWithVat": 209.33
+            },
+            "12": {
+              "priceWithoutVat": 217.0,
+              "priceWithVat": 262.57
+            },
+            "13": {
+              "priceWithoutVat": 277.0,
+              "priceWithVat": 335.17
+            },
+            "14": {
+              "priceWithoutVat": 347.0,
+              "priceWithVat": 419.87
+            },
+            "15": {
+              "priceWithoutVat": 434.0,
+              "priceWithVat": 525.14
+            },
+            "16": {
+              "priceWithoutVat": 546.0,
+              "priceWithVat": 660.66
+            },
+            "17": null,
+            "18": null,
+            "19": null,
+            "20": null,
+            "21": null,
+            "22": {
+              "priceWithoutVat": 8.67,
+              "priceWithVat": 10.49
+            },
+            "23": {
+              "priceWithoutVat": 2.89,
+              "priceWithVat": 3.5
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2698.34,
+            "priceWithVat": 3265.0
+          },
+          "commodityNT": null,
+          "distributionVT": {
+            "priceWithoutVat": 1516.53,
+            "priceWithVat": 1835.0
+          },
+          "distributionNT": null
+        },
+        "D25d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 80.0,
+              "priceWithVat": 96.8
+            },
+            "10": {
+              "priceWithoutVat": 128.0,
+              "priceWithVat": 154.88
+            },
+            "11": {
+              "priceWithoutVat": 160.0,
+              "priceWithVat": 193.6
+            },
+            "12": {
+              "priceWithoutVat": 200.0,
+              "priceWithVat": 242.0
+            },
+            "13": {
+              "priceWithoutVat": 256.0,
+              "priceWithVat": 309.76
+            },
+            "14": {
+              "priceWithoutVat": 320.0,
+              "priceWithVat": 387.2
+            },
+            "15": {
+              "priceWithoutVat": 401.0,
+              "priceWithVat": 485.21
+            },
+            "16": {
+              "priceWithoutVat": 505.0,
+              "priceWithVat": 611.05
+            },
+            "17": null,
+            "18": null,
+            "19": null,
+            "20": null,
+            "21": null,
+            "22": {
+              "priceWithoutVat": 8.01,
+              "priceWithVat": 9.69
+            },
+            "23": {
+              "priceWithoutVat": 2.67,
+              "priceWithVat": 3.23
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2860.33,
+            "priceWithVat": 3461.0
+          },
+          "commodityNT": {
+            "priceWithoutVat": 2603.3,
+            "priceWithVat": 3150.0
+          },
+          "distributionVT": {
+            "priceWithoutVat": 1656.49,
+            "priceWithVat": 2004.35
+          },
+          "distributionNT": {
+            "priceWithoutVat": 175.2,
+            "priceWithVat": 211.99
+          }
+        },
+        "D26d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 110.0,
+              "priceWithVat": 133.1
+            },
+            "10": {
+              "priceWithoutVat": 175.0,
+              "priceWithVat": 211.75
+            },
+            "11": {
+              "priceWithoutVat": 219.0,
+              "priceWithVat": 264.99
+            },
+            "12": {
+              "priceWithoutVat": 274.0,
+              "priceWithVat": 331.54
+            },
+            "13": {
+              "priceWithoutVat": 350.0,
+              "priceWithVat": 423.5
+            },
+            "14": {
+              "priceWithoutVat": 438.0,
+              "priceWithVat": 529.98
+            },
+            "15": {
+              "priceWithoutVat": 548.0,
+              "priceWithVat": 663.08
+            },
+            "16": {
+              "priceWithoutVat": 690.0,
+              "priceWithVat": 834.9
+            },
+            "17": null,
+            "18": null,
+            "19": null,
+            "20": null,
+            "21": null,
+            "22": {
+              "priceWithoutVat": 10.95,
+              "priceWithVat": 13.25
+            },
+            "23": {
+              "priceWithoutVat": 3.65,
+              "priceWithVat": 4.42
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2860.33,
+            "priceWithVat": 3461.0
+          },
+          "commodityNT": {
+            "priceWithoutVat": 2603.3,
+            "priceWithVat": 3150.0
+          },
+          "distributionVT": {
+            "priceWithoutVat": 1009.35,
+            "priceWithVat": 1221.31
+          },
+          "distributionNT": {
+            "priceWithoutVat": 175.2,
+            "priceWithVat": 211.99
+          }
+        },
+        "D27d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 76.0,
+              "priceWithVat": 91.96
+            },
+            "10": {
+              "priceWithoutVat": 122.0,
+              "priceWithVat": 147.62
+            },
+            "11": {
+              "priceWithoutVat": 152.0,
+              "priceWithVat": 183.92
+            },
+            "12": {
+              "priceWithoutVat": 191.0,
+              "priceWithVat": 231.11
+            },
+            "13": {
+              "priceWithoutVat": 244.0,
+              "priceWithVat": 295.24
+            },
+            "14": {
+              "priceWithoutVat": 305.0,
+              "priceWithVat": 369.05
+            },
+            "15": {
+              "priceWithoutVat": 381.0,
+              "priceWithVat": 461.01
+            },
+            "16": {
+              "priceWithoutVat": 480.0,
+              "priceWithVat": 580.8
+            },
+            "17": null,
+            "18": null,
+            "19": null,
+            "20": null,
+            "21": null,
+            "22": {
+              "priceWithoutVat": 7.62,
+              "priceWithVat": 9.22
+            },
+            "23": {
+              "priceWithoutVat": 2.54,
+              "priceWithVat": 3.07
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2860.33,
+            "priceWithVat": 3461.0
+          },
+          "commodityNT": {
+            "priceWithoutVat": 2603.3,
+            "priceWithVat": 3150.0
+          },
+          "distributionVT": {
+            "priceWithoutVat": 1656.49,
+            "priceWithVat": 2004.35
+          },
+          "distributionNT": {
+            "priceWithoutVat": 175.2,
+            "priceWithVat": 211.99
+          }
+        },
+        "D35d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 154.0,
+              "priceWithVat": 186.34
+            },
+            "10": {
+              "priceWithoutVat": 246.0,
+              "priceWithVat": 297.66
+            },
+            "11": {
+              "priceWithoutVat": 308.0,
+              "priceWithVat": 372.68
+            },
+            "12": {
+              "priceWithoutVat": 385.0,
+              "priceWithVat": 465.85
+            },
+            "13": {
+              "priceWithoutVat": 492.0,
+              "priceWithVat": 595.32
+            },
+            "14": {
+              "priceWithoutVat": 616.0,
+              "priceWithVat": 745.36
+            },
+            "15": {
+              "priceWithoutVat": 770.0,
+              "priceWithVat": 931.7
+            },
+            "16": {
+              "priceWithoutVat": 970.0,
+              "priceWithVat": 1173.7
+            },
+            "17": null,
+            "18": null,
+            "19": null,
+            "20": null,
+            "21": null,
+            "22": {
+              "priceWithoutVat": 15.39,
+              "priceWithVat": 18.62
+            },
+            "23": {
+              "priceWithoutVat": 5.13,
+              "priceWithVat": 6.21
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2904.13,
+            "priceWithVat": 3514.0
+          },
+          "commodityNT": {
+            "priceWithoutVat": 2761.15,
+            "priceWithVat": 3341.0
+          },
+          "distributionVT": {
+            "priceWithoutVat": 421.52,
+            "priceWithVat": 510.04
+          },
+          "distributionNT": {
+            "priceWithoutVat": 175.2,
+            "priceWithVat": 211.99
+          }
+        },
+        "D45d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 154.0,
+              "priceWithVat": 186.34
+            },
+            "10": {
+              "priceWithoutVat": 246.0,
+              "priceWithVat": 297.66
+            },
+            "11": {
+              "priceWithoutVat": 308.0,
+              "priceWithVat": 372.68
+            },
+            "12": {
+              "priceWithoutVat": 385.0,
+              "priceWithVat": 465.85
+            },
+            "13": {
+              "priceWithoutVat": 492.0,
+              "priceWithVat": 595.32
+            },
+            "14": {
+              "priceWithoutVat": 616.0,
+              "priceWithVat": 745.36
+            },
+            "15": {
+              "priceWithoutVat": 770.0,
+              "priceWithVat": 931.7
+            },
+            "16": {
+              "priceWithoutVat": 970.0,
+              "priceWithVat": 1173.7
+            },
+            "17": null,
+            "18": null,
+            "19": null,
+            "20": null,
+            "21": null,
+            "22": {
+              "priceWithoutVat": 15.39,
+              "priceWithVat": 18.62
+            },
+            "23": {
+              "priceWithoutVat": 5.13,
+              "priceWithVat": 6.21
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2894.21,
+            "priceWithVat": 3502.0
+          },
+          "commodityNT": {
+            "priceWithoutVat": 2776.03,
+            "priceWithVat": 3359.0
+          },
+          "distributionVT": {
+            "priceWithoutVat": 421.52,
+            "priceWithVat": 510.04
+          },
+          "distributionNT": {
+            "priceWithoutVat": 175.2,
+            "priceWithVat": 211.99
+          }
+        },
+        "D56d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 154.0,
+              "priceWithVat": 186.34
+            },
+            "10": {
+              "priceWithoutVat": 246.0,
+              "priceWithVat": 297.66
+            },
+            "11": {
+              "priceWithoutVat": 308.0,
+              "priceWithVat": 372.68
+            },
+            "12": {
+              "priceWithoutVat": 385.0,
+              "priceWithVat": 465.85
+            },
+            "13": {
+              "priceWithoutVat": 492.0,
+              "priceWithVat": 595.32
+            },
+            "14": {
+              "priceWithoutVat": 616.0,
+              "priceWithVat": 745.36
+            },
+            "15": {
+              "priceWithoutVat": 770.0,
+              "priceWithVat": 931.7
+            },
+            "16": {
+              "priceWithoutVat": 970.0,
+              "priceWithVat": 1173.7
+            },
+            "17": null,
+            "18": null,
+            "19": null,
+            "20": null,
+            "21": null,
+            "22": {
+              "priceWithoutVat": 15.39,
+              "priceWithVat": 18.62
+            },
+            "23": {
+              "priceWithoutVat": 5.13,
+              "priceWithVat": 6.21
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2894.21,
+            "priceWithVat": 3502.0
+          },
+          "commodityNT": {
+            "priceWithoutVat": 2776.03,
+            "priceWithVat": 3359.0
+          },
+          "distributionVT": {
+            "priceWithoutVat": 421.52,
+            "priceWithVat": 510.04
+          },
+          "distributionNT": {
+            "priceWithoutVat": 175.2,
+            "priceWithVat": 211.99
+          }
+        },
+        "D57d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 154.0,
+              "priceWithVat": 186.34
+            },
+            "10": {
+              "priceWithoutVat": 246.0,
+              "priceWithVat": 297.66
+            },
+            "11": {
+              "priceWithoutVat": 308.0,
+              "priceWithVat": 372.68
+            },
+            "12": {
+              "priceWithoutVat": 385.0,
+              "priceWithVat": 465.85
+            },
+            "13": {
+              "priceWithoutVat": 492.0,
+              "priceWithVat": 595.32
+            },
+            "14": {
+              "priceWithoutVat": 622.0,
+              "priceWithVat": 752.62
+            },
+            "15": {
+              "priceWithoutVat": 933.0,
+              "priceWithVat": 1128.93
+            },
+            "16": {
+              "priceWithoutVat": 1433.0,
+              "priceWithVat": 1733.93
+            },
+            "17": {
+              "priceWithoutVat": 2494.0,
+              "priceWithVat": 3017.74
+            },
+            "18": {
+              "priceWithoutVat": 4801.0,
+              "priceWithVat": 5809.21
+            },
+            "19": {
+              "priceWithoutVat": 9841.0,
+              "priceWithVat": 11907.61
+            },
+            "20": {
+              "priceWithoutVat": 20779.0,
+              "priceWithVat": 25142.59
+            },
+            "21": {
+              "priceWithoutVat": 129.87,
+              "priceWithVat": 157.14
+            },
+            "22": null,
+            "23": {
+              "priceWithoutVat": 43.29,
+              "priceWithVat": 52.38
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2894.21,
+            "priceWithVat": 3502.0
+          },
+          "commodityNT": {
+            "priceWithoutVat": 2776.03,
+            "priceWithVat": 3359.0
+          },
+          "distributionVT": {
+            "priceWithoutVat": 421.52,
+            "priceWithVat": 510.04
+          },
+          "distributionNT": {
+            "priceWithoutVat": 175.2,
+            "priceWithVat": 211.99
+          }
+        },
+        "D61d": {
+          "breakerRows": {
+            "9": {
+              "priceWithoutVat": 64.0,
+              "priceWithVat": 77.44
+            },
+            "10": {
+              "priceWithoutVat": 103.0,
+              "priceWithVat": 124.63
+            },
+            "11": {
+              "priceWithoutVat": 128.0,
+              "priceWithVat": 154.88
+            },
+            "12": {
+              "priceWithoutVat": 161.0,
+              "priceWithVat": 194.81
+            },
+            "13": {
+              "priceWithoutVat": 205.0,
+              "priceWithVat": 248.05
+            },
+            "14": {
+              "priceWithoutVat": 257.0,
+              "priceWithVat": 310.97
+            },
+            "15": {
+              "priceWithoutVat": 321.0,
+              "priceWithVat": 388.41
+            },
+            "16": {
+              "priceWithoutVat": 404.0,
+              "priceWithVat": 488.84
+            },
+            "17": null,
+            "18": null,
+            "19": null,
+            "20": null,
+            "21": null,
+            "22": {
+              "priceWithoutVat": 6.42,
+              "priceWithVat": 7.77
+            },
+            "23": {
+              "priceWithoutVat": 2.14,
+              "priceWithVat": 2.59
+            }
+          },
+          "fixedMonthly": {
+            "priceWithoutVat": 138.84,
+            "priceWithVat": 168.0
+          },
+          "commodityVT": {
+            "priceWithoutVat": 2698.34,
+            "priceWithVat": 3265.0
+          },
+          "commodityNT": {
+            "priceWithoutVat": 2698.34,
+            "priceWithVat": 3265.0
+          },
+          "distributionVT": {
+            "priceWithoutVat": 2343.05,
+            "priceWithVat": 2835.09
+          },
+          "distributionNT": {
+            "priceWithoutVat": 175.2,
+            "priceWithVat": 211.99
+          }
+        }
+      },
+      "common": {
+        "system": {
+          "priceWithoutVat": 164.24,
+          "priceWithVat": 198.73
+        },
+        "pozePerMwh": {
+          "priceWithoutVat": 0.0,
+          "priceWithVat": 0.0
+        },
+        "infrastructure": {
+          "priceWithoutVat": 12.87,
+          "priceWithVat": 15.57
+        },
+        "tax": {
+          "priceWithoutVat": 28.3,
+          "priceWithVat": 34.24
+        }
+      },
+      "infrastructureComponentsWithoutVat": {
+        "dataCentre": 5.88,
+        "eru": 4,
+        "oteSettlement": 1.61,
+        "pozeAdministration": 1.38
+      },
+      "publishedUnitSummaries": {
+        "VT": {
+          "D01d": {
+            "priceWithoutVat": 4745.59,
+            "priceWithVat": 5742.16
+          },
+          "D02d": {
+            "priceWithoutVat": 4407.41,
+            "priceWithVat": 5332.97
+          },
+          "D25d": {
+            "priceWithoutVat": 4709.36,
+            "priceWithVat": 5698.33
+          },
+          "D26d": {
+            "priceWithoutVat": 4062.22,
+            "priceWithVat": 4915.29
+          },
+          "D27d": {
+            "priceWithoutVat": 4709.36,
+            "priceWithVat": 5698.33
+          },
+          "D35d": {
+            "priceWithoutVat": 3518.19,
+            "priceWithVat": 4257.01
+          },
+          "D45d": {
+            "priceWithoutVat": 3508.27,
+            "priceWithVat": 4245.01
+          },
+          "D56d": {
+            "priceWithoutVat": 3508.27,
+            "priceWithVat": 4245.01
+          },
+          "D57d": {
+            "priceWithoutVat": 3508.27,
+            "priceWithVat": 4245.01
+          },
+          "D61d": {
+            "priceWithoutVat": 5233.93,
+            "priceWithVat": 6333.06
+          }
+        },
+        "NT": {
+          "D25d": {
+            "priceWithoutVat": 2971.04,
+            "priceWithVat": 3594.96
+          },
+          "D26d": {
+            "priceWithoutVat": 2971.04,
+            "priceWithVat": 3594.96
+          },
+          "D27d": {
+            "priceWithoutVat": 2971.04,
+            "priceWithVat": 3594.96
+          },
+          "D35d": {
+            "priceWithoutVat": 3128.89,
+            "priceWithVat": 3785.96
+          },
+          "D45d": {
+            "priceWithoutVat": 3143.77,
+            "priceWithVat": 3803.96
+          },
+          "D56d": {
+            "priceWithoutVat": 3143.77,
+            "priceWithVat": 3803.96
+          },
+          "D57d": {
+            "priceWithoutVat": 3143.77,
+            "priceWithVat": 3803.96
+          },
+          "D61d": {
+            "priceWithoutVat": 3066.08,
+            "priceWithVat": 3709.96
+          }
+        }
+      }
+    }
+  }
+}

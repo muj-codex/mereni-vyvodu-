@@ -1,4 +1,6 @@
 import { InnogyPrices } from './InnogyPrices';
+import { MndPrices } from './MndPrices';
+import { assessMnd } from './mndCosts';
 import { CentropolPrices } from './CentropolPrices';
 import { assessCentropol } from './centropolCosts';
 import { PrePrices } from './PrePrices';
@@ -36,12 +38,15 @@ export function InnogyHouseholdComparison({
   try { pre = assessPre('D', code, area, amps, vt + nt, { annualVT: vt, annualNT: nt }, phases); } catch { /* Shared validation. */ }
   let centropol: ReturnType<typeof assessCentropol> | null = null;
   try { centropol = assessCentropol('D', code, area, amps, vt+nt, {annualVT:vt,annualNT:nt}, phases); } catch { /* Shared validation. */ }
+  let mnd: ReturnType<typeof assessMnd> | null = null;
+  try { mnd = assessMnd('D', code, area, amps, vt+nt, {annualVT:vt,annualNT:nt}, phases); } catch { /* Shared validation. */ }
   const offers = [
     { name: 'ČEZ', value: cezResult?.priceWithVat ?? null },
     { name: 'E.ON', value: eon?.priceWithVat ?? null },
     { name: 'innogy', value: innogy?.priceWithVat ?? null },
     { name: 'PRE', value: pre?.priceWithVat ?? null },
     { name: 'Centropol', value: centropol?.priceWithVat ?? null },
+    { name: 'MND', value: mnd?.priceWithVat ?? null },
   ]
     .filter((o): o is { name: string; value: number } => o.value !== null)
     .sort((a, b) => a.value - b.value || a.name.localeCompare(b.name));
@@ -62,6 +67,7 @@ export function InnogyHouseholdComparison({
       />
       <PrePrices customer="D" code={code} area={area} amps={amps} phases={phases} annualKwh={vt + nt} split={{annualVT:vt,annualNT:nt}} />
       <CentropolPrices customer="D" code={code} area={area} amps={amps} phases={phases} annualKwh={vt+nt} split={{annualVT:vt,annualNT:nt}} />
+      <MndPrices customer="D" code={code} area={area} amps={amps} phases={phases} annualKwh={vt+nt} split={{annualVT:vt,annualNT:nt}} />
       <section className="card" aria-label="Společné pořadí domácností">
         <h3>Pořadí úplných nabídek domácností</h3>
         <p>
@@ -74,6 +80,7 @@ export function InnogyHouseholdComparison({
               <li key={o.name}>
                 {o.name} · {fmt(o.value)} Kč/rok včetně DPH · rozdíl proti nejlevnější{' '}
                 {fmt(o.value - offers[0].value)} Kč/rok
+                {o.name === 'MND' && mnd?.warning && <span className="notice">{mnd.warning}</span>}
               </li>
             ))}
           </ol>

@@ -111,7 +111,7 @@ for (const [code, price, dist, breaker, nt] of [
     );
     await expect(
       s.getByLabel('Pořadí domácích nabídek', { exact: true }).locator('li'),
-    ).toHaveCount(5);
+    ).toHaveCount(6);
     await expect(s).not.toContainText(/ORLEN|Spotřeba nad 30 MWh/);
     await sortedPrices(s.getByLabel('Pořadí domácích nabídek', { exact: true }));
     await s.getByLabel('Počet fází pro cenu ČEZ', { exact: true }).selectOption('1');
@@ -152,7 +152,8 @@ test('30 MWh boundary only warns businesses; households have no limit, other are
   await s.getByRole('button', { name: 'POKRAČOVAT K POROVNÁNÍ', exact: true }).click();
   const home = s.getByRole('region', { name: 'innogy domácnosti', exact: true });
   await expect(home.getByLabel('Roční cena innogy', { exact: true })).toBeVisible();
-  await expect(s).not.toContainText(/ORLEN|Spotřeba nad 30 MWh/);
+  await expect(s).not.toContainText(/ORLEN/);
+  await expect(home).not.toContainText('Spotřeba nad 30 MWh');
   for (const area of ['EG.D', 'PREdistribuce']) {
     await s.getByRole('button', { name: '← Zpět', exact: true }).click();
     await s.getByLabel('Distribuční oblast', { exact: true }).selectOption(area);
@@ -162,6 +163,6 @@ test('30 MWh boundary only warns businesses; households have no limit, other are
     );
     await expect(
       s.getByLabel('Pořadí domácích nabídek', { exact: true }).locator('li'),
-    ).toHaveCount(3);
+    ).toHaveCount(4);
   }
 });

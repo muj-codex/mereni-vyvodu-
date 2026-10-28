@@ -310,3 +310,14 @@ Detaily zdrojů, pravidel a omezení: [E.ON import 1.4.8](eon-import-1.4.8.md), 
 - V cíleném běhu prošlo všech 34 nových E2E případů; starší očekávání prázdného firemního pořadí v EG.D bylo upraveno na nově dostupný Centropol. Finální `CI=1 npm run test:e2e -- --workers=4`: 380/380, 190 iPhone + 190 iPad, 11,8 minuty nad aktuálním dokončeným buildem, bez přeskočených scénářů.
 - Nové scénáře ověřují C02d/C25d/C35d/C45d/C56d/C62d a D02d/D25d/D35d/D45d/D57d/D61d, úplné ceny v každé oblasti, nezávislé C/D jističe, D57d, 1f vstupy, společné řazení, rozdíly a vyloučení C55d ve všech třech oblastech. Jediná úplná firemní nabídka v EG.D/PRE je zobrazena na 1. místě, neověřené nabídky nedostávají cenu.
 - Původní regresní scénáře měření, MTP, diagnostiky, UZEL, odečtů, série, historie, IndexedDB, backupů a PWA prošly. Baseline 87 původních zdrojových souborů je ověřená proti skutečnému HEAD 1.4.12; přesné integrační změny pouze v pěti tarifních prezentačních/porovnávacích souborech. Původní ceníky, cenové funkce ORLEN/ČEZ/E.ON/innogy/PRE a měřicí matematika beze změn.
+
+## 1.4.14 – MND Proud, Ceník Prosinec 28
+
+- Výchozí skutečný main 1.4.13: `5a3f85bd11f2935ded941c75e0bdc6b7a09b7189`. Patch zvýšen přesně o 1 na 1.4.14 v obou manifestech, závislosti beze změn.
+- `python scripts/import-mnd.py --check`: 6 původních PDF, 1101 ověřených dvojic, 11 C + 10 D sazeb v každé oblasti. Balíček Prosinec 28 z přílohy, bez záměny se základním Proudem; infrastruktura účtovaná jednou. [Report včetně tištěných odchylek zaokrouhlení](mnd-validation-1.4.14.json).
+- `npm test`: 796/796, 36 souborů. Opravená pouze typová parametrizace nového testu, TypeScript ověřen následnými buildy.
+- `npm run build`: úspěch, TypeScript + production + 8 offline souborů.
+- `npm run build:pwa`: samostatný úspěšný build, 8 offline souborů.
+- Cílené E2E 90/90. Finální `CI=1 npm run test:e2e -- --workers=4`: 416/416, 208 iPhone + 208 iPad, 12,3 minuty nad dokončeným aktuálním buildem, bez přeskočených scénářů.
+- Nových 36 E2E případů pokrývá C02d/C25d/C35d/C45d/C56d/C62d a D02d/D25d/D35d/D45d/D57d/D61d, úplné ceny v každé oblasti, sdílené vstupy, řazení, rozdíly, D57d/1f, přesně 30 MWh bez varování a vyšší spotřebu s výrazným upozorněním v kartě i pořadí pro obě kategorie. MND zůstává vypočtená a řazená, ORLEN mimo domácnosti. Původní domácí innogy nemá zděděný limit MND.
+- Baseline 90 původních zdrojových souborů ověřena proti skutečnému HEAD 1.4.13, přesné integrační změny ve čtyřech tarifních souborech. Ostatní ceníky a cenové funkce ORLEN/ČEZ/E.ON/innogy/PRE/Centropol i měřicí část beze změn. Původní regrese odečtů, historie, IndexedDB, UZEL, MTP, diagnostiky, backupů a PWA prošly.

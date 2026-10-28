@@ -132,6 +132,7 @@ it('includes all five complete business offers with the same inputs, sorted by g
     'ORLEN',
     'ČEZ ESCO',
     'Centropol',
+    'MND',
     'E.ON Variant',
     'innogy',
     'PRE',
@@ -155,6 +156,6 @@ it('adds household PRE to common ranking without ORLEN or an inherited business 
   );
   expect(html).toContain('PRE PROUD FAVORIT 2');
   expect(html).toContain('Pořadí domácích nabídek');
-  expect(html).not.toMatch(/ORLEN|Spotřeba nad 30 MWh/);
+  expect(html).not.toMatch(/ORLEN/);
   expect(assessPre('C', 'C02d', 'ČEZ Distribuce', 40, 40000, null).warning).toBeNull();
 });

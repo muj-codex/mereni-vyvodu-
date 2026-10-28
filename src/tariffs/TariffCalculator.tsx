@@ -250,7 +250,7 @@ function Suppliers({ context }: { context: ComparisonContext }) {
         className="tariff-suppliers"
         key={`${context.customer}:${context.method}:${context.distributionArea}`}
       >
-        {suppliersFor(context.customer, context.method).filter((s) => s.id !== 'cez' && s.id !== 'eon' && s.id !== 'innogy' && s.id !== 'pre' && s.id !== 'centropol').map((s) => (
+        {suppliersFor(context.customer, context.method).filter((s) => s.id !== 'cez' && s.id !== 'eon' && s.id !== 'innogy' && s.id !== 'pre' && s.id !== 'centropol' && s.id !== 'mnd').map((s) => (
           <SupplierCard supplier={s} key={s.id} />
         ))}
       </div>

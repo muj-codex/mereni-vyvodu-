@@ -1,0 +1,370 @@
+{
+  "version": "1.4.14",
+  "sources": 6,
+  "verifiedNetGrossPairs": 1101,
+  "tariffsPerArea": {
+    "C": 11,
+    "D": 10
+  },
+  "unreadable": 0,
+  "printedRoundingDifferences": [
+    {
+      "source": "2026_10_01_MND_Proud_Cenik_Prosinec_28_CEZ_MO.pdf",
+      "row": "commercial1",
+      "net": 2930.57,
+      "printedGross": 3546.0,
+      "calculatedGross": 3545.99
+    },
+    {
+      "source": "2026_10_01_MND_Proud_Cenik_Prosinec_28_CEZ_MO.pdf",
+      "row": "commercial1",
+      "net": 2930.57,
+      "printedGross": 3546.0,
+      "calculatedGross": 3545.99
+    },
+    {
+      "source": "2026_10_01_MND_Proud_Cenik_Prosinec_28_CEZ_MO.pdf",
+      "row": "commercial1",
+      "net": 2935.53,
+      "printedGross": 3552.0,
+      "calculatedGross": 3551.99
+    },
+    {
+      "source": "2026_10_01_MND_Proud_Cenik_Prosinec_28_CEZ_MO.pdf",
+      "row": "commercial1",
+      "net": 2935.53,
+      "printedGross": 3552.0,
+      "calculatedGross": 3551.99
+    },
+    {
+      "source": "2026_10_01_MND_Proud_Cenik_Prosinec_28_CEZ_MO.pdf",
+      "row": "commercial2",
+      "net": 2839.66,
+      "printedGross": 3436.0,
+      "calculatedGross": 3435.99
+    },
+    {
+      "source": "2026_10_01_MND_Proud_Cenik_Prosinec_28_CEZ_MO.pdf",
+      "row": "commercial2",
+      "net": 2908.26,
+      "printedGross": 3519.0,
+      "calculatedGross": 3518.99
+    },
+    {
+      "source": "2026_10_01_MND_Proud_Cenik_Prosinec_28_CEZ_MO.pdf",
+      "row": "commercial2",
+      "net": 2908.26,
+      "printedGross": 3519.0,
+      "calculatedGross": 3518.99
+    },
+    {
+      "source": "2026_10_01_MND_Proud_Cenik_Prosinec_28_CEZ_MO.pdf",
+      "row": "summaryVT",
+      "net": 5331.5,
+      "printedGross": 6451.12,
+      "calculatedGross": 6451.11
+    },
+    {
+      "source": "2026_10_01_MND_Proud_Cenik_Prosinec_28_CEZ_MO.pdf",
+      "row": "summaryVT",
+      "net": 5331.5,
+      "printedGross": 6451.12,
+      "calculatedGross": 6451.11
+    },
+    {
+      "source": "2026_10_01_MND_Proud_Cenik_Prosinec_28_EGD_MO.pdf",
+      "row": "commercial1",
+      "net": 2930.57,
+      "printedGross": 3546.0,
+      "calculatedGross": 3545.99
+    },
+    {
+      "source": "2026_10_01_MND_Proud_Cenik_Prosinec_28_EGD_MO.pdf",
+      "row": "commercial1",
+      "net": 2930.57,
+      "printedGross": 3546.0,
+      "calculatedGross": 3545.99
+    },
+    {
+      "source": "2026_10_01_MND_Proud_Cenik_Prosinec_28_EGD_MO.pdf",
+      "row": "commercial1",
+      "net": 2935.53,
+      "printedGross": 3552.0,
+      "calculatedGross": 3551.99
+    },
+    {
+      "source": "2026_10_01_MND_Proud_Cenik_Prosinec_28_EGD_MO.pdf",
+      "row": "commercial1",
+      "net": 2935.53,
+      "printedGross": 3552.0,
+      "calculatedGross": 3551.99
+    },
+    {
+      "source": "2026_10_01_MND_Proud_Cenik_Prosinec_28_EGD_MO.pdf",
+      "row": "commercial2",
+      "net": 2839.66,
+      "printedGross": 3436.0,
+      "calculatedGross": 3435.99
+    },
+    {
+      "source": "2026_10_01_MND_Proud_Cenik_Prosinec_28_EGD_MO.pdf",
+      "row": "commercial2",
+      "net": 2908.26,
+      "printedGross": 3519.0,
+      "calculatedGross": 3518.99
+    },
+    {
+      "source": "2026_10_01_MND_Proud_Cenik_Prosinec_28_EGD_MO.pdf",
+      "row": "commercial2",
+      "net": 2908.26,
+      "printedGross": 3519.0,
+      "calculatedGross": 3518.99
+    },
+    {
+      "source": "2026_10_01_MND_Proud_Cenik_Prosinec_28_EGD_MO.pdf",
+      "row": "summaryNT",
+      "net": 3256.5,
+      "printedGross": 3940.37,
+      "calculatedGross": 3940.36
+    },
+    {
+      "source": "2026_10_01_MND_Proud_Cenik_Prosinec_28_PRE_MO.pdf",
+      "row": "commercial1",
+      "net": 2930.57,
+      "printedGross": 3546.0,
+      "calculatedGross": 3545.99
+    },
+    {
+      "source": "2026_10_01_MND_Proud_Cenik_Prosinec_28_PRE_MO.pdf",
+      "row": "commercial1",
+      "net": 2930.57,
+      "printedGross": 3546.0,
+      "calculatedGross": 3545.99
+    },
+    {
+      "source": "2026_10_01_MND_Proud_Cenik_Prosinec_28_PRE_MO.pdf",
+      "row": "commercial1",
+      "net": 2935.53,
+      "printedGross": 3552.0,
+      "calculatedGross": 3551.99
+    },
+    {
+      "source": "2026_10_01_MND_Proud_Cenik_Prosinec_28_PRE_MO.pdf",
+      "row": "commercial1",
+      "net": 2935.53,
+      "printedGross": 3552.0,
+      "calculatedGross": 3551.99
+    },
+    {
+      "source": "2026_10_01_MND_Proud_Cenik_Prosinec_28_PRE_MO.pdf",
+      "row": "commercial2",
+      "net": 2839.66,
+      "printedGross": 3436.0,
+      "calculatedGross": 3435.99
+    },
+    {
+      "source": "2026_10_01_MND_Proud_Cenik_Prosinec_28_PRE_MO.pdf",
+      "row": "commercial2",
+      "net": 2908.26,
+      "printedGross": 3519.0,
+      "calculatedGross": 3518.99
+    },
+    {
+      "source": "2026_10_01_MND_Proud_Cenik_Prosinec_28_PRE_MO.pdf",
+      "row": "commercial2",
+      "net": 2908.26,
+      "printedGross": 3519.0,
+      "calculatedGross": 3518.99
+    },
+    {
+      "source": "2026_10_01_MND_Proud_Cenik_Prosinec_28_CEZ.pdf",
+      "row": "commercial1",
+      "net": 2698.34,
+      "printedGross": 3265.0,
+      "calculatedGross": 3264.99
+    },
+    {
+      "source": "2026_10_01_MND_Proud_Cenik_Prosinec_28_CEZ.pdf",
+      "row": "commercial1",
+      "net": 2894.21,
+      "printedGross": 3502.0,
+      "calculatedGross": 3501.99
+    },
+    {
+      "source": "2026_10_01_MND_Proud_Cenik_Prosinec_28_CEZ.pdf",
+      "row": "commercial1",
+      "net": 2894.21,
+      "printedGross": 3502.0,
+      "calculatedGross": 3501.99
+    },
+    {
+      "source": "2026_10_01_MND_Proud_Cenik_Prosinec_28_CEZ.pdf",
+      "row": "commercial1",
+      "net": 2894.21,
+      "printedGross": 3502.0,
+      "calculatedGross": 3501.99
+    },
+    {
+      "source": "2026_10_01_MND_Proud_Cenik_Prosinec_28_CEZ.pdf",
+      "row": "commercial1",
+      "net": 2698.34,
+      "printedGross": 3265.0,
+      "calculatedGross": 3264.99
+    },
+    {
+      "source": "2026_10_01_MND_Proud_Cenik_Prosinec_28_CEZ.pdf",
+      "row": "commercial2",
+      "net": 2603.3,
+      "printedGross": 3150.0,
+      "calculatedGross": 3149.99
+    },
+    {
+      "source": "2026_10_01_MND_Proud_Cenik_Prosinec_28_CEZ.pdf",
+      "row": "commercial2",
+      "net": 2603.3,
+      "printedGross": 3150.0,
+      "calculatedGross": 3149.99
+    },
+    {
+      "source": "2026_10_01_MND_Proud_Cenik_Prosinec_28_CEZ.pdf",
+      "row": "commercial2",
+      "net": 2761.15,
+      "printedGross": 3341.0,
+      "calculatedGross": 3340.99
+    },
+    {
+      "source": "2026_10_01_MND_Proud_Cenik_Prosinec_28_CEZ.pdf",
+      "row": "commercial2",
+      "net": 2698.34,
+      "printedGross": 3265.0,
+      "calculatedGross": 3264.99
+    },
+    {
+      "source": "2026_10_01_MND_Proud_Cenik_Prosinec_28_EGD.pdf",
+      "row": "commercial1",
+      "net": 2698.34,
+      "printedGross": 3265.0,
+      "calculatedGross": 3264.99
+    },
+    {
+      "source": "2026_10_01_MND_Proud_Cenik_Prosinec_28_EGD.pdf",
+      "row": "commercial1",
+      "net": 2894.21,
+      "printedGross": 3502.0,
+      "calculatedGross": 3501.99
+    },
+    {
+      "source": "2026_10_01_MND_Proud_Cenik_Prosinec_28_EGD.pdf",
+      "row": "commercial1",
+      "net": 2894.21,
+      "printedGross": 3502.0,
+      "calculatedGross": 3501.99
+    },
+    {
+      "source": "2026_10_01_MND_Proud_Cenik_Prosinec_28_EGD.pdf",
+      "row": "commercial1",
+      "net": 2894.21,
+      "printedGross": 3502.0,
+      "calculatedGross": 3501.99
+    },
+    {
+      "source": "2026_10_01_MND_Proud_Cenik_Prosinec_28_EGD.pdf",
+      "row": "commercial1",
+      "net": 2698.34,
+      "printedGross": 3265.0,
+      "calculatedGross": 3264.99
+    },
+    {
+      "source": "2026_10_01_MND_Proud_Cenik_Prosinec_28_EGD.pdf",
+      "row": "commercial2",
+      "net": 2603.3,
+      "printedGross": 3150.0,
+      "calculatedGross": 3149.99
+    },
+    {
+      "source": "2026_10_01_MND_Proud_Cenik_Prosinec_28_EGD.pdf",
+      "row": "commercial2",
+      "net": 2603.3,
+      "printedGross": 3150.0,
+      "calculatedGross": 3149.99
+    },
+    {
+      "source": "2026_10_01_MND_Proud_Cenik_Prosinec_28_EGD.pdf",
+      "row": "commercial2",
+      "net": 2761.15,
+      "printedGross": 3341.0,
+      "calculatedGross": 3340.99
+    },
+    {
+      "source": "2026_10_01_MND_Proud_Cenik_Prosinec_28_EGD.pdf",
+      "row": "commercial2",
+      "net": 2698.34,
+      "printedGross": 3265.0,
+      "calculatedGross": 3264.99
+    },
+    {
+      "source": "2026_10_01_MND_Proud_Cenik_Prosinec_28_PRE.pdf",
+      "row": "commercial1",
+      "net": 2698.34,
+      "printedGross": 3265.0,
+      "calculatedGross": 3264.99
+    },
+    {
+      "source": "2026_10_01_MND_Proud_Cenik_Prosinec_28_PRE.pdf",
+      "row": "commercial1",
+      "net": 2894.21,
+      "printedGross": 3502.0,
+      "calculatedGross": 3501.99
+    },
+    {
+      "source": "2026_10_01_MND_Proud_Cenik_Prosinec_28_PRE.pdf",
+      "row": "commercial1",
+      "net": 2894.21,
+      "printedGross": 3502.0,
+      "calculatedGross": 3501.99
+    },
+    {
+      "source": "2026_10_01_MND_Proud_Cenik_Prosinec_28_PRE.pdf",
+      "row": "commercial1",
+      "net": 2894.21,
+      "printedGross": 3502.0,
+      "calculatedGross": 3501.99
+    },
+    {
+      "source": "2026_10_01_MND_Proud_Cenik_Prosinec_28_PRE.pdf",
+      "row": "commercial1",
+      "net": 2698.34,
+      "printedGross": 3265.0,
+      "calculatedGross": 3264.99
+    },
+    {
+      "source": "2026_10_01_MND_Proud_Cenik_Prosinec_28_PRE.pdf",
+      "row": "commercial2",
+      "net": 2603.3,
+      "printedGross": 3150.0,
+      "calculatedGross": 3149.99
+    },
+    {
+      "source": "2026_10_01_MND_Proud_Cenik_Prosinec_28_PRE.pdf",
+      "row": "commercial2",
+      "net": 2603.3,
+      "printedGross": 3150.0,
+      "calculatedGross": 3149.99
+    },
+    {
+      "source": "2026_10_01_MND_Proud_Cenik_Prosinec_28_PRE.pdf",
+      "row": "commercial2",
+      "net": 2761.15,
+      "printedGross": 3341.0,
+      "calculatedGross": 3340.99
+    },
+    {
+      "source": "2026_10_01_MND_Proud_Cenik_Prosinec_28_PRE.pdf",
+      "row": "commercial2",
+      "net": 2698.34,
+      "printedGross": 3265.0,
+      "calculatedGross": 3264.99
+    }
+  ],
+  "infrastructureCharged": "aggregate once; components informational only"
+}

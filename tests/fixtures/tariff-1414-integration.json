@@ -1,0 +1,54 @@
+{
+  "src/tariffs/businessOffers.ts": [
+    {
+      "before": "import { assessCentropol }",
+      "after": "import { assessMnd, mndLimitWarning } from './mndCosts';\nimport { assessCentropol }"
+    },
+    {
+      "before": "    { name: 'Centropol', pricing: 'FIXNĚ PRO PODNIKATELE na 2 roky', value: assessCentropol('C', ...args).priceWithVat },",
+      "after": "    { name: 'Centropol', pricing: 'FIXNĚ PRO PODNIKATELE na 2 roky', value: assessCentropol('C', ...args).priceWithVat },\n    { name: 'MND', pricing: 'Proud – Ceník Prosinec 28 · pevná cena do 31. 12. 2028' + (context.annualKwh > 30000 ? ` · ${mndLimitWarning}` : ''), value: assessMnd('C', ...args).priceWithVat },"
+    }
+  ],
+  "src/tariffs/CezPrices.tsx": [
+    {
+      "before": "import { useState } from 'react';",
+      "after": "import { useState } from 'react';\nimport { MndBusinessPrices } from './MndPrices';"
+    },
+    {
+      "before": "<CentropolBusinessPrices context={context} />",
+      "after": "<CentropolBusinessPrices context={context} /><MndBusinessPrices context={context} />"
+    },
+    {
+      "before": "ČEZ, E.ON, innogy, PRE i Centropol.",
+      "after": "ČEZ, E.ON, innogy, PRE, Centropol i MND."
+    }
+  ],
+  "src/tariffs/TariffCalculator.tsx": [
+    {
+      "before": "&& s.id !== 'centropol'",
+      "after": "&& s.id !== 'centropol' && s.id !== 'mnd'"
+    }
+  ],
+  "src/tariffs/InnogyHouseholdComparison.tsx": [
+    {
+      "before": "import { InnogyPrices } from './InnogyPrices';",
+      "after": "import { InnogyPrices } from './InnogyPrices';\nimport { MndPrices } from './MndPrices';\nimport { assessMnd } from './mndCosts';"
+    },
+    {
+      "before": "  const offers = [",
+      "after": "  let mnd: ReturnType<typeof assessMnd> | null = null;\n  try { mnd = assessMnd('D', code, area, amps, vt+nt, {annualVT:vt,annualNT:nt}, phases); } catch { /* Shared validation. */ }\n  const offers = ["
+    },
+    {
+      "before": "    { name: 'Centropol', value: centropol?.priceWithVat ?? null },",
+      "after": "    { name: 'Centropol', value: centropol?.priceWithVat ?? null },\n    { name: 'MND', value: mnd?.priceWithVat ?? null },"
+    },
+    {
+      "before": "      <section className=\"card\" aria-label=\"Společné pořadí domácností\">",
+      "after": "      <MndPrices customer=\"D\" code={code} area={area} amps={amps} phases={phases} annualKwh={vt+nt} split={{annualVT:vt,annualNT:nt}} />\n      <section className=\"card\" aria-label=\"Společné pořadí domácností\">"
+    },
+    {
+      "before": "                {fmt(o.value - offers[0].value)} Kč/rok",
+      "after": "                {fmt(o.value - offers[0].value)} Kč/rok\n                {o.name === 'MND' && mnd?.warning && <span className=\"notice\">{mnd.warning}</span>}"
+    }
+  ]
+}

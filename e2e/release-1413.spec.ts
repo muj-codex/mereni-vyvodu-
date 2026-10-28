@@ -113,7 +113,7 @@ for (const [code, price, dist, breaker, nt] of [
     );
     await expect(
       s.getByLabel('Pořadí domácích nabídek', { exact: true }).locator('li'),
-    ).toHaveCount(5);
+    ).toHaveCount(6);
     await expect(s).not.toContainText(/ORLEN|Spotřeba nad 30 MWh/);
     await sortedPrices(s.getByLabel('Pořadí domácích nabídek', { exact: true }));
     await s.getByLabel('Počet fází pro cenu ČEZ', { exact: true }).selectOption('1');
@@ -155,7 +155,7 @@ for (const [area, cDist, cBreaker, dDist, dBreaker] of [
         { exact: true },
       );
       await expect(order).toContainText('Centropol');
-      await expect(order.locator('li')).toHaveCount(customer === 'C' ? 1 : 3);
+      await expect(order.locator('li')).toHaveCount(customer === 'C' ? 2 : 4);
       await sortedPrices(order);
       if (customer === 'D') {
         await expect(s).not.toContainText(/ORLEN/);
