@@ -38,7 +38,7 @@ test('company workflow keeps the complete C catalog and single/dual tariff infor
   );
   await expect(s.locator('.tariff-supplier')).toHaveCount(1);
 });
-test('D flat connection has verified ČEZ plus one unloaded suppliers, disabled update buttons and no ORLEN', async ({
+test('D flat connection has all seven verified suppliers, offline EPET prices and no ORLEN', async ({
   page,
   context,
 }) => {
@@ -49,7 +49,7 @@ test('D flat connection has verified ČEZ plus one unloaded suppliers, disabled 
   const cards = s.locator('.tariff-supplier');
   expect(
     await cards.evaluateAll((nodes) => nodes.map((n) => n.getAttribute('data-supplier-id'))),
-  ).toEqual(['epet']);
+  ).toEqual([]);
   await expect(s.getByRole('region', { name: 'ČEZ domácnosti', exact: true })).toContainText(
     'Elektřina na dobu neurčitou',
   );
@@ -57,15 +57,10 @@ test('D flat connection has verified ČEZ plus one unloaded suppliers, disabled 
   await context.setOffline(true);
   const requests: string[] = [];
   page.on('request', (r) => requests.push(r.url()));
-  for (const card of await cards.all()) {
-    await expect(card).toHaveAttribute('data-update-state', 'idle');
-    await expect(card).toHaveAttribute('data-source-status', 'not-loaded');
-    await expect(card).toContainText('zatím nenahrán');
-    await expect(card).toContainText('zatím neověřeno');
-    await expect(
-      card.getByRole('button', { name: 'AKTUALIZOVAT CENÍK', exact: true }),
-    ).toBeDisabled();
-  }
+  const epet = s.getByRole('region', { name: 'EPET domácnosti', exact: true });
+  await expect(epet).toContainText('FIX 24 · GARANT 7_2026');
+  await expect(epet.getByLabel('Roční cena EPET', {exact:true})).toBeVisible();
+  await expect(epet.getByRole('button', {name:'AKTUALIZOVAT CENÍK',exact:true})).toHaveCount(0);
   await expect(cards.getByRole('status')).toHaveCount(0);
   expect(requests).toEqual([]);
 });

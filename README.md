@@ -387,3 +387,9 @@ Paušální připojení zobrazuje `C25d · 2T` a `C45d · 2T`. Interní hodnoty 
 - MND pro firmy i domácnosti ve všech třech oblastech, účinnost od 7. 10. 2026 a pevná obchodní cena do 31. 12. 2028. Vlastní ověřené regulované a jističové tabulky, včetně D57d.
 - Limit 30 MWh se týká obou kategorií. Nad limit cena a pořadí zůstávají orientačně dostupné s upozorněním. Infrastruktura účtována jednou, bez automatických sankcí.
 - Ostatní dodavatelé a měřicí část zachovány. [Zdroje, výpočet a podmínky](docs/mnd-1.4.14.md).
+
+### 1.4.15 – EPET FIX 24
+
+- EPET FIX 24 · GARANT 7_2026 pro firmy i domácnosti ve všech třech distribučních oblastech, účinnost od 20. 7. 2026. Pevná obchodní cena 24 měsíců od skutečného zahájení dodávky.
+- Vlastní ověřené jističové a distribuční tabulky z šesti oficiálních PDF, 11 C + 10 D sazeb, společná pořadí úplných ročních cen včetně DPH. POZE 2026 nulové, infrastruktura účtovaná jednou, bez volitelných administrativních služeb.
+- Ostatní dodavatelé a měřicí část zachovány. [Zdroje, ceny a podmínky](docs/epet-1.4.15.md).

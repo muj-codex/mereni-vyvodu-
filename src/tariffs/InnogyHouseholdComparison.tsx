@@ -1,4 +1,6 @@
 import { InnogyPrices } from './InnogyPrices';
+import { EpetPrices } from './EpetPrices';
+import { assessEpet } from './epetCosts';
 import { MndPrices } from './MndPrices';
 import { assessMnd } from './mndCosts';
 import { CentropolPrices } from './CentropolPrices';
@@ -40,6 +42,8 @@ export function InnogyHouseholdComparison({
   try { centropol = assessCentropol('D', code, area, amps, vt+nt, {annualVT:vt,annualNT:nt}, phases); } catch { /* Shared validation. */ }
   let mnd: ReturnType<typeof assessMnd> | null = null;
   try { mnd = assessMnd('D', code, area, amps, vt+nt, {annualVT:vt,annualNT:nt}, phases); } catch { /* Shared validation. */ }
+  let epet: ReturnType<typeof assessEpet> | null = null;
+  try { epet = assessEpet('D', code, area, amps, vt+nt, {annualVT:vt,annualNT:nt}, phases); } catch { /* Shared validation. */ }
   const offers = [
     { name: 'ČEZ', value: cezResult?.priceWithVat ?? null },
     { name: 'E.ON', value: eon?.priceWithVat ?? null },
@@ -47,6 +51,7 @@ export function InnogyHouseholdComparison({
     { name: 'PRE', value: pre?.priceWithVat ?? null },
     { name: 'Centropol', value: centropol?.priceWithVat ?? null },
     { name: 'MND', value: mnd?.priceWithVat ?? null },
+    { name: 'EPET', value: epet?.priceWithVat ?? null },
   ]
     .filter((o): o is { name: string; value: number } => o.value !== null)
     .sort((a, b) => a.value - b.value || a.name.localeCompare(b.name));
@@ -68,6 +73,7 @@ export function InnogyHouseholdComparison({
       <PrePrices customer="D" code={code} area={area} amps={amps} phases={phases} annualKwh={vt + nt} split={{annualVT:vt,annualNT:nt}} />
       <CentropolPrices customer="D" code={code} area={area} amps={amps} phases={phases} annualKwh={vt+nt} split={{annualVT:vt,annualNT:nt}} />
       <MndPrices customer="D" code={code} area={area} amps={amps} phases={phases} annualKwh={vt+nt} split={{annualVT:vt,annualNT:nt}} />
+      <EpetPrices customer="D" code={code} area={area} amps={amps} phases={phases} annualKwh={vt+nt} split={{annualVT:vt,annualNT:nt}} />
       <section className="card" aria-label="Společné pořadí domácností">
         <h3>Pořadí úplných nabídek domácností</h3>
         <p>

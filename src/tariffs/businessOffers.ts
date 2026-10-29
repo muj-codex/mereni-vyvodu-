@@ -1,3 +1,4 @@
+import { assessEpet } from './epetCosts';
 import { assessMnd, mndLimitWarning } from './mndCosts';
 import { assessCentropol } from './centropolCosts';
 import { assessPre } from './preCosts';
@@ -30,6 +31,7 @@ export function compareBusinessOffers(code: string, context: ComparisonContext) 
     { name: 'PRE', pricing: 'PRE PROUD FAVORIT 2 10/2026 · Garance do 30. 9. 2028', value: assessPre('C', ...args).priceWithVat },
     { name: 'Centropol', pricing: 'FIXNĚ PRO PODNIKATELE na 2 roky', value: assessCentropol('C', ...args).priceWithVat },
     { name: 'MND', pricing: 'Proud – Ceník Prosinec 28 · pevná cena do 31. 12. 2028' + (context.annualKwh > 30000 ? ` · ${mndLimitWarning}` : ''), value: assessMnd('C', ...args).priceWithVat },
+    { name: 'EPET', pricing: 'FIX 24 · GARANT 7_2026 · Pevná obchodní cena na 24 měsíců', value: assessEpet('C', ...args).priceWithVat },
   ];
   const offers = results
     .filter((r): r is typeof r & { value: number } => r.value !== null)

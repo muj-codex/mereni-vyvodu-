@@ -1,0 +1,50 @@
+{
+  "src/tariffs/businessOffers.ts": [
+    {
+      "before": "import { assessMnd",
+      "after": "import { assessEpet } from './epetCosts';\nimport { assessMnd"
+    },
+    {
+      "before": "    { name: 'MND', pricing: 'Proud – Ceník Prosinec 28 · pevná cena do 31. 12. 2028' + (context.annualKwh > 30000 ? ` · ${mndLimitWarning}` : ''), value: assessMnd('C', ...args).priceWithVat },",
+      "after": "    { name: 'MND', pricing: 'Proud – Ceník Prosinec 28 · pevná cena do 31. 12. 2028' + (context.annualKwh > 30000 ? ` · ${mndLimitWarning}` : ''), value: assessMnd('C', ...args).priceWithVat },\n    { name: 'EPET', pricing: 'FIX 24 · GARANT 7_2026 · Pevná obchodní cena na 24 měsíců', value: assessEpet('C', ...args).priceWithVat },"
+    }
+  ],
+  "src/tariffs/CezPrices.tsx": [
+    {
+      "before": "import { MndBusinessPrices }",
+      "after": "import { EpetBusinessPrices } from './EpetPrices';\nimport { MndBusinessPrices }"
+    },
+    {
+      "before": "ČEZ, E.ON, innogy, PRE, Centropol i MND.",
+      "after": "ČEZ, E.ON, innogy, PRE, Centropol, MND i EPET."
+    },
+    {
+      "before": "<MndBusinessPrices context={context} />",
+      "after": "<MndBusinessPrices context={context} /><EpetBusinessPrices context={context} />"
+    }
+  ],
+  "src/tariffs/InnogyHouseholdComparison.tsx": [
+    {
+      "before": "import { MndPrices }",
+      "after": "import { EpetPrices } from './EpetPrices';\nimport { assessEpet } from './epetCosts';\nimport { MndPrices }"
+    },
+    {
+      "before": "  const offers = [",
+      "after": "  let epet: ReturnType<typeof assessEpet> | null = null;\n  try { epet = assessEpet('D', code, area, amps, vt+nt, {annualVT:vt,annualNT:nt}, phases); } catch { /* Shared validation. */ }\n  const offers = ["
+    },
+    {
+      "before": "    { name: 'MND', value: mnd?.priceWithVat ?? null },",
+      "after": "    { name: 'MND', value: mnd?.priceWithVat ?? null },\n    { name: 'EPET', value: epet?.priceWithVat ?? null },"
+    },
+    {
+      "before": "      <MndPrices customer=\"D\" code={code} area={area} amps={amps} phases={phases} annualKwh={vt+nt} split={{annualVT:vt,annualNT:nt}} />",
+      "after": "      <MndPrices customer=\"D\" code={code} area={area} amps={amps} phases={phases} annualKwh={vt+nt} split={{annualVT:vt,annualNT:nt}} />\n      <EpetPrices customer=\"D\" code={code} area={area} amps={amps} phases={phases} annualKwh={vt+nt} split={{annualVT:vt,annualNT:nt}} />"
+    }
+  ],
+  "src/tariffs/TariffCalculator.tsx": [
+    {
+      "before": "&& s.id !== 'mnd'",
+      "after": "&& s.id !== 'mnd' && s.id !== 'epet'"
+    }
+  ]
+}

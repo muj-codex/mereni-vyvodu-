@@ -1,0 +1,14 @@
+{
+  "version": "1.4.15",
+  "sources": 6,
+  "verifiedNetGrossPairs": 1590,
+  "tariffsPerArea": {
+    "C": 11,
+    "D": 10
+  },
+  "unreadable": 0,
+  "printedRoundingDifferences": [],
+  "infrastructureCharged": "aggregate once; components informational only",
+  "poze2026": 0,
+  "optionalServicesIncluded": false
+}

@@ -116,7 +116,7 @@ for (const [code, price, dist, breaker, nt] of [
     );
     await expect(
       s.getByLabel('Pořadí domácích nabídek', { exact: true }).locator('li'),
-    ).toHaveCount(6);
+    ).toHaveCount(7);
     await expect(s).not.toContainText(/ORLEN|Spotřeba nad 30 MWh/);
     await sortedPrices(s.getByLabel('Pořadí domácích nabídek', { exact: true }));
     await s.getByLabel('Počet fází pro cenu ČEZ', { exact: true }).selectOption('1');
@@ -155,7 +155,7 @@ test('PRE never guesses other areas or C55d; no inherited 30 MWh restriction', a
       if (customer === 'D') {
         await expect(
           s.getByLabel('Pořadí domácích nabídek', { exact: true }).locator('li'),
-        ).toHaveCount(4);
+        ).toHaveCount(5);
         await expect(s).not.toContainText(/ORLEN/);
       }
     }

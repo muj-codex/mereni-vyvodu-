@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { EpetBusinessPrices } from './EpetPrices';
 import { MndBusinessPrices } from './MndPrices';
 import { CentropolBusinessPrices } from './CentropolPrices';
 import { PreBusinessPrices } from './PrePrices';
@@ -173,7 +174,7 @@ function HouseholdPrices({ context }: { context: ComparisonContext }) {
       <h2>Domácnosti / sazby D – ČEZ</h2>
       <p>Elektřina na dobu neurčitou · účinnost od 1. 1. 2026</p>
       <p>Distribuční oblast: {context.distributionArea}</p>
-      <p className="hint">Vstupy sazby, jističe a spotřeby níže platí společně pro ČEZ, E.ON, innogy, PRE, Centropol i MND.</p>
+      <p className="hint">Vstupy sazby, jističe a spotřeby níže platí společně pro ČEZ, E.ON, innogy, PRE, Centropol, MND i EPET.</p>
       <div className="field-grid">
         <label className="field">
           <span>Sazba domácnosti ČEZ</span>
@@ -280,7 +281,7 @@ function HouseholdPrices({ context }: { context: ComparisonContext }) {
 }
 export function CezPrices({ context }: { context: ComparisonContext }) {
   return context.customer === 'C' ? (
-    <><EscoElectricity24Prices context={context} /><InnogyBusinessPrices context={context} /><PreBusinessPrices context={context} /><CentropolBusinessPrices context={context} /><MndBusinessPrices context={context} /></>
+    <><EscoElectricity24Prices context={context} /><InnogyBusinessPrices context={context} /><PreBusinessPrices context={context} /><CentropolBusinessPrices context={context} /><MndBusinessPrices context={context} /><EpetBusinessPrices context={context} /></>
   ) : (
     <HouseholdPrices context={context} />
   );

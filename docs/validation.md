@@ -321,3 +321,15 @@ Detaily zdrojů, pravidel a omezení: [E.ON import 1.4.8](eon-import-1.4.8.md), 
 - Cílené E2E 90/90. Finální `CI=1 npm run test:e2e -- --workers=4`: 416/416, 208 iPhone + 208 iPad, 12,3 minuty nad dokončeným aktuálním buildem, bez přeskočených scénářů.
 - Nových 36 E2E případů pokrývá C02d/C25d/C35d/C45d/C56d/C62d a D02d/D25d/D35d/D45d/D57d/D61d, úplné ceny v každé oblasti, sdílené vstupy, řazení, rozdíly, D57d/1f, přesně 30 MWh bez varování a vyšší spotřebu s výrazným upozorněním v kartě i pořadí pro obě kategorie. MND zůstává vypočtená a řazená, ORLEN mimo domácnosti. Původní domácí innogy nemá zděděný limit MND.
 - Baseline 90 původních zdrojových souborů ověřena proti skutečnému HEAD 1.4.13, přesné integrační změny ve čtyřech tarifních souborech. Ostatní ceníky a cenové funkce ORLEN/ČEZ/E.ON/innogy/PRE/Centropol i měřicí část beze změn. Původní regrese odečtů, historie, IndexedDB, UZEL, MTP, diagnostiky, backupů a PWA prošly.
+
+## 1.4.15 – EPET FIX 24 · GARANT 7_2026
+
+- Skutečný výchozí main 1.4.14: `08023116407cf01cf6a6083ae3f82195f7be3c0c`. Patch zvýšen přesně o 1 na 1.4.15 v obou root manifestech. Závislosti beze změn.
+- `python scripts/import-epet.py --check`: všech šest originálů PDF, 1590 ověřených dvojic bez/s DPH, 11 C + 10 D sazeb v každé ze tří oblastí, nezávislé opakované obchodní tabulky a jednotkové součty. Žádné nečitelné hodnoty ani zaokrouhlovací nesrovnalosti. [Report](epet-validation-1.4.15.json).
+- `npm test`: 886/886, 37 souborů. Devadesát nových případů ověřuje všechny obchodní ceny, roční výpočty, DPH, POZE, infrastrukturu jednou, pořadí, neúplné vstupy, D57d ve všech vysokých pásmech a 1f/3f jističové ceny.
+- `npm run build`: úspěch, TypeScript + production + 8 offline souborů.
+- `npm run build:pwa`: samostatný úspěšný build, 8 offline souborů.
+- Historická očekávání počtu úplných nabídek a původní zástupné karty EPET aktualizována na nově načtené ceníky. Očekávaná verze v testu backupu sleduje povinný patch; implementace backupu zachována. Nový E2E referenční výpočet pro EG.D/PRE opraven na obchodní cenu EPET 2819, nikoli původní MND 2899,17. Aplikační ceny nebylo nutné kvůli těmto testovým nesrovnalostem měnit.
+- Baseline 93 původních zdrojových souborů ověřena proti skutečnému HEAD 1.4.14; přesné povolené integrační změny pouze ve čtyřech tarifních souborech. Datasety a cenové funkce ORLEN/ČEZ/E.ON/innogy/PRE/Centropol/MND i všechny měřicí zdroje zachované.
+- Finální `CI=1 npm run test:e2e -- --workers=4`: **454/454**, **227 iPhone + 227 iPad**, 12,4 minuty nad dokončeným aktuálním produkčním/PWA buildem, žádné přeskočené scénáře.
+- Nových 38 E2E případů pokrývá C02d/C25d/C27d/C35d/C45d/C56d/C62d a D02d/D25d/D27d/D35d/D45d/D56d/D57d/D61d, přesné roční náklady, metadata fixace, všechny tři oblasti, řazení, rozdíly, chybějící rozpad, domácí 1f a vysoký jistič D57d. Původní regrese měření, MTP, UZEL, odečtů a série, historie, IndexedDB, backupu a PWA prošla.
